@@ -1,0 +1,52 @@
+# ── 1. 密钥与配置(绝不进 Git)────────────────────────────
+# 真实环境变量永远本地保留;只提交 .env.example
+.env
+.env.*
+!.env.example
+
+# 服务账号 / 凭证(Vertex AI、Google service account 等)
+credentials.json
+token.json
+*.pem
+*.key
+service-account*.json
+
+# ── 2. Python 运行时产物 ──────────────────────────────────
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 字节码缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 打包 / 构建产物
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# 测试 / 类型 / lint 缓存
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ── 3. ADK 本地状态 ──────────────────────────────────────
+# session 持久化(SQLite)
+*.db
+*.sqlite
+*.sqlite3
+sessions.db
+
+# 本地日志 / 临时输出
+*.log
+logs/
+
+# ── 4. 编辑器 / 操作系统垃圾文件 ──────────────────────────
+.DS_Store
+.vscode/
+.idea/
