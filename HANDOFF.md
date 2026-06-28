@@ -136,7 +136,9 @@ cd "/Users/yue/Documents/Drip Coffee Maker"
 **今天(6-28)已跑一次自动 e2e,结论**:
 - ✅ **核心验证通过**:start_bag 被调用(seed 转告对)、record_cup 写入并**跨会话持久化**(全新 service 读到同一条轨迹)、`flags_derived` 自动派生、phase→`grind_converged`。**"上一杯从假变真"成立。**
 - ✅ **已修(不耗额度)**:`start_bag` 改收 `roast_days_ago`(工具算日期)——之前"8天前"被模型算成老豆、`bean_aged` 误亮,已修并验证;`build_instruction` 注入"今天"。`requirements.txt` 加 `google-adk[db]`。
-- ⬜ **待修(需额度验证 · 建议开分支)**:**思维链泄露**——某杯把 record_cup 的填表推理直接吐给了用户。改 instruction 加一句"别把记账/填表推理说给用户,record_cup 在后台调",改完跑一次复验。
+- 🌿 **思维链泄露:修复已在分支 `feat/no-cot-leak`(commit `bc0c008`),未合 main。** 改的是 instruction"记忆纪律"加一句"record_cup 后台调、别把填表/判断推理说给用户"。**冷启动已验干净;但真正泄露的"第一杯反馈"轮没验到**(跑到那撞了日配额20)。
+  - **明天**:`git checkout feat/no-cot-leak` → 跑短验证(冷启动 + **2 杯反馈**,重点看杯2 还泄不泄露)→ 干净就合 main,还泄就继续改。
+  - ⚠️ **验证脚本坑:空响应 ≠ 干净**——空串没有泄露标记会被误判 🟢(今天踩过的假绿)。把空响应判成"未测/⚠️"再看,别信"总判定 🟢"。
 
 **S2 端到端通过后**:可以考虑把"读梯度"也接到结构化轨迹(目前靠注入文本,已够;若要更硬可加 get_history 工具),以及规划用户级口味画像(`user:` 作用域,今天留了空槽)。
 
