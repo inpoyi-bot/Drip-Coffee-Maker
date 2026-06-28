@@ -150,9 +150,78 @@
 
 ---
 
+## 九、口味层孪生(E11a / E11b)· 萃取毕业 → 偏好定位 probe → 双分支
+
+> **归属**:Taste Diagnostician(SPEC §2.2)· EDD 新增。**补的盲区**:前面 14 条几乎全在萃取层;口味层(萃取已收敛、残余抱怨是主观偏好)是暗区,也是 §2.2 命根子的镜像危险带。
+> **判别力**:E11a / E11b **共享完全相同的开局**,gold 仅在「用户对探针的回答」后分叉,且**同一个『换豆』动作一对一错**(E11a 换豆=对,E11b 换豆=错)。靠「酸→换豆」反射蒙的 agent 两条都换 → E11b 当场露馅(总则#3 孪生对照)。没有捷径能同时蒙对两条。
+
+### 共享开局(E11a / E11b 输入完全相同)
+- 浅焙,已冲数杯,**萃取已收敛**。
+- 客观四项全到位:vs_prev **无变化** · 流速 **正常** · 床面 **平** · 收尾 **化甜回甘**(萃取到位签名;过萃签名=舌根滞苦/焦木/空洞+流速慢,本开局已关掉)。
+- 用户本杯唯一新信息:「太酸了,我不太喜欢」——**无任何偏好定位信息**(不知是『讨厌果酸品类』还是『爱、但要更圆润』)。
+
+### 第一动作 gold(E11a / E11b 共享、必须完全相同)
+| 字段 | gold |
+|---|---|
+| `turn_type` | `probe` |
+| `gradient` | `已收敛` |
+| `decision` | `探针` |
+| `confidence` | `high` |
+| `flags_asserted` | `[preference_unspecified]` |
+| `rationale` | 萃取四项到位+流速正常+床面平+收尾化甜 → 萃取毕业;残余酸属口味层非欠萃;偏好未定位 → 探针定位,不假设。 |
+
+> **`confidence: high` 不是笔误**:对「该 probe」高把握(萃取毕业有四项硬证据)。不确定性不在判断里,在**偏好数据**里,由 `preference_unspecified` 单独承载——**认知边界(可不可判定)≠ 校准边界(多有把握)**:这里是认知边界(偏好物理上还没表达成形),正确标出,而非低 confidence 瞎猜。
+> **评分(判动作不判话术)**:probe 这一轮**只验 `turn_type:probe` + `flags_asserted:[preference_unspecified]`,不验探针话术**。语义须二选一定位偏好(不爱风格本身 / 爱但想更厚),话术不限。
+> **可接受原因集合**:(1) 识别萃取已毕业;(2) 残余酸归口味层非萃取缺陷;(3) 偏好未定位 → 必须 probe,不替用户拍。
+> **gate(任一即 fail)**:任何 `direction:finer`(萃取已毕业,磨细=萃死好浅焙,§2.2 命根子)/ 不 probe 直接 `terminate_reason:flavor_mismatch`(酸→反射换豆)/ `decision:转轴` 走萃取内换轴 / probe 探**错对象**(去 probe 流速/床面/研磨而非偏好)。
+
+### E11a · 第二杯:用户答「对,我就是不爱这种酸」
+| 字段 | gold |
+|---|---|
+| `turn_type` / `decision` | `terminate` / `停手` |
+| `terminate_reason` | `flavor_mismatch`(萃取毕业、口味层不匹配,**可处理**) |
+| `flags_asserted` | `[]`(偏好已定位) |
+| 下游 | 转 **Bean Scout** 换品类 |
+| `rationale` | 偏好定位为「不爱果酸风格本身」;冲煮端改不了豆的风味取向 → 出口在选豆层。 |
+
+> E11a 是露骨 case(用户已明说),单独看谁都能蒙对 → **必须靠 E11b 对照才有判别力**。
+> **gate**:此时仍 `finer` / 萃取内 `转轴` = fail;套 `[limitation_noted]` 装「brew 端还能救」= fail(不爱品类 brew 救不了,误把 E11b 的解贴到 E11a)。
+
+### E11b · 第二杯:用户答「我喜欢这个酸,但想更厚一点」★ 命门
+> 用户**明说爱这个酸**。「酸=口味=换豆」反射的 agent 会在这里**把用户喜欢的好豆换掉**(§2.2 命根子的镜像)。真懂的认出「萃取毕业 + 偏好=爱、要更厚」,绝不换豆。
+
+| 字段 | gold |
+|---|---|
+| `turn_type` / `decision` | `terminate` / `停手` |
+| `terminate_reason` | `taste_unaddressable`(萃取毕业、残余在口味层、**本版工具不可处理**;**绝不可填 `flavor_mismatch`**——语义相反:那是可处理/换豆能解) |
+| `flags_asserted` | `[limitation_noted]` |
+| 下游 | 指向 brew 端三杠杆(升温 / 延长接触 / 提粉量提浓度)作为**版本外**出口;**本版不开、不执行** |
+| `rationale` | 偏好=爱此风格、要更厚;软化酸感的合法杠杆在 brew 端,但三者均越出本版单轴范围 → 诚实终止、指版本外出口,不换豆、不磨细。 |
+
+> **可接受原因集合**:识别(a)偏好是「爱、要更厚」非「不爱品类」;(b)正确杠杆在 brew 端;(c)brew 端本版冻结 → 诚实 `limitation_noted` 终止 + 指版本外出口。
+> **gate(任一即 fail)**:`terminate_reason:flavor_mismatch` 或「转 Bean Scout 换豆」(换掉用户喜欢的好豆,本条最严重的假绿)/ `direction:finer`(萃取已毕业)/ **擅自提粉量/动比例轴去「帮调厚」**——比例轴是冻结轴,越界解冻=fail。**本版口味层是「会收手的诊断器」,不是「会陪你调到满意的教练」。**
+
+### 口味层 `terminate_reason` 三分(已拍定 · 契约新增)
+萃取毕业后用户仍有残余抱怨时,`terminate_reason` 互斥三支,靠「可否处理 / 处理在哪层」切开,合起来盖住「萃取没问题但用户没到满意」的全部出口:
+| 值 | 语义 | 解在哪 | case |
+|---|---|---|---|
+| `satisfied` | 无残余抱怨 | — | E8 |
+| `flavor_mismatch` | 口味层,**可处理** | 选豆层(换豆) | E11a |
+| `taste_unaddressable` | 口味层,**本版工具不可处理** | brew 端但本版冻结 → 本版无解 | E11b |
+> 三支两两不重叠,选错一 COUNT 即现形(总则:要 COUNT 的就枚举)。命名留痕:弃用过 `out_of_scope_brew`——它把语义重心错挂在「brew 轴」、易诱导 agent 去引导 brew;`taste_unaddressable` 重心在「口味层 · 本版够不着」,与 `flavor_mismatch` 成 addressable/unaddressable 干净对照。
+
+### ⚠️ 版本边界注释 · E11b / taste_unaddressable
+E11b 的 `limitation_noted` gate(判「提粉量 / 任何 brew 干预 = 错」)**绑定单轴版本**,非永久产品原则。
+- 本版口味层 = 会收手的诊断器(萃取毕业即诚实终止,brew 端一律不碰)。
+- `taste_unaddressable` 的「unaddressable」是**版本性**的:解在 brew 端,但比例轴/水温轴本版冻结 → 本版无解。
+- ⚠️ 多轴 conductor 上线、比例轴解冻后,提粉量从「越界」变「正解」,E11b 此 gold **须重判**,`taste_unaddressable` 对该场景可能不再成立。
+> 边界决策留痕:别让「本版冻结」被未来读成「agent 永远不该碰粉量」。(已同步 SPEC §6.6。)
+
+---
+
 ## 缺口看板(后续可继续补)
 
 - [ ] 冷启动信息不全(用户不知道烘焙日期)时的稳健行为
 - [ ] 用户一次报告多个互相矛盾的词(超出 E1b 的二选一)
-- [ ] 口味层(萃取到位后)的微调路径——本版未做,留待 taste 轴
+- [x] 口味层诊断出口已补(E11 三分:`satisfied`/`flavor_mismatch`/`taste_unaddressable`);brew 端**实际微调**仍版本冻结(见 §九 + SPEC §6.6)
 - [ ] 把本 rubric 编码为 ADK `*.evalset.json`,接入 `adk eval` 自动回归

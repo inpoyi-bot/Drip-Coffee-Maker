@@ -221,6 +221,11 @@ Multi-agent / ADK · MCP Server · cross-round Memory · Guardrails · Deployabi
 >
 > 实证白皮书脊椎 ②:商品化层(seed/自检,谁都能做)vs 耐用资产层(收敛推理,你的 IP)分开装。Evidences spine ②: separate the commoditized layer (seed/checklist, anyone can do) from the durable-asset layer (convergence reasoning, your IP).
 
+### 6.6 版本边界注释 / Version-boundary notes
+> 防止把「本版冻结」误读成「永久产品原则」。每条版本边界留痕,等对应轴解冻时重判 gold。
+
+- **口味层 · 提粉量(E11b · `taste_unaddressable`)**:本版只动研磨、冻结比例与水温轴。萃取毕业后用户「爱这个酸但想更厚」属口味层,正确杠杆(升温 / 延长接触 / 提浓度)全在 brew 端、本版冻结 → 诚实终止(`taste_unaddressable` + `limitation_noted`),**不碰粉量**。这是**版本边界,非产品原则**:多轴 conductor 上线、比例轴解冻后,「提粉量」从越界变正解,`docs/evals.md` 的 **E11b gold 须重判**。
+
 ---
 
 ## 7. 开放问题 / Open Questions

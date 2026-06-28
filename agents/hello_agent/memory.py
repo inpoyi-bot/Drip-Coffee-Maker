@@ -159,8 +159,10 @@ def record_cup(
         grind_now: 当前研磨相对基准(砍豆机记 N/A)。
         bed_note: 自由观察位(沟壑/挂壁等枚举塞不下的形态)。
         terminate_reason: 仅 terminate 时,satisfied|would_overextract|
-            plateau_axis_topped|plateau_bean_decay|plateau_ambiguous。
-        flags_asserted: agent 声明的旗标,可含 "info_insufficient" | "limitation_noted"。
+            plateau_axis_topped|plateau_bean_decay|plateau_ambiguous|
+            flavor_mismatch|taste_unaddressable(后两个=口味层:可换豆 / 本版不可处理)。
+        flags_asserted: agent 声明的旗标,可含 "info_insufficient" | "limitation_noted"
+            | "preference_unspecified"(萃取毕业但偏好未定位 → 需 probe)。
     """
     state = tool_context.state if tool_context is not None else {}
     bag = state.get("bag", {}) if hasattr(state, "get") else {}
