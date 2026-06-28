@@ -47,7 +47,7 @@ cd "/Users/yue/Documents/Drip Coffee Maker"
    - **Description:** `Re-run grind-axis convergence arc on gemini-2.5-flash after quota reset; all 5 cups non-empty; removes the cup-4 empty-response placeholder`
 
 ## 5. 完整脚本(明天直接存成 `run_arc.py`)
-已含三类重试:429/503、网络 ConnectError、**空响应**。每杯间隔 3s 缓解 per-minute 限流。
+已含重试:429/503、网络 ConnectError。**空响应不重发**(带工具时重发会和已写入的 record_cup 撞成"你在重复");每杯间隔 **15s** 缓解 RPM=5。
 ```python
 import asyncio, sys
 sys.path.insert(0, "/Users/yue/Documents/Drip Coffee Maker/agents")
@@ -79,14 +79,12 @@ async def main():
                 async for ev in runner.run_async(user_id="u", session_id="arc1", new_message=content):
                     if ev.is_final_response() and ev.content and ev.content.parts:
                         out = ev.content.parts[0].text or ""
-                if not out.strip():
-                    raise RuntimeError("empty response")  # 空响应也重试
-                break
+                break  # 空响应也接受、绝不重发——带工具时重发会和已写入的 record_cup 撞成"你在重复"
             except Exception as e:
                 wait = 8 * (attempt + 1)
                 print(f"  (杯{i} 第{attempt+1}次失败 {type(e).__name__},等 {wait}s 重试…)")
                 await asyncio.sleep(wait)
-        await asyncio.sleep(3)
+        await asyncio.sleep(15)   # RPM=5:带工具每轮~2次调用,间隔拉到~15s 别撞每分钟限流
         print("=" * 72)
         print(f"[杯 {i}] 用户:", msg)
         print("-" * 72)
@@ -99,7 +97,7 @@ asyncio.run(main())
 ## 6. 今天踩过的坑(明天别重踩)
 - `gemini-2.0-flash` 免费额度=0,用 `gemini-2.5-flash`;`limit:0` 报错先想到换型号。
 - 顺手探可用模型:`gemini-flash-latest` 今天可用(alias,不利复现,只当应急,别提交)。
-- 报错谱:`SERVICE_DISABLED`(开服务)→ `API_KEY_SERVICE_BLOCKED`(key 被限,换 AI Studio 干净项目 key)→ `429 limit:0`(换型号)→ `429 limit:20`(日配额,等重置/绑卡)→ `503`(过载,重试)→ `ConnectError`(网络/代理抖动,重试)→ 空响应(重试)。
+- 报错谱:`SERVICE_DISABLED`(开服务)→ `API_KEY_SERVICE_BLOCKED`(key 被限,换 AI Studio 干净项目 key)→ `429 limit:0`(换型号)→ `429 limit:20`(日配额,等重置/绑卡)→ `503`(过载,重试)→ `ConnectError`(网络/代理抖动,重试)→ 空响应(**不重发**,带工具时重发会撞 record_cup)。
 - `model` 在 `agent.py` 单独一行,换模型是改一个词的事。
 
 ---
@@ -118,7 +116,9 @@ asyncio.run(main())
 **怎么跑(带 SQLite 持久化)**:
 ```bash
 cd "/Users/yue/Documents/Drip Coffee Maker"
-./.venv/bin/adk web agents --session_service_uri="sqlite:///./sessions.db"
+./.venv/bin/pip install -r requirements.txt   # 已加 google-adk[db](sqlalchemy),否则持久化报错
+./.venv/bin/adk web agents --session_service_uri="sqlite+aiosqlite:///./sessions.db"
+# ⚠️ 必须 sqlite+aiosqlite://(异步驱动);写成 sqlite:// 会"Failed to create database engine"
 # 浏览器选 hello_agent,走一遍冷启动 → 几杯 → 满意收敛
 ```
 > `sessions.db` 会建在 repo 根,已被 `.gitignore`(`*.db`)挡住。
@@ -131,7 +131,12 @@ cd "/Users/yue/Documents/Drip Coffee Maker"
 5. **跨会话持久化(核心卖点)**:关掉浏览器/重启 `adk web`,**resume 同一个 session**,"这包豆的记忆"轨迹**还在**——这就是"上一杯从假变真"。
 6. 用 **Trace** 面板看 `record_cup` 的入参,核对是否和那杯对话一致。
 
-**容易踩**:① 模型可能漏调 `record_cup`(软约束),漏了就在 instruction 的"记忆纪律"里加强/或考虑用 callback 强制;② 16 个参数较宽,模型可能填错枚举,对着 evals.md 的取值校;③ 若 503/429,沿用 §5 的重试与错峰。
+**容易踩**:① 模型可能漏调 `record_cup`(软约束),漏了就在 instruction 的"记忆纪律"里加强/或考虑用 callback 强制;② 16 个参数较宽,模型可能填错枚举,对着 evals.md 的取值校;③ **配额是 RPM=5(每分钟5次)+ 日20**,带工具每轮~2次调用,脚本跑必须把间隔拉到 ~15s,否则狂撞每分钟限流;④ **脚本别"空响应重发"**——带工具时重发会和已写入的 record_cup 撞成"你在重复上一杯"(今天踩过,已在 scratchpad `test_s2_e2e.py` 修);用 `adk web` 手动走则无此问题。
+
+**今天(6-28)已跑一次自动 e2e,结论**:
+- ✅ **核心验证通过**:start_bag 被调用(seed 转告对)、record_cup 写入并**跨会话持久化**(全新 service 读到同一条轨迹)、`flags_derived` 自动派生、phase→`grind_converged`。**"上一杯从假变真"成立。**
+- ✅ **已修(不耗额度)**:`start_bag` 改收 `roast_days_ago`(工具算日期)——之前"8天前"被模型算成老豆、`bean_aged` 误亮,已修并验证;`build_instruction` 注入"今天"。`requirements.txt` 加 `google-adk[db]`。
+- ⬜ **待修(需额度验证 · 建议开分支)**:**思维链泄露**——某杯把 record_cup 的填表推理直接吐给了用户。改 instruction 加一句"别把记账/填表推理说给用户,record_cup 在后台调",改完跑一次复验。
 
 **S2 端到端通过后**:可以考虑把"读梯度"也接到结构化轨迹(目前靠注入文本,已够;若要更硬可加 get_history 工具),以及规划用户级口味画像(`user:` 作用域,今天留了空槽)。
 

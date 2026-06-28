@@ -1,3 +1,4 @@
+from datetime import date
 from google.adk.agents import Agent
 from .memory import start_bag, record_cup, render_trajectory
 
@@ -26,7 +27,7 @@ INSTRUCTION = """
 # 冷启动(第一杯,没有历史时)
 先问清这几项,再给起点配方:
 - 烘焙度(浅/中/深)
-- 烘焙日期
+- 烘焙日期 → 换算成**距今天数**传给 `start_bag` 的 `roast_days_ago`(用户说『8天前』就传 8;给了具体日期就用顶部『今天』减出天数)
 - 粉量(克重)
 - **磨豆机类型(锥刀/平刀 / 砍豆机blade / 不确定)** 与当前研磨刻度(无刻度就让他描述,如"白砂糖粗细")
 
@@ -113,7 +114,9 @@ C. **味觉校准(只前置一句,别在开局砸一堆):**
 # 注入:每轮把"这包豆的记忆"渲染进上下文(InstructionProvider = Callable[[ReadonlyContext], str])。
 # 这样 agent 读的是结构化轨迹,不是对聊天的模糊回忆——顺带根治 S1 软约束被绕过的问题。
 def build_instruction(ctx) -> str:
-    return INSTRUCTION + "\n\n" + render_trajectory(ctx.state)
+    # 注入"今天"——让模型有可靠的当前日期,别自己瞎猜(否则豆龄会算错)。
+    today = f"今天是 {date.today().isoformat()}。\n\n"
+    return today + INSTRUCTION + "\n\n" + render_trajectory(ctx.state)
 
 
 # ADK 按固定名字 root_agent 来找入口,改名它就找不到。

@@ -11,7 +11,7 @@
 """
 
 from __future__ import annotations
-from datetime import date
+from datetime import date, timedelta
 
 # ── 静态规则:烘焙度 → 起点配方(SPEC §6.5 seed match) ──────────────
 # 水温记基准值(数字),便于 baseline/actual 分开;比例记文本。
@@ -53,7 +53,7 @@ def _is_blade(grinder_type: str) -> bool:
 # ── 工具 1:冷启动登记表头 + 静态查 seed ─────────────────────────────
 def start_bag(
     roast: str,
-    roast_date: str,
+    roast_days_ago: int,
     dose_g: float,
     grinder_type: str,
     baseline_grind: str = "",
@@ -63,13 +63,16 @@ def start_bag(
 
     Args:
         roast: 烘焙度,只接受 "浅" | "中" | "深"。
-        roast_date: 烘焙日期,ISO 格式如 "2026-06-18"。
+        roast_days_ago: 烘焙距今**天数**(用户说"8天前"就传 8)。由工具换算成日期
+            并存,**别让模型自己算日期**(模型不知道"今天",算出来会错)。
         dose_g: 粉量(克)。
         grinder_type: 磨豆机类型,如 "锥刀" | "平刀" | "砍豆机" | "不确定"。
         baseline_grind: 当前研磨刻度或描述(如"粗砂糖");砍豆机留空。
     """
+    # 工具按可靠的"今天"算出烘焙日期并存;之后每杯据此重算豆龄(它每天在长)
+    roast_date = (date.today() - timedelta(days=max(0, int(roast_days_ago)))).isoformat()
     seed = SEED.get(roast, SEED["中"])
-    age = _bean_age_days(roast_date)
+    age = int(roast_days_ago)
     band = _bean_band(roast, age)
     blade = _is_blade(grinder_type)
 
