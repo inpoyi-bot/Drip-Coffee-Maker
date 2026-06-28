@@ -5,7 +5,8 @@
 > 1. **(S1)跑干净 5/5 收敛弧线** 替换 `docs/demo-arc.md`(现为 4/5 占位)——见 §1–§5。
 > 2. **(S1)补跑剩下 7 个 eval**(E1a/E2a/E4/E6/E7/E8/E9),拿到全绿 S1 基线——见 §7。
 > 3. **(S2)端到端测记忆层**(start_bag/record_cup 真被调用 + 跨会话持久化)——见 §8。
-> **顺序建议**:先 §8(S2 端到端,最关键,验证今天搭的记忆层)→ 再 §1 弧线 → 再 §7 补 eval。
+> 4. **(S3,待规则定稿)口味层规则落地 + 跑 E11**——case+契约已落,规则在 S3 对话推,定稿后写进 instruction 再测——见 §9。
+> **顺序建议**:先 §8(S2 端到端,最关键)→ §1 弧线 → §9(若 S3 规则已定)→ §7 补 eval。**额度紧,一天大概只够 1–2 件,别贪。**
 
 ---
 
@@ -133,3 +134,18 @@ cd "/Users/yue/Documents/Drip Coffee Maker"
 **容易踩**:① 模型可能漏调 `record_cup`(软约束),漏了就在 instruction 的"记忆纪律"里加强/或考虑用 callback 强制;② 16 个参数较宽,模型可能填错枚举,对着 evals.md 的取值校;③ 若 503/429,沿用 §5 的重试与错峰。
 
 **S2 端到端通过后**:可以考虑把"读梯度"也接到结构化轨迹(目前靠注入文本,已够;若要更硬可加 get_history 工具),以及规划用户级口味画像(`user:` 作用域,今天留了空槽)。
+
+---
+
+## 9.(S3)口味层规则落地 + 跑 E11
+S3 的 eval case(E11a/E11b 口味层孪生)+ 契约枚举**已落 repo**(`docs/evals.md §九`;`memory.py` 已含 `flavor_mismatch`/`taste_unaddressable`/`preference_unspecified`)。**还差"写规则"那半**——口味层逻辑还没进 `agent.py` 的消歧/终止段,所以**现在跑 E11 会 fail**(EDD 正常顺序:case 先行、规则后补)。
+
+**规则设计在另一个对话(S3)进行中。** 设计定稿后:
+1. **把口味层逻辑写进 `agent.py` instruction**:萃取毕业(客观四项到位 + 收尾化甜)后用户仍抱怨 → `probe` 偏好(`turn_type=probe` + `preference_unspecified`,不替用户拍)→ 据回答分支:
+   - 不爱品类 → `terminate_reason=flavor_mismatch` + 转 Bean Scout(换豆);
+   - 爱但想更厚 → `terminate_reason=taste_unaddressable` + `limitation_noted` + 指版本外 brew 出口,**不碰粉量 / 不磨细 / 不换豆**。
+2. **契约无需再改**(memory.py 今天已同步),只动 `agent.py`。
+3. **跑 E11a/E11b 验证(需额度)**:按 §九 的 gold/gate 判。重点 E11b **别换豆、别提粉量**(最严重假绿);probe 轮**只验 `turn_type`+`preference_unspecified`,不验话术**。
+4. 通过后,基线从"14 条"扩成"16 条全绿"。
+
+**依赖与排期**:规则来自 S3 对话;落地只动 `agent.py`,与 §7/§8 互不冲突但都抢额度,**排在 S2 端到端之后**。
