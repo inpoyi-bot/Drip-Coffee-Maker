@@ -59,6 +59,13 @@ The agent disambiguates the subjective sensory words the user *can* give ("too s
 - **豆级 / Bean-level (主 / primary)**: 这包豆的收敛轨迹 — 闭环成立的前提,demo 弧线的数据源。This bag's convergence trajectory — the precondition for the loop, the data behind the demo arc.
 - **用户级 / User-level (副 / secondary)**: 跨豆沉淀的口味画像 — 冲过几包豆后自然长出"你偏好浅焙果酸"。Cross-bag taste profile — emerges after a few bags ("you lean toward light-roast brightness").
 
+### 2.4 Taste Diagnostician 输入契约 / Input Contract
+> 口味层消歧以「萃取已毕业」为**前置真值**,由上游(萃取层收敛判定)保证,下游信任、不复核。
+> The taste-layer disambiguation takes "extraction has graduated" as a **given truth**, guaranteed upstream (the extraction-layer convergence call); the downstream trusts it and does not re-verify.
+
+- E11a/E11b 等口味层 case 的开局「萃取四项已收敛」是**给定前提**,非待验状态。
+- ⚠️ **已知风险(指派给上游,非 S3)**:「欠萃伪装成毕业」灰区(豆偏粗 / 到研磨极限 / 相对最甜 → 四项全绿实则欠萃 plateau)。若上游误放行,本组件会忠实信任 → 误判口味层无解 / 换豆。**该灰区的拦截是萃取层责任,见 `docs/evals.md` 缺口看板「萃取层 · 拦截欠萃伪装」条。**
+
 ---
 
 ## 3. 诊断 Agent 的真实形态 / What the Diagnostic Agent Actually Is
