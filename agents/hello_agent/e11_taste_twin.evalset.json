@@ -1,0 +1,221 @@
+{
+  "eval_set_id": "e11_taste_twin",
+  "name": "口味层孪生 E11a / E11b · 萃取毕业 → 偏好定位 probe → 双分支",
+  "description": "见 docs/evals.md §九。共享开局(浅焙、萃取已收敛、客观四项到位、用户『太酸了,我不太喜欢』),gold 仅在第二杯用户对探针的回答后分叉。同一个『换豆』动作 E11a 对 / E11b 错;靠『酸→换豆』反射蒙的 agent 两条都换 → E11b 露馅。开局精确度由 session_input.state 预设(最近一杯 gradient=已收敛 → 触发 agent.py 第-1步守卫 → 进口味层 probe)。",
+  "eval_cases": [
+    {
+      "eval_id": "E11a_flavor_mismatch",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-17",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-26", "bean_age_days": 9, "axis": "grind",
+              "turn_type": "seed", "direction": "—", "step": "", "grind_now": "基准",
+              "report": {"sensory": "偏酸", "vs_prev": "n/a", "brew_time": "1分30秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "起点配方,先建立基准。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-27", "bean_age_days": 10, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸减、出现回甘", "vs_prev": "变好", "brew_time": "1分38秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "磨细后萃取上来,酸收住、化甜,方向对。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-28", "bean_age_days": 11, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "report": {"sensory": "收尾化甜、有回甘", "vs_prev": "没变", "brew_time": "1分40秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "已收敛", "decision": "停手", "terminate_reason": null, "confidence": "high",
+              "flags_asserted": [], "flags_derived": [], "rationale": "客观四项到位(流速正常/床面平/收尾化甜)、再细就会过萃 → 萃取层已收敛。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E11a-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "这杯太酸了,我不太喜欢。和上杯比没变,整杯还是1分40秒,床面平,杯壁没挂粉。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "萃取这一关其实已经到位了——流速、床面、收尾化甜都稳,再磨细只会把这支好豆萃死。所以这口『酸』是口味层的事,我先帮你定位一下:你是不爱这种果酸风格本身,还是其实喜欢、只是想要更圆润厚一点?"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "太酸",
+                  "vs_prev": "没变",
+                  "brew_time": "1分40秒",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "已收敛",
+                  "decision": "探针",
+                  "confidence": "high",
+                  "flags_asserted": ["preference_unspecified"],
+                  "rationale": "萃取四项到位+流速正常+床面平+收尾化甜 → 萃取毕业;残余酸属口味层非欠萃;偏好未定位 → 探针定位,不假设。"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "invocation_id": "E11a-turn2",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "对,我就是不爱这种酸,这类果酸调性我都不太行。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "明白了——这不是冲煮能改的,是这支豆的风味取向跟你的口味不合。研磨这根轴已经调好了,就停在这个刻度。下一步建议换个品类的豆子(低酸、偏甜感的处理法),那是选豆层的事,冲煮端再怎么调也改不了豆子本身的酸性格。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "terminate",
+                  "sensory": "太酸",
+                  "vs_prev": "没变",
+                  "gradient": "已收敛",
+                  "decision": "停手",
+                  "terminate_reason": "flavor_mismatch",
+                  "confidence": "high",
+                  "flags_asserted": [],
+                  "rationale": "偏好定位为『不爱果酸风格本身』;冲煮端改不了豆的风味取向 → 出口在选豆层(换品类)。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "eval_id": "E11b_taste_unaddressable",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-17",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-26", "bean_age_days": 9, "axis": "grind",
+              "turn_type": "seed", "direction": "—", "step": "", "grind_now": "基准",
+              "report": {"sensory": "偏酸", "vs_prev": "n/a", "brew_time": "1分30秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "起点配方,先建立基准。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-27", "bean_age_days": 10, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸减、出现回甘", "vs_prev": "变好", "brew_time": "1分38秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "磨细后萃取上来,酸收住、化甜,方向对。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-28", "bean_age_days": 11, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "report": {"sensory": "收尾化甜、有回甘", "vs_prev": "没变", "brew_time": "1分40秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "已收敛", "decision": "停手", "terminate_reason": null, "confidence": "high",
+              "flags_asserted": [], "flags_derived": [], "rationale": "客观四项到位(流速正常/床面平/收尾化甜)、再细就会过萃 → 萃取层已收敛。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E11b-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "这杯太酸了,我不太喜欢。和上杯比没变,整杯还是1分40秒,床面平,杯壁没挂粉。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "萃取这一关其实已经到位了——流速、床面、收尾化甜都稳,再磨细只会把这支好豆萃死。所以这口『酸』是口味层的事,我先帮你定位一下:你是不爱这种果酸风格本身,还是其实喜欢、只是想要更圆润厚一点?"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "太酸",
+                  "vs_prev": "没变",
+                  "brew_time": "1分40秒",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "已收敛",
+                  "decision": "探针",
+                  "confidence": "high",
+                  "flags_asserted": ["preference_unspecified"],
+                  "rationale": "萃取四项到位+流速正常+床面平+收尾化甜 → 萃取毕业;残余酸属口味层非欠萃;偏好未定位 → 探针定位,不假设。"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "invocation_id": "E11b-turn2",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "不不,我挺喜欢这个酸的,就是想要更厚一点、口感更扎实。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "好——那这支豆没问题,别换,研磨也已经调到位了,就停在这个刻度。你想要的『更厚』其实是浓度/醇厚度,能动它的杠杆在冲煮端(升温、延长接触、提高粉量提浓度),但这几样都超出了本版『只动研磨』的范围,这一版我先不碰。所以诚实说:在本版工具里这口『想更厚』暂时没法再帮你调,但绝不是要你换掉这支你喜欢的豆。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "terminate",
+                  "sensory": "太酸但喜欢、想更厚",
+                  "vs_prev": "没变",
+                  "gradient": "已收敛",
+                  "decision": "停手",
+                  "terminate_reason": "taste_unaddressable",
+                  "confidence": "high",
+                  "flags_asserted": ["limitation_noted"],
+                  "rationale": "偏好=爱此风格、要更厚;软化/增厚的合法杠杆在 brew 端(升温/延接触/提浓度),但三者均越出本版单轴范围 → 诚实终止、指版本外出口,不换豆、不磨细、不动比例/粉量轴。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

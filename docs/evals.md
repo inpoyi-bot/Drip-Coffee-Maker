@@ -224,6 +224,12 @@ E11b 的 `limitation_noted` gate(判「提粉量 / 任何 brew 干预 = 错」)*
 - [ ] 冷启动信息不全(用户不知道烘焙日期)时的稳健行为
 - [ ] 用户一次报告多个互相矛盾的词(超出 E1b 的二选一)
 - [x] 口味层诊断出口已补(E11 三分:`satisfied`/`flavor_mismatch`/`taste_unaddressable`);brew 端**实际微调**仍版本冻结(见 §九 + SPEC §6.6)
-- [ ] 把本 rubric 编码为 ADK `*.evalset.json`,接入 `adk eval` 自动回归
+- [x] 把 §九 编码为 ADK `*.evalset.json` + 确定性自定义 metric,接入 `adk eval` 自动回归
+  - 数据:`agents/hello_agent/e11_taste_twin.evalset.json`(2 case × 2 轮;开局精度由 `session_input.state` 预设——末杯 `gradient=已收敛` 触发 agent.py 第-1步守卫)。
+  - 评分:`agents/hello_agent/e11_metric.py::taste_layer_gate`(自定义 metric)。**只判 record_cup 结构化字段**(turn_type/decision/gradient/terminate_reason/flags_asserted 集合等值)+ 负向 `direction!=finer`,**不判探针话术/rationale**(§5#2 判动作不判说法)。确定性、无 LLM-judge 抖动。
+  - 配置:`agents/hello_agent/e11_test_config.json`(criteria → custom_metrics)。
+  - 跑:`./.venv/bin/python -m google.adk.cli eval agents/hello_agent agents/hello_agent/e11_taste_twin.evalset.json --config_file_path agents/hello_agent/e11_test_config.json`(需 `agents/` 在 sys.path / 按 `hello_agent` 包名导入 metric)。
+  - ⚠️ 已离线验证:gold 自比全 PASSED;磨细/直接终止/误填 `flavor_mismatch`/漏 `limitation_noted` 全 FAILED;仅改 rationale 仍 PASSED。**端到端真跑需 gemini API 配额 + 上游可靠置位 `gradient=已收敛`**(handoff §6#1)。
+  - ⚠️ evalset 里 `roast_date` 是固定 ISO 日期;跑得太晚豆龄会漂进 stale(只多派生 `bean_aged` 旗标,不影响守卫与 E11 gold)。
 - [ ] **【萃取层 · 拦截欠萃伪装 · S3 后置】** 四项全绿但实为**欠萃 plateau**(vs_prev 无变化是因**到研磨极限**、化甜是**相对最优**而非绝对到位)→ gold:agent **不得直接盖 `gradient:已收敛` 进口味层**;要么继续打「**绝对刻度化甜探针**」(干净盖过酸的甜 vs 努力才尝到一点点),要么识别为欠萃 plateau。接 E1/E4 萃取线、**不进 E11**;是萃取层↔口味层交接点的"哑弹拆除器",被 SPEC §2.4 输入契约的 ⚠️ 指派。
 - [ ] **【E11 口味层 · 待萃取层债登记后回看】** E11b 前置消歧:用户报「不甜」要区分 **真欠萃**(违反开局前提 → 退回萃取层)vs **回甘被酸盖住**(符合开局 → 走口味层);用专家「**反向探针:寡淡没余味 vs 有回甘被酸盖住**」。这是 E11b「爱这个酸但要更厚」的镜像入口。

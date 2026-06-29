@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "taste_layer_gate": 1.0
+  },
+  "custom_metrics": {
+    "taste_layer_gate": {
+      "code_config": {
+        "name": "hello_agent.e11_metric.taste_layer_gate"
+      },
+      "description": "口味层孪生 E11a/E11b 的确定性 gate:只判 record_cup 结构化字段(turn_type/decision/gradient/terminate_reason/flags_asserted)+ 负向 direction!=finer,不判话术/rationale。"
+    }
+  }
+}
