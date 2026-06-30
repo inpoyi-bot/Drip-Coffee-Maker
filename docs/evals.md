@@ -68,13 +68,15 @@
 ### E3 — 砍豆机 + 又酸又苦 → 归因双峰分布,不得甩锅注水
 - **场景**:冷启动,用户磨豆机是**砍豆机(blade)**;开局症状"又酸又苦"。
 - **✅ 必须**:① 告知**研磨轴在砍豆机上不可靠**(双峰分布:细粉过萃发苦+粗块欠萃发酸)、降低期望、建议换锥/平刀;② **把"又酸又苦"归因到砍豆机本身的双峰分布**,而不是回指注水手法。
-- **❌ 绝不**:把"又酸又苦"判成"注水不均→调你的 swirl"(在砍豆机上是误诊,不均来自磨豆机不是手法);当成正常磨豆机自信"磨细2格"。
+- **结构化 gold**:`turn_type=terminate` + `decision=停手` + `terminate_reason=axis_unreliable`。原因:当前优化轴因硬件约束无法产生可靠反馈;这不是 `plateau_ambiguous`(还没爬山,原因也不模糊)。
+- **❌ 绝不**:把"又酸又苦"判成"注水不均→调你的 swirl"(在砍豆机上是误诊,不均来自磨豆机不是手法);当成正常磨豆机自信"磨细2格";把 `terminate_reason` 填成 `plateau_ambiguous`。
 - **防的后门**:"又酸又苦"在 E2 逻辑里本是"萃取不均→回指注水"的信号——此 case 专门分辨"真懂砍豆机"与"碰巧提了砍豆机却把不均归错因"。rubric 必须显式要求归因到磨豆机。**注意**:说成"萃取不均"= FAIL(它通向"调 swirl"这条错误干预轴,而双峰 swirl 一万次也去不掉),不给"碰巧没说出回指注水"的同情分——按动作判。
 - **配对防"复述双峰"假绿**:E3 单独存在仍有捷径——一个见"砍豆机"标签就背"双峰"的 agent 也能过。必须配 E3b 才测得真。
 
 ### E3b — 锥刀 + 又酸又苦(E3 的对照,防"复述双峰"假绿)
 - **场景**:冷启动,磨豆机是**锥刀(burr)**;开局症状**同样**"又酸又苦"。
 - **✅ 必须**:**不归因到双峰/磨豆机**(锥刀颗粒分布正常);按萃取不均(通道/注水)或先探针,走均匀度证据路径。
+- **结构化 gate**:不得使用 `terminate_reason=axis_unreliable`。
 - **❌ 绝不**:不分磨豆机类型,照样背"砍豆机双峰"(暴露它在复述标签而非条件化归因)。
 - **防的后门**:与 E3 配成对——"复述双峰"的 agent 会 E3 过、E3b 翻车。只有真正**按磨豆机类型条件化归因**才能两条都过。
 
@@ -134,6 +136,7 @@
 - **场景**:第12杯,**烘后约35天**(锚烘焙日期,非开封天数)。
 - **用户报告**:"连续两杯都没改善;而且**香气明显掉了、有点纸板感、整体变平淡**。"(陈化专属风味词,与酸/苦的萃取轴不同类)
 - **✅ 必须**(按动作判):指出 plateau 在"轴到顶"与"豆陈化"之间**本就欠定/模糊**,把**两种归因都点出**;并明确——**无论哪种,继续磨细都救不了**(轴到顶→磨细过萃;陈化→磨细补不回流失的香气)→ **别让用户继续磨细**。
+- **结构化 gold**:`turn_type=terminate` + `decision=停手` + `terminate_reason=plateau_ambiguous`;`direction` 与 `step` 必须为空/不传。若话术说停手、结构化却写 `adjust`/`finer`/`+1格` = FAIL。
 - **❌ 绝不**:机械套"连续两次无改善→宣布到顶"而不想陈化;反向一口咬定"是豆老了"往豆子上甩锅(同样是过度自信);继续让用户磨细。
 - **防的后门**:加入陈化**专属风味词**(纸板感/香气掉),让"是不是豆老了"从瞎猜变成有据可依;gold 奖励的是**动作(别再磨细+点出模糊)**,不是某个单一诊断。
 
@@ -219,6 +222,32 @@ E11b 的 `limitation_noted` gate(判「提粉量 / 任何 brew 干预 = 错」)*
 
 ---
 
+## 十、B 档后 7 条高危 live 回归观测(现象记录)
+
+> **来源**:实现侧 live 跑真模型(`gemini-2.5-flash`)后的观察记录。
+> **性质**:现象记录,供判断侧追溯。不把两处瑕疵归因给 B 档,也不倒推诊断策略。
+
+### 背景
+- B 档落地后,重跑 7 条高危萃取 case:`E1b` / `E1c` / `E2b` / `E3` / `E3b` / `E5` / `E10`。
+- 7 条在**动作层 rubric**上全过:未毕业开局没有被口味层守卫误接走;酸收尾探针、欠萃磨细、涩判别、砍豆机双峰条件化、plateau 欠定、扛住查表行为照旧。
+- 这 7 条此前不是 S1 已绿的那批(`E1a` / `E2a` / `E4` / `E6` / `E7` / `E8` / `E9`),因此下面两处是首次观测到的既有萃取层瑕疵,不是 B 档引入。
+
+### 观测一 · E3 砍豆机终止枚举缺口
+- **场景**:冷启动,砍豆机(blade),开局症状"又酸又苦"。
+- **动作层表现**:归因正确——双峰分布(细粉过萃发苦 + 粗块欠萃发酸),归因到磨豆机本身,不甩锅注水/swirl,建议换锥/平刀。
+- **结构化瑕疵**:live 跑曾出现第一杯 `terminate` 但 `terminate_reason=plateau_ambiguous`。该枚举语义是移动山顶/陈化欠定,与"硬件让当前轴反馈不可靠"不匹配。
+- **判断侧决策**:新增 `terminate_reason=axis_unreliable`。拒绝复用 `plateau_ambiguous`,也拒绝继续调研磨。
+- **当前状态**:已更新 contract/rubric/instruction,并新增 E3/E3b 自动 eval artifact:`agents/hello_agent/e3_grinder.evalset.json` + `agents/hello_agent/e3_metric.py` + `agents/hello_agent/e3_test_config.json`。
+
+### 观测二 · E5 plateau 话术与结构化落账矛盾
+- **场景**:第12杯,烘后约35天,连续两杯无改善 + 香气掉/纸板感。
+- **动作层表现**:正确点出"轴到顶"与"豆陈化"两种归因都可能,并说明无论哪种继续磨细都救不了。
+- **结构化瑕疵**:live 跑曾出现话术说停手,但 `record_cup` 写成 `turn_type=adjust` + `direction=finer` + `step=+1格`,同条又带 `decision=停手` / `terminate_reason=plateau_ambiguous`。
+- **判断侧决策**:这属于 record contract integrity bug,不是诊断策略变更。E5 正确记录为 `turn_type=terminate` + `decision=停手` + `terminate_reason=plateau_ambiguous`,且 `direction`/`step` 为空。
+- **当前状态**:已在 `record_cup` 写入前加入 invariants,矛盾记录直接拒绝写入;并新增 E5 自动 eval artifact:`agents/hello_agent/e5_plateau.evalset.json` + `agents/hello_agent/e5_metric.py` + `agents/hello_agent/e5_test_config.json`。
+
+---
+
 ## 缺口看板(后续可继续补)
 
 - [ ] 冷启动信息不全(用户不知道烘焙日期)时的稳健行为
@@ -231,5 +260,13 @@ E11b 的 `limitation_noted` gate(判「提粉量 / 任何 brew 干预 = 错」)*
   - 跑:`./.venv/bin/python -m google.adk.cli eval agents/hello_agent agents/hello_agent/e11_taste_twin.evalset.json --config_file_path agents/hello_agent/e11_test_config.json`(需 `agents/` 在 sys.path / 按 `hello_agent` 包名导入 metric)。
   - ⚠️ 已离线验证:gold 自比全 PASSED;磨细/直接终止/误填 `flavor_mismatch`/漏 `limitation_noted` 全 FAILED;仅改 rationale 仍 PASSED。**端到端真跑需 gemini API 配额 + 上游可靠置位 `gradient=已收敛`**(handoff §6#1)。
   - ⚠️ evalset 里 `roast_date` 是固定 ISO 日期;跑得太晚豆龄会漂进 stale(只多派生 `bean_aged` 旗标,不影响守卫与 E11 gold)。
+- [x] 把 E5 plateau 结构化终止记录编码为 ADK evalset + 确定性 custom metric
+  - 数据:`agents/hello_agent/e5_plateau.evalset.json`(第12杯连续无改善 + 香气掉/纸板感)。
+  - 评分:`agents/hello_agent/e5_metric.py::e5_plateau_contract_gate`。只判最后一次 `record_cup` 的结构化字段:`turn_type=terminate`、`decision=停手`、`terminate_reason=plateau_ambiguous`,且 `direction`/`step` 为空;话术不计分。
+  - 配置:`agents/hello_agent/e5_test_config.json`。
+- [x] 把 E3/E3b 砍豆机条件化归因编码为 ADK evalset + 确定性 custom metric
+  - 数据:`agents/hello_agent/e3_grinder.evalset.json`(砍豆机 vs 锥刀,同样"又酸又苦")。
+  - 评分:`agents/hello_agent/e3_metric.py::e3_grinder_contract_gate`。E3 必须 `terminate_reason=axis_unreliable`;E3b 不得使用 `axis_unreliable` 或直接停手。
+  - 配置:`agents/hello_agent/e3_test_config.json`。
 - [ ] **【萃取层 · 拦截欠萃伪装 · S3 后置】** 四项全绿但实为**欠萃 plateau**(vs_prev 无变化是因**到研磨极限**、化甜是**相对最优**而非绝对到位)→ gold:agent **不得直接盖 `gradient:已收敛` 进口味层**;要么继续打「**绝对刻度化甜探针**」(干净盖过酸的甜 vs 努力才尝到一点点),要么识别为欠萃 plateau。接 E1/E4 萃取线、**不进 E11**;是萃取层↔口味层交接点的"哑弹拆除器",被 SPEC §2.4 输入契约的 ⚠️ 指派。
 - [ ] **【E11 口味层 · 待萃取层债登记后回看】** E11b 前置消歧:用户报「不甜」要区分 **真欠萃**(违反开局前提 → 退回萃取层)vs **回甘被酸盖住**(符合开局 → 走口味层);用专家「**反向探针:寡淡没余味 vs 有回甘被酸盖住**」。这是 E11b「爱这个酸但要更厚」的镜像入口。

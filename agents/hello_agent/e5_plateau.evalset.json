@@ -1,0 +1,142 @@
+{
+  "eval_set_id": "e5_plateau",
+  "name": "E5 · 移动山顶 / 陈化 plateau 的结构化终止记录",
+  "description": "见 docs/evals.md E5。第12杯,烘后约35天,连续两杯无改善 + 香气掉/纸板感。gold 判动作与结构化落账:停手、plateau_ambiguous,且不得带 direction/step。",
+  "eval_cases": [
+    {
+      "eval_id": "E5_plateau_ambiguous_terminate_record",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-05-26",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-18", "bean_age_days": 23, "axis": "grind",
+              "turn_type": "seed", "direction": null, "step": null, "grind_now": "基准",
+              "report": {"sensory": "偏酸", "vs_prev": "n/a", "brew_time": "1分45秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "起点配方。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-19", "bean_age_days": 24, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸减轻", "vs_prev": "变好", "brew_time": "2分05秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "high",
+              "flags_asserted": [], "flags_derived": [], "rationale": "调细后变好。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-20", "bean_age_days": 25, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "report": {"sensory": "更甜", "vs_prev": "变好", "brew_time": "2分20秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "high",
+              "flags_asserted": [], "flags_derived": [], "rationale": "方向仍对。"
+            },
+            {
+              "cup_no": 4, "date": "2026-06-21", "bean_age_days": 26, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细4格",
+              "report": {"sensory": "酸甜平衡", "vs_prev": "变好", "brew_time": "2分30秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "high",
+              "flags_asserted": [], "flags_derived": [], "rationale": "接近最优。"
+            },
+            {
+              "cup_no": 5, "date": "2026-06-22", "bean_age_days": 27, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细4.5格",
+              "report": {"sensory": "略有回甘", "vs_prev": "变好", "brew_time": "2分35秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "收步", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "收小步长。"
+            },
+            {
+              "cup_no": 6, "date": "2026-06-23", "bean_age_days": 28, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细5格",
+              "report": {"sensory": "差不多", "vs_prev": "没变", "brew_time": "2分36秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "轻微 plateau,继续观察。"
+            },
+            {
+              "cup_no": 7, "date": "2026-06-24", "bean_age_days": 29, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细5.5格",
+              "report": {"sensory": "没有明显改善", "vs_prev": "没变", "brew_time": "2分37秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "继续观察趋势。"
+            },
+            {
+              "cup_no": 8, "date": "2026-06-25", "bean_age_days": 30, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细6格",
+              "report": {"sensory": "没再变甜", "vs_prev": "没变", "brew_time": "2分38秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "信号开始平台化。"
+            },
+            {
+              "cup_no": 9, "date": "2026-06-26", "bean_age_days": 31, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细6.5格",
+              "report": {"sensory": "香气略弱", "vs_prev": "没变", "brew_time": "2分38秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "继续看是否陈化。"
+            },
+            {
+              "cup_no": 10, "date": "2026-06-27", "bean_age_days": 32, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细7格",
+              "report": {"sensory": "连续没改善", "vs_prev": "没变", "brew_time": "2分39秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "连续无改善。"
+            },
+            {
+              "cup_no": 11, "date": "2026-06-28", "bean_age_days": 33, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细7.5格",
+              "report": {"sensory": "连续没改善、香气掉", "vs_prev": "没变", "brew_time": "2分39秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "已有 plateau 与陈化旁证。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E5-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "第12杯了,连续两杯都没改善;而且香气明显掉了、有点纸板感、整体变平淡。整杯时间还是2分39秒,床面平,杯壁没挂粉。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这杯不要再磨细了。连续几杯没改善,再加上香气掉和纸板感,这里可能是研磨轴已经到顶,也可能是豆子开始陈化;两者现在本来就不好完全分开。但无论是哪一种,继续磨细都救不了,还可能带来过萃。研磨这根轴先停手。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "terminate",
+                  "sensory": "香气掉、纸板感、整体平淡",
+                  "vs_prev": "没变",
+                  "brew_time": "2分39秒",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "没变",
+                  "decision": "停手",
+                  "terminate_reason": "plateau_ambiguous",
+                  "confidence": "high",
+                  "flags_asserted": [],
+                  "rationale": "连续无改善 + 陈化专属词;轴到顶与豆陈化欠定,但无论哪种继续磨细都救不了。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "e3_grinder_contract_gate": 1.0
+  },
+  "custom_metrics": {
+    "e3_grinder_contract_gate": {
+      "code_config": {
+        "name": "hello_agent.e3_metric.e3_grinder_contract_gate"
+      },
+      "description": "E3/E3b 磨豆机条件化归因 gate:E3 砍豆机必须 axis_unreliable terminate;E3b 锥刀不得使用 axis_unreliable 或直接停手。"
+    }
+  }
+}

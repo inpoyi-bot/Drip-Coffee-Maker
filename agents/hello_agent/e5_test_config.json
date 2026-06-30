@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "e5_plateau_contract_gate": 1.0
+  },
+  "custom_metrics": {
+    "e5_plateau_contract_gate": {
+      "code_config": {
+        "name": "hello_agent.e5_metric.e5_plateau_contract_gate"
+      },
+      "description": "E5 plateau 终止记录契约:只判 record_cup 结构化字段 turn_type=terminate、decision=停手、terminate_reason=plateau_ambiguous,且 direction/step 为空。"
+    }
+  }
+}

@@ -50,6 +50,50 @@ def _is_blade(grinder_type: str) -> bool:
     return "砍豆" in grinder_type or "blade" in grinder_type.lower()
 
 
+def _has_value(value: str | None) -> bool:
+    return value is not None and str(value).strip() != ""
+
+
+def _validate_record_contract(
+    *,
+    turn_type: str,
+    decision: str,
+    direction: str,
+    step: str,
+    terminate_reason: str,
+) -> None:
+    """拒绝互相矛盾的结构化记录,避免污染后续梯度判断。"""
+    errors: list[str] = []
+    has_direction = _has_value(direction)
+    has_step = _has_value(step)
+    has_terminate_reason = _has_value(terminate_reason)
+
+    if decision == "停手" or has_terminate_reason:
+        if turn_type != "terminate":
+            errors.append("decision=停手 或 terminate_reason 非空时,turn_type 必须是 terminate")
+        if has_direction:
+            errors.append("terminate 记录不能带 direction")
+        if has_step:
+            errors.append("terminate 记录不能带 step")
+
+    if turn_type == "adjust":
+        if has_terminate_reason:
+            errors.append("adjust 记录不能带 terminate_reason")
+        if not has_direction:
+            errors.append("adjust 记录必须带 direction")
+
+    if turn_type == "probe":
+        if has_terminate_reason:
+            errors.append("probe 记录不能带 terminate_reason")
+        if has_direction:
+            errors.append("probe 记录不能带 direction")
+        if has_step:
+            errors.append("probe 记录不能带 step")
+
+    if errors:
+        raise ValueError("record_cup contract violation: " + "; ".join(errors))
+
+
 # ── 工具 1:冷启动登记表头 + 静态查 seed ─────────────────────────────
 def start_bag(
     roast: str,
@@ -162,7 +206,7 @@ def record_cup(
         grind_now: 当前研磨相对基准(砍豆机记 N/A)。
         bed_note: 自由观察位(沟壑/挂壁等枚举塞不下的形态)。
         terminate_reason: 仅 terminate 时,satisfied|would_overextract|
-            plateau_axis_topped|plateau_bean_decay|plateau_ambiguous|
+            plateau_axis_topped|plateau_bean_decay|plateau_ambiguous|axis_unreliable|
             flavor_mismatch|taste_unaddressable(后两个=口味层:可换豆 / 本版不可处理)。
         flags_asserted: agent 声明的旗标,可含 "info_insufficient" | "limitation_noted"
             | "preference_unspecified"(萃取毕业但偏好未定位 → 需 probe)。
@@ -170,6 +214,14 @@ def record_cup(
     state = tool_context.state if tool_context is not None else {}
     bag = state.get("bag", {}) if hasattr(state, "get") else {}
     cups = state.get("cups", []) if hasattr(state, "get") else []
+
+    _validate_record_contract(
+        turn_type=turn_type,
+        decision=decision,
+        direction=direction,
+        step=step,
+        terminate_reason=terminate_reason,
+    )
 
     # ── 派生项:工具算,不由 agent 经手(杜绝矛盾记录) ──
     age = _bean_age_days(bag["roast_date"]) if bag.get("roast_date") else None
@@ -185,8 +237,8 @@ def record_cup(
         "bean_age_days": age,
         "axis": "grind",                       # 预留多轴
         "turn_type": turn_type,
-        "direction": direction or "—",
-        "step": step,
+        "direction": direction or None,
+        "step": step or None,
         "grind_now": grind_now,
         "report": {
             "sensory": sensory,
@@ -236,9 +288,11 @@ def render_trajectory(state) -> str:
     lines.append(f"已冲 {len(cups)} 杯:")
     for c in cups:
         r = c["report"]
+        direction = c.get("direction") or "—"
+        step = c.get("step") or ""
         lines.append(
             f"- 杯{c['cup_no']}[{c['turn_type']}] "
-            f"{c['direction']}{(' '+c['step']) if c['step'] else ''} "
+            f"{direction}{(' '+step) if step else ''} "
             f"报告{{{r['sensory']} / vs上杯:{r['vs_prev']} / {r['brew_time']} / "
             f"床面:{r['bed_shape']} / 挂粉环:{r['wall_ring']}}} "
             f"→ 梯度:{c['gradient']} 决策:{c['decision']}"

@@ -1,0 +1,90 @@
+{
+  "eval_set_id": "e3_grinder",
+  "name": "E3/E3b · 砍豆机双峰 vs 锥刀对照",
+  "description": "见 docs/evals.md E3/E3b。同样『又酸又苦』,砍豆机必须归因到硬件双峰并以 axis_unreliable 停掉研磨轴;锥刀不得误用该硬件出口。",
+  "eval_cases": [
+    {
+      "eval_id": "E3_blade_axis_unreliable",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {}
+      },
+      "conversation": [
+        {
+          "invocation_id": "E3-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "我要开一包新豆,V60,中焙,烘焙约10天,粉量15克。磨豆机是砍豆机 blade,没有刻度。第一杯冲出来又酸又苦,酸很尖,后面也有苦味。整杯大概2分钟,床面看起来还算平,杯壁没挂粉。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这里先不要把问题归到注水,也不要继续调研磨。砍豆机会产生细粉和粗块并存的双峰分布,细粉容易苦、粗块容易酸,所以这根研磨轴给不了可靠反馈。研磨这根轴先停手,建议换锥刀或平刀后再进入收敛。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "terminate",
+                  "sensory": "又酸又苦",
+                  "vs_prev": "n/a",
+                  "brew_time": "2分钟",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "n/a",
+                  "decision": "停手",
+                  "terminate_reason": "axis_unreliable",
+                  "confidence": "high",
+                  "flags_asserted": ["limitation_noted"],
+                  "rationale": "砍豆机双峰分布导致研磨轴反馈不可靠,不是注水不均,当前轴无法 hill-climb。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "eval_id": "E3b_burr_not_axis_unreliable",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {}
+      },
+      "conversation": [
+        {
+          "invocation_id": "E3b-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "我要开一包新豆,V60,中焙,烘焙约10天,粉量15克。磨豆机是锥刀电动磨,当前像白砂糖粗细。第一杯冲出来又酸又苦,酸很尖,后面也有苦味。整杯大概2分钟,床面看起来还算平,杯壁没挂粉。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "锥刀不是砍豆机,所以不要把这杯直接归因成双峰硬件问题。又酸又苦更像需要继续查均匀度或做味觉探针;这杯先不把研磨轴停掉。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "又酸又苦",
+                  "vs_prev": "n/a",
+                  "brew_time": "2分钟",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "n/a",
+                  "decision": "探针",
+                  "confidence": "medium",
+                  "flags_asserted": ["info_insufficient"],
+                  "rationale": "锥刀颗粒分布正常,不能套砍豆机双峰;需继续查均匀度或定位酸苦涩。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
