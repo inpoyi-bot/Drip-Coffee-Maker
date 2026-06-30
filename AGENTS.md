@@ -20,6 +20,16 @@
    这些是我要拥有的判断,讲清楚让我决策,别替我定。
    传输协议 / SDK 语法 / schema 细节 → 点一句"认得即可",别让我淹在里面。
 
-## 当前阶段
-S0:锁范围(已锁,见 SPEC §6)+ 建 repo + ADK hello-agent。
-目标是"证明管道通了 + 我能讲清楚每个文件",不是实现任何功能。
+## 当前进度
+范围已锁(见 SPEC §6),ADK hello-agent 已建好。
+
+当前已经不只是"证明管道通了":
+- `agents/hello_agent/agent.py` 已实现 V60、冻结手法、只调研磨的单轴收敛教练。
+- `agents/hello_agent/memory.py` 已实现豆级记忆:`start_bag` 冷启动、`record_cup` 逐杯落账、`render_trajectory` 注入这包豆的轨迹。
+- `docs/demo-arc.md` 已有一条 5 杯干净 demo 弧线:冷启动 → 欠萃 → 磨细 → 读梯度 → 满意停手。
+- `docs/evals.md` + `agents/hello_agent/*evalset.json` / `*_metric.py` 已开始把高危边界 case 编成 ADK eval,重点覆盖口味层 E11、砍豆机 E3、plateau E5。
+
+当前重点不是扩功能,而是:
+1. 把现有研磨单轴闭环讲清楚、跑稳、用 eval 锁住。
+2. 补缺口看板里的高风险边界,尤其是"欠萃伪装成毕业"和冷启动信息不全。
+3. 为最终提交补 README / 运行说明 / 视频与 writeup 素材;MCP、Deployability、安全护栏还没有形成可提交证据。
