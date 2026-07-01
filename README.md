@@ -1,0 +1,167 @@
+# Drip Coffee Maker
+
+An ADK coffee agent capstone: a V60 pour-over coach that helps a beginner converge across cups, not a one-shot recipe recommender.
+
+The full product definition is locked in [`docs/SPEC.md`](docs/SPEC.md). The load-bearing idea is SPEC §3: this project implements a stateful hill-climb loop over one bag of beans. The agent remembers prior cups, reads the gradient against the previous cup, decides whether to continue, probe, stop, or route to taste-layer handling, and records each turn as structured trajectory data.
+
+## Current Scope
+
+This build intentionally freezes the product to a small, explainable slice:
+
+- Brewing method: V60 only.
+- Optimization axis: grind only.
+- Technique, water temperature, dose, and ratio: held constant after the seed recipe.
+- Memory: bean-level trajectory only.
+- Taste profile across beans: out of scope for this version.
+
+The goal is not to beat a coffee master recipe. The master recipe is only the seed. The agent's value is the convergence process from that seed toward this user's cup, grinder, water, bean, and taste.
+
+## What The Agent Does
+
+The agent follows the loop in SPEC §3:
+
+1. Start a new bag from a static seed recipe.
+2. Hold technique and non-grind variables constant.
+3. Ask for light feedback after each cup.
+4. Compare this cup against the previous cup.
+5. Decide one action: adjust grind, probe uncertainty, or stop.
+6. Record a structured cup entry.
+7. Render the trajectory back into the next turn so the agent reasons from real memory, not chat recollection.
+
+Key files:
+
+| File | Role |
+|---|---|
+| [`agents/hello_agent/agent.py`](agents/hello_agent/agent.py) | ADK agent instruction and tool wiring. |
+| [`agents/hello_agent/memory.py`](agents/hello_agent/memory.py) | Bean-level memory tools: `start_bag`, `record_cup`, `render_trajectory`. |
+| [`docs/demo-arc.md`](docs/demo-arc.md) | Clean 5-cup demo arc transcript. |
+| [`docs/evals.md`](docs/evals.md) | Human-readable eval rubric and gap board. |
+| [`mcp_server/coffee_server.py`](mcp_server/coffee_server.py) | Minimal MCP server for static coffee rules. |
+
+## Install
+
+Use a virtual environment, then install dependencies:
+
+```bash
+python3 -m venv .venv
+./.venv/bin/pip install -r requirements.txt
+```
+
+Create the local agent environment file from the example:
+
+```bash
+cp .env.example agents/hello_agent/.env
+```
+
+Then put your Gemini API key in `agents/hello_agent/.env`.
+
+## Run The Agent
+
+Start ADK web from the repo root:
+
+```bash
+./.venv/bin/adk web agents
+```
+
+Select `hello_agent` in the ADK UI.
+
+For persistent sessions, use SQLite:
+
+```bash
+./.venv/bin/adk web agents --session_service_uri="sqlite+aiosqlite:///./sessions.db"
+```
+
+`sessions.db` is local runtime state and is ignored by git.
+
+## Run Evals
+
+These evals call the real Gemini model and may consume API quota.
+
+E3/E3b grinder attribution:
+
+```bash
+PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval \
+  agents/hello_agent \
+  agents/hello_agent/e3_grinder.evalset.json \
+  --config_file_path agents/hello_agent/e3_test_config.json
+```
+
+E5 plateau termination record:
+
+```bash
+PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval \
+  agents/hello_agent \
+  agents/hello_agent/e5_plateau.evalset.json \
+  --config_file_path agents/hello_agent/e5_test_config.json
+```
+
+E7c unknown roast age:
+
+```bash
+PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval \
+  agents/hello_agent \
+  agents/hello_agent/e7c_unknown_roast_age.evalset.json \
+  --config_file_path agents/hello_agent/e7c_test_config.json
+```
+
+E11 taste-layer twin:
+
+```bash
+PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval \
+  agents/hello_agent \
+  agents/hello_agent/e11_taste_twin.evalset.json \
+  --config_file_path agents/hello_agent/e11_test_config.json
+```
+
+E12 graduation gate:
+
+```bash
+PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval \
+  agents/hello_agent \
+  agents/hello_agent/e12_graduation_gate.evalset.json \
+  --config_file_path agents/hello_agent/e12_test_config.json
+```
+
+Committed eval histories live under:
+
+```text
+agents/hello_agent/.adk/eval_history/
+```
+
+## Evidence Map
+
+This section maps repo artifacts back to the course/project concepts in SPEC §6.4.
+
+| Concept | Evidence |
+|---|---|
+| Agent / ADK | `agents/hello_agent/agent.py` defines `root_agent`; the ADK agent owns the stateful convergence loop, memory tools, gradient reading, and termination. |
+| Cross-round memory | `memory.py` stores `bag` and `cups`, then injects `render_trajectory` into each turn. |
+| Convergence loop | `docs/demo-arc.md` shows cold start -> feedback -> grind moves -> satisfied stop. |
+| Eval-driven development | `docs/evals.md` plus E3/E5/E7c/E11/E12 evalsets and custom metrics. |
+| Guardrails | `record_cup` rejects contradictory structured records; evals gate high-risk failures. |
+| MCP Server | `mcp_server/coffee_server.py` implements a standalone MCP server exposing static seed/precheck tools; it is intentionally not on the ADK runtime path. |
+| Deployability | Local ADK run commands and reproducible dependency setup are documented here. |
+
+## Why MCP Is Separate
+
+SPEC §6.5 says seed matching and pre-recipe checks are static-rule territory, not agent reasoning. The MCP server intentionally only covers that commodity layer:
+
+- `get_seed_recipe`
+- `precheck_bag`
+
+MCP is implemented but intentionally separate from the ADK convergence loop in this version. The ADK agent does not call MCP tools at runtime; it owns the cross-cup memory, gradient reading, orchestration, and termination decisions. MCP demonstrates the external static-tool boundary for seed recipes and precheck advice.
+
+## Known Boundaries
+
+This version is a focused capstone build, not a full coffee product.
+
+- Only V60 is supported.
+- Only grind is actively adjusted.
+- Water temperature, ratio, dose, and technique are frozen after the seed.
+- User-level taste memory is not implemented.
+- Some remaining rubric gaps are documented in `docs/evals.md`, including multi-symptom reports and an E11b "not sweet" mirror case.
+- E11b's `taste_unaddressable` behavior is a version boundary, not a permanent product principle. If brew axes are unlocked later, the gold should be rejudged.
+
+## Project Status
+
+The project is in the Build phase, just before code freeze. The core loop is implemented and tested against the main high-risk cases. The next work should be packaging, explanation, and final writeup rather than expanding the core behavior.
