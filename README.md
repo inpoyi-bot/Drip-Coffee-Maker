@@ -130,17 +130,17 @@ agents/hello_agent/.adk/eval_history/
 
 ## Evidence Map
 
-This section maps repo artifacts back to the course/project concepts in SPEC §6.4.
+This section maps repo artifacts back to the course/project concepts in SPEC §6.4. It is intentionally evidence-based: each claim points to a file or reproducible command in this repo.
 
-| Concept | Evidence |
-|---|---|
-| Agent / ADK | `agents/hello_agent/agent.py` defines `root_agent`; the ADK agent owns the stateful convergence loop, memory tools, gradient reading, and termination. |
-| Cross-round memory | `memory.py` stores `bag` and `cups`, then injects `render_trajectory` into each turn. |
-| Convergence loop | `docs/demo-arc.md` shows cold start -> feedback -> grind moves -> satisfied stop. |
-| Eval-driven development | `docs/evals.md` plus E3/E5/E7c/E11/E12 evalsets and custom metrics. |
-| Guardrails | `record_cup` rejects contradictory structured records; evals gate high-risk failures. |
-| MCP Server | `mcp_server/coffee_server.py` implements a standalone MCP server exposing static seed/precheck tools; it is intentionally not on the ADK runtime path. |
-| Deployability | Local ADK run commands and reproducible dependency setup are documented here. |
+| Concept | Repo evidence | Accurate claim |
+|---|---|---|
+| ADK agent | `agents/hello_agent/agent.py` defines `root_agent` with ADK tools. | The runtime agent owns the V60 convergence loop, tool orchestration, gradient reading, and termination decisions. |
+| Cross-round memory | `agents/hello_agent/memory.py` stores `bag` and `cups`; `render_trajectory` injects the trajectory into each turn. | The agent reasons from structured cup history, not just chat transcript recollection. |
+| Convergence loop | `docs/demo-arc.md` shows cold start -> feedback -> grind moves -> satisfied stop. | The demo evidence is a stateful hill-climb over one bag of beans, not a one-shot recipe answer. |
+| Eval-driven development | `docs/evals.md` plus E3/E5/E7c/E11/E12 evalsets, custom metrics, and committed eval histories. | High-risk behavior is guarded by deterministic eval gates where possible. |
+| Guardrails | `record_cup` in `memory.py` rejects contradictory structured records; evals check contract-sensitive failures. | The build protects the memory trajectory from invalid action/termination records. |
+| MCP Server | `mcp_server/coffee_server.py` and `mcp_server/README.md` define and smoke-test static seed/precheck tools. | MCP demonstrates the external static-tool boundary; it is standalone and intentionally separate from the ADK runtime path. |
+| Deployability | `requirements.txt`, `.env.example`, local `adk web` commands, SQLite session command, and eval run commands are documented here. | The project has a reproducible local ADK run path with optional SQLite-backed sessions; it does not claim cloud or production deployment. |
 
 ## Why MCP Is Separate
 
