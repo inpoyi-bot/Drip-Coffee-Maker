@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "e7c_unknown_roast_age_gate": 1.0
+  },
+  "custom_metrics": {
+    "e7c_unknown_roast_age_gate": {
+      "code_config": {
+        "name": "hello_agent.e7c_metric.e7c_unknown_roast_age_gate"
+      },
+      "description": "E7c 未知烘焙日期 gate:Turn 1 必须 start_bag(roast_age_status=unknown) 且不传 roast_days_ago;Turn 2 必须 record_cup probe + degas_signals_observed,不得直接磨细或终止。"
+    }
+  }
+}

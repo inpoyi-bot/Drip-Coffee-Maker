@@ -115,6 +115,16 @@
 - **变体(同分支)**:把烘焙日期换成"烘后约40天"→ 必须提示豆可能已衰减、风味平淡别归咎手法。
 - **防的后门**:E5 在第12杯触到陈化,但没测**开局**的 pre-check;此 case 专测静态排查这条分支被不被触发。
 
+### E7c — 未知烘焙日期 → 低置信冷启动 + 排气信号 validation probe
+- **归属**:冷启动静态自检 / bag-level uncertainty routing。
+- **场景**:
+  1. Turn 1 冷启动:V60、浅焙、粉量15g、锥刀电动磨、当前研磨像粗砂糖,但用户不知道烘焙日期,包装上也找不到。
+  2. Turn 2 第一杯后:闷蒸气泡很多、粉床明显鼓、流速忽快忽慢;味道不稳定、有点酸空;床面还算平,杯壁没挂粉环。
+- **✅ Turn 1 必须**:接受未知烘焙日期为合法冷启动状态,继续给浅焙 V60 seed;调用 `start_bag(roast_age_status="unknown")`,不传 `roast_days_ago`;bag 写入 `roast_age_status=unknown`、`roast_date=null`、`bean_age_days=null`、`bean_age_band=null`、`flags` 含 `roast_age_unknown`/`low_confidence_cold_start`、`bean_age_hypothesis=uncertain`、`bean_age_evidence_status=no_signals_yet`;明确低置信提示,冻结手法,本版仍只调研磨。
+- **✅ Turn 2 必须**:把排气/流速不稳记为当杯 observation,只更新假设为 `bean_age_hypothesis=possibly_under_rested`、`bean_age_evidence_status=supporting_single_direction`;调用 `record_cup(turn_type=probe,decision=探针,flags_asserted=["degas_signals_observed"],confidence=low|medium)`,不带 `direction`/`step`/`terminate_reason`;发起 validation probe:下一杯研磨/水温/粉量/比例照旧,低扰动复现,观察流速稳定后酸空是否仍稳定出现。
+- **❌ 绝不**:把烘焙日期当 blocking requirement;编造/默认 `roast_days_ago=0/7/14`;把 unknown 当 fresh;第一杯见排气就写死 `under_rested`;把酸空直接判欠萃并 `direction=finer`;把不稳定直接归咎手法;解冻水温、粉量、比例或手法。
+- **防的后门**:E7/E7c 形成 known-risk / unknown-risk 对照。E7a/E7b 是已知日期命中 pre-check;E7c 是 ground truth 缺失时把"不知道"建模成 first-class uncertainty state,保护 hill-climbing 的梯度可读性。
+
 ---
 
 ## 七、终止的三条分支(E5 只摸了一条,补齐另两条)
@@ -333,7 +343,12 @@ E12a / E12b 建议新增 flags:
 
 ## 缺口看板(后续可继续补)
 
-- [ ] 冷启动信息不全(用户不知道烘焙日期)时的稳健行为
+- [x] 冷启动信息不全(用户不知道烘焙日期)时的稳健行为(E7c 已编码)
+  - 数据:`agents/hello_agent/e7c_unknown_roast_age.evalset.json`(Turn 1 unknown cold start / Turn 2 degas validation probe)。
+  - 评分:`agents/hello_agent/e7c_metric.py::e7c_unknown_roast_age_gate`。Turn 1 只判 `start_bag` 是否走 `roast_age_status=unknown` 且不传 `roast_days_ago`;Turn 2 只判 `record_cup` 是否为 probe + `degas_signals_observed`,并硬禁继续磨细/终止出口。
+  - 配置:`agents/hello_agent/e7c_test_config.json`。
+  - 本地 contract 验证:unknown 不生成 `roast_date`/`bean_age_days`/`bean_age_band`;排气信号只更新 `bean_age_hypothesis=possibly_under_rested`,不改写 bean age fact。
+  - ✅ 端到端结果(2026-07-01):`agents/hello_agent/.adk/eval_history/hello_agent_e7c_unknown_roast_age_1782911320.2279649.evalset_result.json` → `Tests passed: 1`, `Tests failed: 0`。
 - [ ] 用户一次报告多个互相矛盾的词(超出 E1b 的二选一)
 - [x] 口味层诊断出口已补(E11 三分:`satisfied`/`flavor_mismatch`/`taste_unaddressable`);brew 端**实际微调**仍版本冻结(见 §九 + SPEC §6.6)
 - [x] 把 §九 编码为 ADK `*.evalset.json` + 确定性自定义 metric,接入 `adk eval` 自动回归

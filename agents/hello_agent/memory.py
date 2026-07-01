@@ -97,32 +97,56 @@ def _validate_record_contract(
 # ── 工具 1:冷启动登记表头 + 静态查 seed ─────────────────────────────
 def start_bag(
     roast: str,
-    roast_days_ago: int,
-    dose_g: float,
-    grinder_type: str,
+    roast_days_ago: int | None = None,
+    dose_g: float | None = None,
+    grinder_type: str = "",
     baseline_grind: str = "",
+    roast_age_status: str = "known",
     tool_context=None,
 ) -> dict:
     """冷启动登记这包豆,并按烘焙度静态查出起点配方。问齐4项后调一次。
 
     Args:
         roast: 烘焙度,只接受 "浅" | "中" | "深"。
-        roast_days_ago: 烘焙距今**天数**(用户说"8天前"就传 8)。由工具换算成日期
-            并存,**别让模型自己算日期**(模型不知道"今天",算出来会错)。
+        roast_days_ago: 烘焙距今**天数**(用户说"8天前"就传 8)。已知时由工具换算成日期
+            并存,**别让模型自己算日期**(模型不知道"今天",算出来会错)。未知时传 None 或省略。
+        roast_age_status: "known" | "unknown"。未知时不生成 roast_date / bean_age_days / bean_age_band。
         dose_g: 粉量(克)。
         grinder_type: 磨豆机类型,如 "锥刀" | "平刀" | "砍豆机" | "不确定"。
         baseline_grind: 当前研磨刻度或描述(如"粗砂糖");砍豆机留空。
     """
-    # 工具按可靠的"今天"算出烘焙日期并存;之后每杯据此重算豆龄(它每天在长)
-    roast_date = (date.today() - timedelta(days=max(0, int(roast_days_ago)))).isoformat()
+    if dose_g is None:
+        raise ValueError("start_bag requires dose_g")
+
+    age_unknown = roast_age_status == "unknown" or roast_days_ago is None
     seed = SEED.get(roast, SEED["中"])
-    age = int(roast_days_ago)
-    band = _bean_band(roast, age)
     blade = _is_blade(grinder_type)
+
+    if age_unknown:
+        roast_age_status = "unknown"
+        roast_date = None
+        age = None
+        band = None
+        bag_flags = ["roast_age_unknown", "low_confidence_cold_start"]
+        bean_age_hypothesis = "uncertain"
+        bean_age_evidence_status = "no_signals_yet"
+    else:
+        # 工具按可靠的"今天"算出烘焙日期并存;之后每杯据此重算豆龄(它每天在长)
+        age = max(0, int(roast_days_ago))
+        roast_date = (date.today() - timedelta(days=age)).isoformat()
+        band = _bean_band(roast, age)
+        bag_flags = []
+        bean_age_hypothesis = band
+        bean_age_evidence_status = "known_from_roast_date"
 
     # 豆龄三档 → 期望管理/提示(不自动改温;过老的升温只作可选一档由 agent 转告)
     advice = []
-    if band == "stale":
+    if roast_age_status == "unknown":
+        advice.append(
+            "烘焙日期未知:豆龄 pre-check 不能高置信完成,先按低置信冷启动处理;"
+            "前几杯若出现排气旺或流速不稳,先保护梯度可读性,别过早归咎手法。"
+        )
+    elif band == "stale":
         advice.append(
             f"豆龄约{age}天偏老,可能已衰减、风味偏平——别归咎手法。"
             "可选:在基准水温上温和+1~2°C榨残值(可能带苦),愿不愿试由用户定,别静默改。"
@@ -139,6 +163,12 @@ def start_bag(
     bag = {
         "roast": roast,
         "roast_date": roast_date,
+        "roast_age_status": roast_age_status,
+        "bean_age_days": age,
+        "bean_age_band": band,
+        "flags": bag_flags,
+        "bean_age_hypothesis": bean_age_hypothesis,
+        "bean_age_evidence_status": bean_age_evidence_status,
         "dose_g": dose_g,
         "ratio": seed["ratio"],
         "water_temp_baseline_c": seed["temp_baseline_c"],   # 主锚:按烘焙度
@@ -163,7 +193,11 @@ def start_bag(
             "注水手法": POUR_METHOD,
         },
         "bean_age_days": age,
+        "roast_age_status": roast_age_status,
         "band": band,
+        "flags": bag_flags,
+        "bean_age_hypothesis": bean_age_hypothesis,
+        "bean_age_evidence_status": bean_age_evidence_status,
         "advice": advice,           # 如实转告用户(提示/降期望;别埋掉)
     }
 
@@ -210,6 +244,7 @@ def record_cup(
             axis_limit_underextracted(萃取层:研磨轴到顶但绝对萃取未毕业)|
             flavor_mismatch|taste_unaddressable(后两个=口味层:可换豆 / 本版不可处理)。
         flags_asserted: agent 声明的旗标,可含 "info_insufficient" | "limitation_noted"
+            | "degas_signals_observed"(豆龄未知时,第一杯出现排气/流速不稳信号)
             | "preference_unspecified"(萃取毕业但偏好未定位 → 需 probe)
             | "absolute_extraction_uncertain"(表面接近毕业但绝对刻度证据不足)
             | "absolute_extraction_not_met"(明确未达到绝对萃取毕业刻度)
@@ -264,6 +299,14 @@ def record_cup(
     if tool_context is not None:
         cups = list(cups) + [record]
         tool_context.state["cups"] = cups
+        if (
+            bag.get("roast_age_status") == "unknown"
+            and "degas_signals_observed" in (flags_asserted or [])
+        ):
+            bag = dict(bag)
+            bag["bean_age_hypothesis"] = "possibly_under_rested"
+            bag["bean_age_evidence_status"] = "supporting_single_direction"
+            tool_context.state["bag"] = bag
         if turn_type == "terminate":           # 研磨轴收敛 → 相位推进(留多轴接口)
             bag = dict(bag)
             bag["phase"] = "grind_converged"
@@ -281,10 +324,16 @@ def render_trajectory(state) -> str:
     if not bag:
         return "## 这包豆的记忆\n(尚未冷启动——请先问齐烘焙度/烘焙日期/粉量/磨豆机,再调 start_bag。)"
 
-    age = _bean_age_days(bag["roast_date"]) if bag.get("roast_date") else "?"
+    age = _bean_age_days(bag["roast_date"]) if bag.get("roast_date") else None
+    age_text = f"烘{bag['roast_date']}(豆龄约{age}天)" if age is not None else "烘焙日期未知(豆龄未知)"
+    flags_text = ",".join(bag.get("flags", [])) or "无"
     lines = [
         "## 这包豆的记忆(读这个做决策,别靠回忆)",
-        f"包:{bag['roast']}焙 · 烘{bag['roast_date']}(豆龄约{age}天) · {bag['dose_g']}g · "
+        f"包:{bag['roast']}焙 · {age_text} · "
+        f"豆龄状态:{bag.get('roast_age_status', 'known')} · "
+        f"豆龄假设:{bag.get('bean_age_hypothesis', 'n/a')} · "
+        f"证据:{bag.get('bean_age_evidence_status', 'n/a')} · "
+        f"包级旗标:{flags_text} · {bag['dose_g']}g · "
         f"{bag['grinder_type']} 基准={bag.get('baseline_grind')} · "
         f"目标{bag['ratio']} {bag['water_temp_actual_c']}°C · 相位={bag['phase']} · 手法已冻结",
     ]

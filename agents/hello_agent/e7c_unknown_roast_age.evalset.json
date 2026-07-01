@@ -1,0 +1,89 @@
+{
+  "eval_set_id": "e7c_unknown_roast_age",
+  "name": "E7c · 未知烘焙日期 · 低置信冷启动 + 排气 validation probe",
+  "description": "见 docs/evals.md E7c。用户不知道烘焙日期时,必须以 roast_age_status=unknown 继续冷启动,不伪造豆龄;第一杯出现排气/流速不稳信号时,必须保护梯度可读性,记录 degas_signals_observed 并发起 validation probe,不得直接磨细。",
+  "eval_cases": [
+    {
+      "eval_id": "E7c_unknown_roast_age_low_confidence_probe",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {}
+      },
+      "conversation": [
+        {
+          "invocation_id": "E7c-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [
+              {
+                "text": "我要开一包新豆开始调。V60,浅焙,但我不知道烘焙日期,包装上也找不到。粉量 15g,锥刀电动磨,当前研磨像粗砂糖。怎么开始?"
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "可以开始,烘焙日期不知道不阻塞。先按浅焙 V60 起点来:15g 粉,比例 1:15~1:16,水温 93°C,研磨以你现在的粗砂糖感作基准,注水手法整包冻结。豆龄这条 pre-check 现在只能低置信处理,所以前几杯如果排气旺或流速不稳,先别急着归咎手法,也别把它当正常 fresh 豆。"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "start_bag",
+                "args": {
+                  "roast": "浅",
+                  "roast_age_status": "unknown",
+                  "dose_g": 15,
+                  "grinder_type": "锥刀电动磨",
+                  "baseline_grind": "粗砂糖"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "invocation_id": "E7c-turn2",
+          "user_content": {
+            "role": "user",
+            "parts": [
+              {
+                "text": "第一杯冲完了。闷蒸时气泡很多,粉床鼓得明显;流速有点忽快忽慢。味道也不太稳定,有点酸空,但我不确定是不是手法问题。最后床面还算平,杯壁没挂粉环。"
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "这杯先不当成干净的欠萃梯度,所以不要急着磨细。你这包豆龄未知,第一杯又有明显排气和流速忽快忽慢,酸空可能被排气/局部不稳污染了。下一杯研磨、水温、粉量、比例都照旧,注水也照同一套低扰动手法,只验证流速稳定后酸空是不是还稳定出现;如果稳定后仍酸空,我们再进入研磨细化。"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "酸空、不稳定、闷蒸气泡多、粉床鼓、流速忽快忽慢",
+                  "vs_prev": "n/a",
+                  "brew_time": "",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "n/a",
+                  "decision": "探针",
+                  "confidence": "medium",
+                  "flags_asserted": ["degas_signals_observed"],
+                  "rationale": "豆龄未知且第一杯排气/流速不稳,酸空梯度被污染;先做 validation probe,不直接磨细。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
