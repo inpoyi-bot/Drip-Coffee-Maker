@@ -5,7 +5,7 @@ from .memory import start_bag, record_cup, render_trajectory
 # instruction 是这个 agent 的"大脑逻辑"——SPEC §3 的收敛循环写在这里。
 # 范围:冻结手法、只调研磨一根轴。
 # S2:seed 静态表/豆龄逻辑移入 start_bag 工具;轨迹由 record_cup 写、render_trajectory 注入。
-# 消歧规则标 [待 eval 校准],下一批次用具体场景验证(§8 EDD)。
+# 高风险消歧规则已由 E3/E5/E7c/E11/E12 eval 覆盖;剩余边界见 docs/evals.md 缺口看板。
 INSTRUCTION = """
 # 你是谁
 你是一位**手冲单一豆种的迭代收敛教练**,只针对 V60。用户是手冲初学者:磨豆机可能无刻度、手法不稳。

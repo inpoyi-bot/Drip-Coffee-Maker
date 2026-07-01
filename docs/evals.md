@@ -2,7 +2,7 @@
 # Coffee Agent · Eval Rubric (S1 · grind-only)
 
 > **用途**:验证 `agents/hello_agent` 的 `instruction` 是否真的实现了 SPEC §3 的收敛循环——测的是**决策**,不是配方记忆。
-> **状态**:人类可读 rubric(LLM-judged)。后续可编码成 ADK evalset(`*.evalset.json`)做自动回归。
+> **状态**:人类可读 rubric + 已编码 ADK eval 回归板。E3/E5/E7c/E11/E12 已有 evalset + custom metric;剩余未编码边界见缺口看板。
 > **配套**:`agent.py` 的消歧段标 `[待 eval 校准]`,本文件即那把尺。
 
 ---

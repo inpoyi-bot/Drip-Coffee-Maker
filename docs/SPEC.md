@@ -65,6 +65,7 @@ The agent disambiguates the subjective sensory words the user *can* give ("too s
 
 - E11a/E11b 等口味层 case 的开局「萃取四项已收敛」是**给定前提**,非待验状态。
 - ⚠️ **已知风险(指派给上游,非 S3)**:「欠萃伪装成毕业」灰区(豆偏粗 / 到研磨极限 / 相对最甜 → 四项全绿实则欠萃 plateau)。若上游误放行,本组件会忠实信任 → 误判口味层无解 / 换豆。**该灰区的拦截是萃取层责任,见 `docs/evals.md` 缺口看板「萃取层 · 拦截欠萃伪装」条。**
+  Build note:该风险已由 E12 graduation gate eval 编码覆盖;仍保留为 taste-layer 输入契约的设计边界。
 
 ---
 

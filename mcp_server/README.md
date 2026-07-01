@@ -93,7 +93,7 @@ tools: ['get_seed_recipe', 'precheck_bag']
 
 ## Verified Examples
 
-本轮已用 MCP client 做过最小验证:
+已验证的最小 MCP client 行为:
 
 - `list_tools` 返回 `get_seed_recipe` 和 `precheck_bag`
 - `get_seed_recipe` 输入 `浅 / 15g / 锥刀 / 粗砂糖`,返回 `1:15~1:16`、`225~240g`、`93°C`
