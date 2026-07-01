@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "graduation_gate": 1.0
+  },
+  "custom_metrics": {
+    "graduation_gate": {
+      "code_config": {
+        "name": "hello_agent.e12_metric.graduation_gate"
+      },
+      "description": "E12 graduation gate:只判 record_cup 结构化字段。E12a 必须萃取层 probe + absolute_extraction_uncertain;E12b 必须 axis_limit_underextracted + absolute_extraction_not_met/axis_limit_reached;两者都不得 gradient=已收敛、不得进入口味层、不得继续磨细。"
+    }
+  }
+}

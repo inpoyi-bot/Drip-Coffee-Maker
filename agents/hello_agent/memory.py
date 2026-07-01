@@ -207,9 +207,13 @@ def record_cup(
         bed_note: 自由观察位(沟壑/挂壁等枚举塞不下的形态)。
         terminate_reason: 仅 terminate 时,satisfied|would_overextract|
             plateau_axis_topped|plateau_bean_decay|plateau_ambiguous|axis_unreliable|
+            axis_limit_underextracted(萃取层:研磨轴到顶但绝对萃取未毕业)|
             flavor_mismatch|taste_unaddressable(后两个=口味层:可换豆 / 本版不可处理)。
         flags_asserted: agent 声明的旗标,可含 "info_insufficient" | "limitation_noted"
-            | "preference_unspecified"(萃取毕业但偏好未定位 → 需 probe)。
+            | "preference_unspecified"(萃取毕业但偏好未定位 → 需 probe)
+            | "absolute_extraction_uncertain"(表面接近毕业但绝对刻度证据不足)
+            | "absolute_extraction_not_met"(明确未达到绝对萃取毕业刻度)
+            | "axis_limit_reached"(研磨轴已到可用极限)。
     """
     state = tool_context.state if tool_context is not None else {}
     bag = state.get("bag", {}) if hasattr(state, "get") else {}

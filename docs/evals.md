@@ -222,7 +222,90 @@ E11b 的 `limitation_noted` gate(判「提粉量 / 任何 brew 干预 = 错」)*
 
 ---
 
-## 十、B 档后 7 条高危 live 回归观测(现象记录)
+## 十、萃取层 graduation gate:拦截欠萃伪装毕业 E12a / E12b
+
+> **归属**:Extraction layer · graduation gate。
+> **补的盲区**:E11 口味层以 `gradient=已收敛` 为前置真值,信任上游、不复核萃取毕业真假。本 case 专测上游有没有资格写下 `gradient=已收敛`。
+> **核心风险**:四项看似全绿,但真实只是 underextraction plateau:`vs_prev 无变化` 是因为研磨轴到顶,`有一点甜 / 有一点回甘` 是相对最优,不是绝对萃取毕业。若上游误盖 `gradient=已收敛`,E11 会忠实信任,进而误判 `flavor_mismatch` / `taste_unaddressable` / 换豆。
+> **判别力**:E12a / E12b 共享相似表面 token:`vs_prev 无变化`、流速正常、床面平、无挂粉环、有一点甜。区别只在证据充分性:E12a 缺少"轴到顶"的充分证据,所以 gold 是 probe;E12b 明确给出"轴到顶 + 绝对甜感仍弱",所以 gold 是 terminate。这样防止 agent 永远 probe 逃过该停手的 case,也防止 agent 永远 plateau 逃过信息不足的 case。
+
+### 共享诱饵:四项看似全绿,但不是 E11 开局
+- 浅焙,V60,锥刀磨,水温 / 比例 / 粉量 / 手法冻结,只调研磨。
+- 前几杯一路从明显欠萃变好:酸从尖空变干净,流速从偏快变正常,床面从浅/不稳变平。
+- 当前杯出现看似毕业的四项:`vs_prev 无变化`、流速正常、床面平、无挂粉环,并且用户说"有一点甜 / 有一点回甘"。
+- **关键区别**:本 case 不得在 `session_input.state` 里预设 `gradient=已收敛`。E11 的 `gradient=已收敛` 是给定前提;E12 的 `gradient=已收敛` 是待审状态。若 agent 自己写成 `已收敛`,即 fail。
+
+### E12a — 四项看似全绿,但绝对刻度不足 → 必须 probe,不得毕业
+- **Failure mode**:agent 把"相对变好 + 四项看似正常"误读成"绝对萃取毕业",直接盖 `gradient=已收敛`,送入口味层。
+- **场景**:浅焙,第5杯。前几杯一路磨细后明显变好,但还没有明确达到"酸能干净化甜、有持续回甘"的绝对刻度。当前杯与上一杯几乎无变化,客观信道看似稳定。
+- **用户报告**:"这杯和上杯几乎没差。时间大概 2 分 35 秒,流速看起来正常,床面也平,杯壁没挂粉环。酸比最开始干净很多,不是那种酸完完全空掉的感觉,尾段也能尝到一点甜。但甜感不明显,我不确定是不是已经算酸甜平衡;整体还是偏薄,酸感好像还是比甜更突出。"
+- **✅ 必须**:停在萃取层,不得宣布毕业;打一次"绝对刻度化甜探针",确认这点甜是"清楚盖过酸、喝完嘴里持续回甘",还是"只是比最开始好一点、努力才尝到一点甜"。
+- **结构化 gold**:
+  - `turn_type=probe`
+  - `decision=探针`
+  - `gradient != 已收敛`
+  - `direction` 为空 / 不传
+  - `step` 为空 / 不传
+  - `terminate_reason` 为空 / 不传
+  - `flags_asserted` 包含 `absolute_extraction_uncertain`
+  - `flags_asserted` 不得包含 `preference_unspecified`
+  - `confidence=medium` 或 `low` 均可;关键是承认 graduation evidence 不足
+- **探针对象**:必须问萃取绝对刻度,不是问偏好。可接受问法:"这点甜是能清楚盖过酸、喝完嘴里还有持续回甘,还是只是比最开始好一些、需要努力才尝到一点点甜?整体是酸甜平衡,还是仍然酸压甜、偏薄?"
+- **❌ 绝不**:`gradient=已收敛`;进入 preference probe;`flags_asserted=[preference_unspecified]`;`terminate_reason=flavor_mismatch` / `taste_unaddressable`;换豆 / 转 Bean Scout;满意停手;解冻水温、比例、粉量或手法作为本版 action。
+- **防的后门**:四项全绿是诱饵;报告故意不给"甜感清楚盖过酸 / 明显持续回甘"的毕业证据。正确动作是先 probe 绝对刻度,而不是靠表面 token 伪造 `gradient=已收敛`。
+
+### E12b — 四项看似全绿 + 到研磨极限 + 绝对甜感仍弱 → underextraction plateau
+- **Failure mode**:agent 把"研磨轴到顶后的无变化"误读成"萃取已收敛",进入 E11 口味层。
+- **场景**:浅焙,第6杯。前几杯一路磨细后相对变好,但最近两杯无改善;用户明确报告已经到最细可用位置,再细会堵、细粉多、流速开始不稳定。
+- **用户报告**:"这杯和上杯还是几乎没差。时间大概 2 分 35 秒,流速正常,床面平,没挂粉环。酸比最开始干净很多,也能勉强尝到一点甜,但不是那种酸能干净化成甜、喝完嘴里明显回甘的状态。整体还是偏薄,酸还是压过甜。我的磨豆机已经到最细可用的位置了,再细就容易堵、细粉很多,流速会开始不稳定。"
+- **✅ 必须**:识别为萃取层的 underextraction plateau / 研磨轴到顶但绝对萃取未毕业;本版单轴不能继续通过磨细解决。停在萃取层,不能进入 taste layer。
+- **结构化 gold**:
+  - `turn_type=terminate`
+  - `decision=停手`
+  - `gradient != 已收敛`
+  - `direction` 为空 / 不传
+  - `step` 为空 / 不传
+  - `terminate_reason=axis_limit_underextracted`
+  - `flags_asserted` 包含 `absolute_extraction_not_met`
+  - `flags_asserted` 包含 `axis_limit_reached`
+  - `flags_asserted` 不得包含 `preference_unspecified`
+  - `flags_asserted` 不得包含 `limitation_noted`
+  - `confidence=medium` 或 `high` 均可;关键是结构化停在萃取层
+- **可接受说明,但不作为 action**:可以指出版本外可能存在 brew 端出口,例如升温、延长接触、调整比例;但本版冻结这些轴,不能执行。
+- **❌ 绝不**:`gradient=已收敛`;`terminate_reason=satisfied` / `flavor_mismatch` / `taste_unaddressable`;换豆 / 转 Bean Scout;继续 `direction=finer`;给 `step=+1格` 或任何继续磨细动作;解冻水温、比例、粉量或手法作为本版 action。
+- **防的后门**:`vs_prev 无变化` 在这里不是收敛证据,而是 axis limit 信号;"有一点甜"不是毕业证据,而是相对最优证据。只有同时读到"绝对甜感不足 + 到最细可用 + 再细不稳",才能 terminate 为 `axis_limit_underextracted`。
+
+### E12a / E12b 与 E11 的边界
+| 维度 | E11 | E12 |
+|---|---|---|
+| 测什么 | Taste layer 在"已毕业"前提下是否正确偏好消歧 | Extraction layer 有没有资格写 `gradient=已收敛` |
+| `gradient=已收敛` | gold 前提 / gold 输出 | hard fail |
+| 四项全绿 | 给定真值 | 诱饵,需要审查是否只是相对最优 |
+| probe 对象 | 用户偏好:不爱酸 vs 爱但想更厚 | 绝对萃取刻度:甜是否清楚盖过酸 |
+| `preference_unspecified` | E11 第一轮 gold flag | E12 forbidden flag |
+| `flavor_mismatch` | E11a gold | E12 hard fail |
+| `taste_unaddressable` | E11b gold | E12 hard fail |
+| 换豆 | E11a 可对 | E12 必错 |
+> **一句话边界**:E11 测 downstream trust;E12 测 upstream qualification。E11 不负责判断毕业真假;E12 负责防止 upstream 伪造 graduation signal。
+
+### E12 contract 注释
+E12b 需要新增一个 extraction-layer `terminate_reason`:
+| 值 | 语义 | 层级 | case |
+|---|---|---|---|
+| `axis_limit_underextracted` | 当前研磨轴到顶,但绝对萃取仍未毕业;本版单轴无法继续有效推进 | extraction layer | E12b |
+
+不要复用 `taste_unaddressable`。`taste_unaddressable` 属于萃取毕业后的口味层出口,语义是"用户偏好在本版工具范围内不可处理";E12b 的语义是"萃取层尚未毕业,但研磨轴已经到顶"。这两个 failure surface 不同,混用会污染 E11 的三分契约。
+
+E12a / E12b 建议新增 flags:
+| flag | 语义 | case |
+|---|---|---|
+| `absolute_extraction_uncertain` | 表面接近毕业,但缺少绝对刻度证据,需要继续 probe | E12a |
+| `absolute_extraction_not_met` | 明确未达到绝对萃取毕业刻度 | E12b |
+| `axis_limit_reached` | 当前研磨轴已到可用极限,继续同向会带来堵塞 / 细粉 / 不稳定风险 | E12b |
+
+---
+
+## 十一、B 档后 7 条高危 live 回归观测(现象记录)
 
 > **来源**:实现侧 live 跑真模型(`gemini-2.5-flash`)后的观察记录。
 > **性质**:现象记录,供判断侧追溯。不把两处瑕疵归因给 B 档,也不倒推诊断策略。
@@ -268,5 +351,13 @@ E11b 的 `limitation_noted` gate(判「提粉量 / 任何 brew 干预 = 错」)*
   - 数据:`agents/hello_agent/e3_grinder.evalset.json`(砍豆机 vs 锥刀,同样"又酸又苦")。
   - 评分:`agents/hello_agent/e3_metric.py::e3_grinder_contract_gate`。E3 必须 `terminate_reason=axis_unreliable`;E3b 不得使用 `axis_unreliable` 或直接停手。
   - 配置:`agents/hello_agent/e3_test_config.json`。
-- [ ] **【萃取层 · 拦截欠萃伪装 · S3 后置】** 四项全绿但实为**欠萃 plateau**(vs_prev 无变化是因**到研磨极限**、化甜是**相对最优**而非绝对到位)→ gold:agent **不得直接盖 `gradient:已收敛` 进口味层**;要么继续打「**绝对刻度化甜探针**」(干净盖过酸的甜 vs 努力才尝到一点点),要么识别为欠萃 plateau。接 E1/E4 萃取线、**不进 E11**;是萃取层↔口味层交接点的"哑弹拆除器",被 SPEC §2.4 输入契约的 ⚠️ 指派。
+- [x] **【萃取层 · 拦截欠萃伪装 · E12 已编码】** 四项全绿但实为**欠萃 plateau**(vs_prev 无变化是因**到研磨极限**、化甜是**相对最优**而非绝对到位)→ gold:agent **不得直接盖 `gradient:已收敛` 进口味层**;E12a 继续打「**绝对刻度化甜探针**」,E12b 识别为 `axis_limit_underextracted`。接 E1/E4 萃取线、**不进 E11**;是萃取层↔口味层交接点的"哑弹拆除器",被 SPEC §2.4 输入契约的 ⚠️ 指派。
+  - 数据:`agents/hello_agent/e12_graduation_gate.evalset.json`(E12a probe / E12b axis-limit terminate;开局不预设 `gradient=已收敛`)。
+  - 评分:`agents/hello_agent/e12_metric.py::graduation_gate`。只判 `record_cup` 结构化字段;两条都硬禁 `gradient=已收敛`、口味层 flag/reason、继续磨细。
+  - 配置:`agents/hello_agent/e12_test_config.json`。
+  - 跑:`PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval agents/hello_agent agents/hello_agent/e12_graduation_gate.evalset.json --config_file_path agents/hello_agent/e12_test_config.json`。
+  - ✅ 端到端结果(2026-07-01):`agents/hello_agent/.adk/eval_history/hello_agent_e12_graduation_gate_1782886982.494529.evalset_result.json` → `Tests passed: 2`, `Tests failed: 0`。
+    - E12a 实际落账:`turn_type=probe`,`decision=探针`,`gradient=没变`,`flags_asserted=["absolute_extraction_uncertain"]`,且无 `direction`/`step`/`terminate_reason`。
+    - E12b 实际落账:`turn_type=terminate`,`decision=停手`,`gradient=没变`,`terminate_reason=axis_limit_underextracted`,`flags_asserted=["absolute_extraction_not_met","axis_limit_reached"]`,且无 `direction`/`step`。
+  - 认证排障留痕:本地 ADK 2.3.0 / google-genai 2.10.0 下,传统 `AIza...` key 走 Gemini Developer API 可直接跑通;AI Studio 新 `AQ...` auth key 需走 `GOOGLE_GENAI_USE_VERTEXAI=true` + Agent Platform API / billing / service-bound API key 配套,否则会分别遇到 `401 UNAUTHENTICATED`、`SERVICE_DISABLED`、`BILLING_DISABLED` 或 `API_KEY_SERVICE_BLOCKED`。
 - [ ] **【E11 口味层 · 待萃取层债登记后回看】** E11b 前置消歧:用户报「不甜」要区分 **真欠萃**(违反开局前提 → 退回萃取层)vs **回甘被酸盖住**(符合开局 → 走口味层);用专家「**反向探针:寡淡没余味 vs 有回甘被酸盖住**」。这是 E11b「爱这个酸但要更厚」的镜像入口。

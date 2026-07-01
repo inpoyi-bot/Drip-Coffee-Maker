@@ -1,0 +1,185 @@
+{
+  "eval_set_id": "e12_graduation_gate",
+  "name": "E12 · 萃取层 graduation gate · 拦截欠萃伪装毕业",
+  "description": "见 docs/evals.md §十。E12a/E12b 专测上游萃取层有没有资格写 gradient=已收敛。两条共享四项看似全绿的诱饵;E12a 证据不足必须 probe,E12b 轴到顶且绝对甜感不足必须 terminate 为 axis_limit_underextracted。任何 gradient=已收敛 / preference_unspecified / 口味层 terminate_reason 都是 hard fail。",
+  "eval_cases": [
+    {
+      "eval_id": "E12a_absolute_extraction_probe",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-17",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-24", "bean_age_days": 7, "axis": "grind",
+              "turn_type": "seed", "direction": null, "step": null, "grind_now": "基准",
+              "report": {"sensory": "酸尖、发空、偏薄", "vs_prev": "n/a", "brew_time": "1分55秒", "bed_shape": "浅", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "起点明显欠萃。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-25", "bean_age_days": 8, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸没那么尖、空感减轻", "vs_prev": "变好", "brew_time": "2分12秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "磨细后萃取上来,方向对。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-26", "bean_age_days": 9, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "report": {"sensory": "酸更干净,开始有一点甜", "vs_prev": "变好", "brew_time": "2分30秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "收步", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "接近目标,但还不是毕业。"
+            },
+            {
+              "cup_no": 4, "date": "2026-06-27", "bean_age_days": 10, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细3.5格",
+              "report": {"sensory": "比上杯差不多,有一点回甘", "vs_prev": "没变", "brew_time": "2分35秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "表面平台化,但未确认绝对甜感。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E12a-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "这杯和上杯几乎没差。时间大概 2 分 35 秒,流速看起来正常,床面也平,杯壁没挂粉环。酸比最开始干净很多,不是那种酸完完全空掉的感觉,尾段也能尝到一点甜。但甜感不明显,我不确定是不是已经算酸甜平衡;整体还是偏薄,酸感好像还是比甜更突出。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这杯还不能直接判毕业。它确实比起点干净很多,但你说甜感不明显、酸还是压过甜,所以我先不把它送进口味层。就用这杯判断一下:这点甜是能清楚盖过酸、喝完嘴里还有持续回甘,还是只是比最开始好一些、需要努力才尝到一点点甜?整体是酸甜平衡,还是仍然酸压甜、偏薄?"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "酸变干净、有一点甜但甜感不明显、偏薄、酸压甜",
+                  "vs_prev": "没变",
+                  "brew_time": "2分35秒",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "没变",
+                  "decision": "探针",
+                  "confidence": "medium",
+                  "flags_asserted": ["absolute_extraction_uncertain"],
+                  "rationale": "四项看似稳定,但只有一点甜且酸压甜;绝对萃取毕业证据不足,必须先问绝对刻度化甜探针。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "eval_id": "E12b_axis_limit_underextracted",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-17",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-23", "bean_age_days": 6, "axis": "grind",
+              "turn_type": "seed", "direction": null, "step": null, "grind_now": "基准",
+              "report": {"sensory": "酸尖、发空、偏薄", "vs_prev": "n/a", "brew_time": "1分50秒", "bed_shape": "浅", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "起点明显欠萃。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-24", "bean_age_days": 7, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸没那么尖、空感减轻", "vs_prev": "变好", "brew_time": "2分08秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "磨细后变好。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-25", "bean_age_days": 8, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "report": {"sensory": "酸更干净,有一点甜", "vs_prev": "变好", "brew_time": "2分28秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "收步", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "方向仍对,但未毕业。"
+            },
+            {
+              "cup_no": 4, "date": "2026-06-26", "bean_age_days": 9, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细3.5格",
+              "report": {"sensory": "差不多,甜感仍弱", "vs_prev": "没变", "brew_time": "2分35秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "连续平台化前一杯。"
+            },
+            {
+              "cup_no": 5, "date": "2026-06-27", "bean_age_days": 10, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+0.5格", "grind_now": "比基准细4格",
+              "report": {"sensory": "仍偏薄,酸压甜", "vs_prev": "没变", "brew_time": "2分35秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "连续无改善,等待轴极限证据。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E12b-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "这杯和上杯还是几乎没差。时间大概 2 分 35 秒,流速正常,床面平,没挂粉环。酸比最开始干净很多,也能勉强尝到一点甜,但不是那种酸能干净化成甜、喝完嘴里明显回甘的状态。整体还是偏薄,酸还是压过甜。我的磨豆机已经到最细可用的位置了,再细就容易堵、细粉很多,流速会开始不稳定。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这不是萃取毕业,而是研磨这根轴已经推到可用极限了:再细会堵、细粉多、流速不稳,但现在又还没达到清楚化甜和明显回甘。研磨轴先停手,不要再继续磨细。本版只动研磨,所以不在这里改水温、比例或手法;那些可能是后续版本外的出口。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "terminate",
+                  "sensory": "勉强一点甜、偏薄、酸压甜、到最细可用位置",
+                  "vs_prev": "没变",
+                  "brew_time": "2分35秒",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "没变",
+                  "decision": "停手",
+                  "terminate_reason": "axis_limit_underextracted",
+                  "confidence": "medium",
+                  "flags_asserted": ["absolute_extraction_not_met", "axis_limit_reached"],
+                  "rationale": "绝对甜感不足且用户明确到研磨轴极限;这是萃取层 underextraction plateau,不是口味层。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
