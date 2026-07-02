@@ -29,7 +29,8 @@
 - `docs/demo-arc.md` 已有一条 5 杯干净 demo 弧线:冷启动 → 欠萃 → 磨细 → 读梯度 → 满意停手。
 - `docs/evals.md` + `agents/hello_agent/*evalset.json` / `*_metric.py` now encode the main high-risk boundary cases: E3 grinder attribution, E5 plateau contract integrity, E7c unknown roast age, E11 taste-layer admission, and E12 graduation gate.
 
-当前重点不是扩功能,而是:
-1. 把现有研磨单轴闭环讲清楚、跑稳、用 eval 锁住。
-2. 补缺口看板里的剩余边界;欠萃伪装成毕业和冷启动信息不全已由 E12 / E7c 覆盖。
-3. 为最终提交补 README / 运行说明 / 视频与 writeup 素材;MCP、Deployability、安全护栏已有基础证据,还需要收口说明。
+当前处于 final submission packaging / feature freeze:
+1. 不再扩功能;不解冻水温、比例、粉量或手法,继续保持 V60 + 研磨单轴 vertical slice。
+2. 不新增大 eval gate,除非只是为了文档 / claim consistency;剩余未自动化 rubric cases 归入 future automation backlog。
+3. 当前只做 README、writeup、video script、claim audit、submission package 这类提交材料收口。
+4. multi-symptom contradictory sensory reports 是 v1 limitation,不是当前提交 blocker。

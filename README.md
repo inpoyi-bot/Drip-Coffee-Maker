@@ -202,4 +202,6 @@ This version is a focused capstone build, not a full coffee product.
 
 ## Project Status
 
-The project is in the Build phase, just before code freeze. The core loop is implemented and tested against the main high-risk cases. The next work should be packaging, explanation, and final writeup rather than expanding the core behavior.
+The project is in final submission packaging, not feature expansion. The grind-only V60 vertical slice is implemented, local run and eval instructions are documented, and the main high-risk eval gates are evidence-tracked through committed artifacts and the status notes in `docs/evals.md`.
+
+Remaining work is submission-facing: final writeup, demo/video script, and one more claim review pass. This status does not claim that every E1-E12 rubric case is automated, or that the full E11 group has a complete live pass; E11 live evidence is limited to the documented minimal E11a/E11b rerun plus offline/mutation validation for the broader encoded gate.
