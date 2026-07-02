@@ -216,6 +216,221 @@
           }
         }
       ]
+    },
+    {
+      "eval_id": "E11c_not_sweet_underextracted_admission_reject",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-17",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-26", "bean_age_days": 9, "axis": "grind",
+              "turn_type": "seed", "direction": "—", "step": "", "grind_now": "基准",
+              "report": {"sensory": "偏酸、偏薄", "vs_prev": "n/a", "brew_time": "1分30秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "起点配方,先建立基准。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-27", "bean_age_days": 10, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸减,但甜感仍弱", "vs_prev": "变好", "brew_time": "1分38秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "磨细后萃取上来,但还没有足够证据宣布萃取毕业。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-28", "bean_age_days": 11, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "report": {"sensory": "酸仍明显,甜感不清楚", "vs_prev": "没变", "brew_time": "1分40秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "表面接近稳定,但绝对甜感和回甘尚未确认,不得预设 gradient=已收敛。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E11c-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "还是不甜;酸挺明显,但我说不清是寡淡没余味,还是有回甘但被酸盖住。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "我先不把这个『不甜』直接判成口味层。帮我分一下:它更像寡淡、酸完没余味,还是其实有回甘,只是被酸感盖住、你想要更厚一点?"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "不甜、酸明显,未分清寡淡没余味还是回甘被酸盖住",
+                  "vs_prev": "没变",
+                  "gradient": "非已收敛",
+                  "decision": "探针",
+                  "terminate_reason": null,
+                  "direction": null,
+                  "confidence": "medium",
+                  "flags_asserted": ["info_insufficient"],
+                  "rationale": "『不甜』入口 admission 未确认;信息不足,需反向探针区分萃取债务 vs E11b 口味层。"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "invocation_id": "E11c-turn2",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "更像寡淡、没什么余味,酸把甜压没了,不是那种酸后会回甘的感觉。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这就不是 E11b 那种『喜欢这个酸但想更厚』了,而是萃取层还没毕业:寡淡、没余味、酸压甜都指向欠萃。下一杯只把研磨再细一点,其他都照旧。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "adjust",
+                  "sensory": "寡淡、没余味、酸压甜",
+                  "vs_prev": "没变",
+                  "gradient": "非已收敛",
+                  "decision": "退回萃取层",
+                  "terminate_reason": null,
+                  "direction": "finer",
+                  "step": "+1格",
+                  "confidence": "medium",
+                  "flags_asserted": [],
+                  "rationale": "用户确认寡淡没余味、酸压甜,破坏 E11b admission;退回萃取层继续研磨诊断。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "eval_id": "E11d_not_sweet_taste_unaddressable_admission_accept",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-17",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-26", "bean_age_days": 9, "axis": "grind",
+              "turn_type": "seed", "direction": "—", "step": "", "grind_now": "基准",
+              "report": {"sensory": "偏酸、偏薄", "vs_prev": "n/a", "brew_time": "1分30秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "起点配方,先建立基准。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-27", "bean_age_days": 10, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸减,但甜感仍弱", "vs_prev": "变好", "brew_time": "1分38秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "磨细后萃取上来,但还没有足够证据宣布萃取毕业。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-28", "bean_age_days": 11, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "report": {"sensory": "酸仍明显,甜感不清楚", "vs_prev": "没变", "brew_time": "1分40秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "没变", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "表面接近稳定,但绝对甜感和回甘尚未确认,不得预设 gradient=已收敛。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E11d-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "还是不甜;酸挺明显,但我说不清是寡淡没余味,还是有回甘但被酸盖住。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "我先不把这个『不甜』直接判成口味层。帮我分一下:它更像寡淡、酸完没余味,还是其实有回甘,只是被酸感盖住、你想要更厚一点?"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "不甜、酸明显,未分清寡淡没余味还是回甘被酸盖住",
+                  "vs_prev": "没变",
+                  "gradient": "非已收敛",
+                  "decision": "探针",
+                  "terminate_reason": null,
+                  "direction": null,
+                  "confidence": "medium",
+                  "flags_asserted": ["info_insufficient"],
+                  "rationale": "『不甜』入口 admission 未确认;信息不足,需反向探针区分萃取债务 vs E11b 口味层。"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "invocation_id": "E11d-turn2",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "其实是有回甘的,我也喜欢这个酸;只是酸太亮,甜感被盖住了,我想要更厚、更圆一点。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这就满足 E11b 的入口了:你喜欢这支豆和这个酸,只是想让杯子更厚更圆。这个方向的合法杠杆在冲煮端,比如升温、延长接触或提高浓度,但本版只动研磨,这些轴都冻结,所以这里诚实停手并标注版本边界。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "terminate",
+                  "sensory": "有回甘、喜欢这个酸、想更厚更圆",
+                  "vs_prev": "没变",
+                  "gradient": "已收敛",
+                  "decision": "停手",
+                  "terminate_reason": "taste_unaddressable",
+                  "direction": null,
+                  "confidence": "high",
+                  "flags_asserted": ["limitation_noted"],
+                  "rationale": "用户确认有回甘且喜欢酸,admission 通过进入 E11b;增厚/变圆的合法杠杆在 brew 端,但本版冻结 → taste_unaddressable。"
+                }
+              }
+            ]
+          }
+        }
+      ]
     }
   ]
 }

@@ -214,6 +214,73 @@
 > **可接受原因集合**:识别(a)偏好是「爱、要更厚」非「不爱品类」;(b)正确杠杆在 brew 端;(c)brew 端本版冻结 → 诚实 `limitation_noted` 终止 + 指版本外出口。
 > **gate(任一即 fail)**:`terminate_reason:flavor_mismatch` 或「转 Bean Scout 换豆」(换掉用户喜欢的好豆,本条最严重的假绿)/ `direction:finer`(萃取已毕业)/ **擅自提粉量/动比例轴去「帮调厚」**——比例轴是冻结轴,越界解冻=fail。**本版口味层是「会收手的诊断器」,不是「会陪你调到满意的教练」。**
 
+### E11c / E11d — 「不甜」镜像入口 · admission gate twin
+
+> **归属**:E11b 前置 admission gate。**核心判断**:「不甜」不是自动进入口味层的证据;只有「有回甘 + 喜欢这个酸 + 想更厚」才允许进入 E11b / `taste_unaddressable`。若「不甜」伴随寡淡、没余味、酸压甜,则必须退回萃取层。
+> **SPEC 回接**:这是 SPEC §2.2 Taste Diagnostician 的入口消歧:把用户主观词「不甜」消歧成下一步动作,而不是关键词反射;同时守 SPEC §2.4 的 handoff guardrail:口味层必须在 admission 通过后才成立。
+
+#### Failure mode
+Agent 看到用户说「不甜」,直接解释成「喜欢这个酸但想更厚」,误触发 `taste_unaddressable + limitation_noted`,把本该继续诊断的萃取层债务包装成「本版工具不可处理」。
+
+#### Why this is a twin pair
+这不是单个 negative case,而是一组 twin:
+| 入口词 | Probe 后证据 | 正确分支 |
+|---|---|---|
+| 「不甜」 | 寡淡、没余味、酸压甜 | 退回萃取层 |
+| 「不甜」 | 有回甘、喜欢这个酸、想更厚 | E11b / `taste_unaddressable` |
+> **判别力**:两个 case 共享同一个「不甜」入口,gold 只在用户回答反向探针后分叉。靠「不甜 → taste_unaddressable」或「不甜 → finer」的反射都无法同时过两条。
+
+#### 共享第一轮:用户说「不甜」,但 admission 未确认
+- **场景**:浅焙,已冲数杯,表面上接近收敛;用户仍反馈「不甜」。
+- **用户报告**:「还是不甜;酸挺明显,但我说不清是寡淡没余味,还是有回甘但被酸盖住。」
+- **✅ 必须**:先做**反向探针**,不能直接进入口味层,也不能直接调参。probe 语义要能区分「寡淡、酸完没余味」vs「有回甘、只是被酸盖住、想更厚一点」;不判固定话术。
+
+| 字段 | gold |
+|---|---|
+| `turn_type` | `probe` |
+| `decision` | `探针` |
+| `gradient` | `info_insufficient` / 任意非 `已收敛` |
+| `terminate_reason` | 空 |
+| `flags_asserted` | 包含 `info_insufficient`;不得包含 `limitation_noted` |
+| `direction` | 空 |
+| negative gate | 不得 `direction=finer`;不得含 `[limitation_noted]`;建议不得含 `preference_unspecified` |
+
+> **Contract note**:不新增 `admission_uncertain` / `extraction_uncertain` flag。Admission uncertainty 用 `gradient != 已收敛` 表达;这轮尚未确认萃取毕业资格,本质是信息不足,所以 E11c/E11d 第一轮用 `[info_insufficient]`,不同于 E11a/E11b 已毕业后的 `[preference_unspecified]`。
+> **评分**:自定义 metric 只判结构化字段,不判 probe 话术;probe 话术只要求语义能区分「寡淡没余味」vs「有回甘但被酸盖住」。
+> **gate(任一即 fail)**:`gradient=已收敛` / `terminate_reason=taste_unaddressable` / `terminate_reason=flavor_mismatch` / 转 Bean Scout 换豆 / 直接磨细 / 擅自提粉量、水温、比例轴 / 带 `[limitation_noted]` / 误标 `[preference_unspecified]`。
+
+#### E11c · 第二轮 negative:用户确认「寡淡、没余味、酸压甜」
+- **用户回答**:「更像寡淡、没什么余味,酸把甜压没了,不是那种酸后会回甘的感觉。」
+- **✅ 必须**:识别这条输入破坏 E11b admission,应该**退回萃取层**,而不是进入 `taste_unaddressable`。本 case 的目的不是新增 brew 调参能力;此分支仍只回到萃取层的研磨诊断。
+
+| 字段 | gold |
+|---|---|
+| `turn_type` | `adjust` |
+| `decision` | 退回萃取层 / 继续萃取诊断 |
+| `gradient` | 非 `已收敛` |
+| `terminate_reason` | 空 |
+| `direction` | `finer` |
+| `flags_asserted` | 不含 `[limitation_noted]` |
+
+> **gate(任一即 fail)**:`terminate_reason=taste_unaddressable` / `terminate_reason=flavor_mismatch` / 转 Bean Scout 换豆 / 带 `[limitation_noted]` / `direction=coarser` / 擅自提粉量、水温、比例轴。
+> **Why this case matters**:它防止 agent 把「寡淡、没余味、酸压甜」这类欠萃证据误包装成「口味层无解」。这条 case 守的是 E11b 的 admission gate:输入不合格时,必须回流萃取层。
+
+#### E11d · 第二轮 positive:用户确认「有回甘、喜欢酸、想更厚」
+- **用户回答**:「其实是有回甘的,我也喜欢这个酸;只是酸太亮,甜感被盖住了,我想要更厚、更圆一点。」
+- **✅ 必须**:识别这已经满足 E11b admission。用户不是不喜欢这支豆,而是喜欢这个酸、想要更厚。正确分支是 `taste_unaddressable`,因为合法杠杆在 brew 端,而本版冻结比例 / 水温 / 接触时间轴。
+
+| 字段 | gold |
+|---|---|
+| `turn_type` | `terminate` |
+| `decision` | `停手` |
+| `terminate_reason` | `taste_unaddressable` |
+| `flags_asserted` | `[limitation_noted]` |
+| `gradient` | `已收敛` |
+| `direction` | 空 |
+
+> **gate(任一即 fail)**:`terminate_reason=flavor_mismatch` / 转 Bean Scout 换豆 / `direction=finer` / 继续 probe / 擅自提粉量、水温、比例轴 / 把「喜欢这个酸但想更厚」解释成「不爱果酸品类」。
+> **Why this case matters**:它证明 agent 不是简单拦截所有「不甜」,而是能把「不甜」经 probe 正确放行到 E11b。与 E11c 成对后,系统必须同时做到:遇到「寡淡、没余味、酸压甜」时不进 E11b;遇到「有回甘、喜欢酸、想更厚」时进入 E11b;不把用户喜欢的好豆误换掉;不把版本外 brew 杠杆偷解冻。
+
 ### 口味层 `terminate_reason` 三分(已拍定 · 契约新增)
 萃取毕业后用户仍有残余抱怨时,`terminate_reason` 互斥三支,靠「可否处理 / 处理在哪层」切开,合起来盖住「萃取没问题但用户没到满意」的全部出口:
 | 值 | 语义 | 解在哪 | case |
@@ -352,11 +419,11 @@ E12a / E12b 建议新增 flags:
 - [ ] 用户一次报告多个互相矛盾的词(超出 E1b 的二选一)
 - [x] 口味层诊断出口已补(E11 三分:`satisfied`/`flavor_mismatch`/`taste_unaddressable`);brew 端**实际微调**仍版本冻结(见 §九 + SPEC §6.6)
 - [x] 把 §九 编码为 ADK `*.evalset.json` + 确定性自定义 metric,接入 `adk eval` 自动回归
-  - 数据:`agents/hello_agent/e11_taste_twin.evalset.json`(2 case × 2 轮;开局精度由 `session_input.state` 预设——末杯 `gradient=已收敛` 触发 agent.py 第-1步守卫)。
-  - 评分:`agents/hello_agent/e11_metric.py::taste_layer_gate`(自定义 metric)。**只判 record_cup 结构化字段**(turn_type/decision/gradient/terminate_reason/flags_asserted 集合等值)+ 负向 `direction!=finer`,**不判探针话术/rationale**(§5#2 判动作不判说法)。确定性、无 LLM-judge 抖动。
+  - 数据:`agents/hello_agent/e11_taste_twin.evalset.json`(4 case × 2 轮;E11a/E11b 开局精度由 `session_input.state` 预设——末杯 `gradient=已收敛` 触发 agent.py 第-1步守卫;E11c/E11d 共享「不甜」admission gate 入口,第一轮不得预设 `gradient=已收敛`)。
+  - 评分:`agents/hello_agent/e11_metric.py::taste_layer_gate`(自定义 metric)。**只判 record_cup 结构化字段**(turn_type/decision/gradient/terminate_reason/direction/flags_asserted),**不判探针话术/rationale**(§5#2 判动作不判说法)。E11c/E11d 第一轮用 `gradient != 已收敛` 表达 admission 未确认,并要求 `flags_asserted=["info_insufficient"]`、不得误标 `preference_unspecified` / `limitation_noted`;E11c negative 第二轮要求 `direction=finer` 且不得带 `limitation_noted`;E11d positive 第二轮要求 `taste_unaddressable + limitation_noted`。
   - 配置:`agents/hello_agent/e11_test_config.json`(criteria → custom_metrics)。
-  - 跑:`./.venv/bin/python -m google.adk.cli eval agents/hello_agent agents/hello_agent/e11_taste_twin.evalset.json --config_file_path agents/hello_agent/e11_test_config.json`(需 `agents/` 在 sys.path / 按 `hello_agent` 包名导入 metric)。
-  - ⚠️ 已离线验证:gold 自比全 PASSED;磨细/直接终止/误填 `flavor_mismatch`/漏 `limitation_noted` 全 FAILED;仅改 rationale 仍 PASSED。**端到端真跑需 gemini API 配额 + 上游可靠置位 `gradient=已收敛`**(handoff §6#1)。
+  - 跑:`PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval agents/hello_agent agents/hello_agent/e11_taste_twin.evalset.json --config_file_path agents/hello_agent/e11_test_config.json`。
+  - ⚠️ 已离线验证:E11a/E11b/E11c/E11d gold 自比全 PASSED;磨细/直接终止/误填 `flavor_mismatch`/漏 `limitation_noted` 等结构化错误会 FAILED;仅改 rationale 仍 PASSED。**端到端真跑需 gemini API 配额 + 上游可靠置位 `gradient=已收敛`**(handoff §6#1)。
   - ⚠️ evalset 里 `roast_date` 是固定 ISO 日期;跑得太晚豆龄会漂进 stale(只多派生 `bean_aged` 旗标,不影响守卫与 E11 gold)。
 - [x] 把 E5 plateau 结构化终止记录编码为 ADK evalset + 确定性 custom metric
   - 数据:`agents/hello_agent/e5_plateau.evalset.json`(第12杯连续无改善 + 香气掉/纸板感)。
@@ -375,4 +442,4 @@ E12a / E12b 建议新增 flags:
     - E12a 实际落账:`turn_type=probe`,`decision=探针`,`gradient=没变`,`flags_asserted=["absolute_extraction_uncertain"]`,且无 `direction`/`step`/`terminate_reason`。
     - E12b 实际落账:`turn_type=terminate`,`decision=停手`,`gradient=没变`,`terminate_reason=axis_limit_underextracted`,`flags_asserted=["absolute_extraction_not_met","axis_limit_reached"]`,且无 `direction`/`step`。
   - 认证排障留痕:本地 ADK 2.3.0 / google-genai 2.10.0 下,传统 `AIza...` key 走 Gemini Developer API 可直接跑通;AI Studio 新 `AQ...` auth key 需走 `GOOGLE_GENAI_USE_VERTEXAI=true` + Agent Platform API / billing / service-bound API key 配套,否则会分别遇到 `401 UNAUTHENTICATED`、`SERVICE_DISABLED`、`BILLING_DISABLED` 或 `API_KEY_SERVICE_BLOCKED`。
-- [ ] **【E11 口味层 · 待萃取层债登记后回看】** E11b 前置消歧:用户报「不甜」要区分 **真欠萃**(违反开局前提 → 退回萃取层)vs **回甘被酸盖住**(符合开局 → 走口味层);用专家「**反向探针:寡淡没余味 vs 有回甘被酸盖住**」。这是 E11b「爱这个酸但要更厚」的镜像入口。
+- [x] **【E11 口味层 · admission gate twin 已编码】** E11b 前置消歧:用户报「不甜」要区分 **真欠萃**(违反开局前提 → 退回萃取层,E11c)vs **回甘被酸盖住**(符合开局 → 走口味层,E11d);用专家「**反向探针:寡淡没余味 vs 有回甘被酸盖住**」。这是 E11b「爱这个酸但要更厚」的镜像入口,已并入 `agents/hello_agent/e11_taste_twin.evalset.json` + `agents/hello_agent/e11_metric.py`。
