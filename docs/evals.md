@@ -3,6 +3,7 @@
 
 > **用途**:验证 `agents/hello_agent` 的 `instruction` 是否真的实现了 SPEC §3 的收敛循环——测的是**决策**,不是配方记忆。
 > **状态**:人类可读 rubric + 已编码 ADK eval 回归板。E3/E5/E7c/E11/E12 已有 evalset + custom metric;剩余未编码边界见缺口看板。
+> **读历史结果**:`agents/hello_agent/.adk/eval_history/` 保留了早期失败 run 作为 EDD 迭代痕迹;当前证据以缺口看板中标注的最新通过 run / 离线验证说明为准。
 > **配套**:`agent.py` 的消歧段标 `[待 eval 校准]`,本文件即那把尺。
 
 ---

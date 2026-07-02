@@ -207,9 +207,9 @@ Not "my recipe is better" (indefensible — why would a capstone out-extract a m
 > **Real reason to cut**: not "no time," but "to keep D5's convergence arc **short, clean, readable** on demo." D5 chose "large steps + trend-reading" → slower, jittery convergence → the demo must trade breadth for a legible arc.
 
 ### 6.3 Demo 弧线 / The demo arc
-D6 选了串行多维 → demo 可拍成**分段收敛弧线**:"研磨收敛 → 转水温 → 再收敛"。比单维更能展示编排,又不至于脏成一团。
+D6 原设想是串行多维 → demo 可拍成**分段收敛弧线**:"研磨收敛 → 转水温 → 再收敛"。v1 为了保持 SPEC §3 的梯度信号短、干净、可读,实际 demo **收窄为研磨单轴闭环**:冷启动 → 欠萃 → 磨细 → 读梯度 → 满意停手。多轴 conductor 保留为后续版本,不是本次 capstone 的交付承诺。
 
-D6 chose serial multi-axis → the demo can be a **segmented convergence arc**: "grind converges → switch to temp → converges again." Shows orchestration better than single-axis, without devolving into noise.
+D6 originally chose serial multi-axis → the demo could become a **segmented convergence arc**: "grind converges → switch to temp → converges again." For v1, the actual demo is intentionally narrowed to a **grind-only closed loop** so SPEC §3's gradient signal stays short, clean, and readable: cold start → underextraction → finer grind → gradient reading → satisfied stop. The multi-axis conductor remains future scope, not a capstone delivery claim.
 
 ### 6.4 关键概念覆盖 (要求 ≥3) / Key Concepts Covered (≥3 required)
 多 Agent / ADK · MCP Server · 跨轮 Memory · 安全护栏 Guardrails · 可部署 Deployability。
@@ -241,9 +241,9 @@ Multi-agent / ADK · MCP Server · cross-round Memory · Guardrails · Deployabi
 > 真正未决的,不是已能从上文推出的。Genuinely unresolved — not things already derivable above.
 
 - **[设计 / design]** 萃取/口味的边界:因果模型覆盖到哪算"够"?哪些是可靠规则、哪些不该假装确定?(Section 4 第 4 题的延续,build 时随 eval case 逐步钉。)Where does the causal model stop being reliable? Which rules are solid, which shouldn't pretend certainty? (To be pinned via eval cases during build.)
-- **[设计 / design]** 第一杯的冷启动:用户第一次开冲、还没有"上一杯"时,起点除了大师方案,要不要先问几个问题(豆袋上的烘焙度?)?Cold start: on cup #1 with no history, beyond the master seed, do we ask a few questions (roast level on the bag)?
+- **[已决 / v1 decision]** 第一杯的冷启动:问齐烘焙度、烘焙日期或未知状态、粉量、磨豆机类型和起始研磨描述后,调用 `start_bag`;未知烘焙日期走 E7c 的低置信冷启动,不阻塞也不编造豆龄。Cold start now asks for roast level, roast date or unknown status, dose, grinder type, and baseline grind, then calls `start_bag`; unknown roast age follows E7c's low-confidence path without blocking or inventing bean age.
 - **[数据 / data]** 单一来源数字进 portfolio/视频前**必须核**:Day 3「56% skill 不触发 / SkillsBench 19%」、Day 4「slopsquatting 扩散」、Day 1「85%/51%/41% / 25–39% 生产力」。Verify single-source stats before they enter the writeup/video.
-- **[工程 / eng]** 口味画像(用户级记忆)在 demo 体量内能不能真长出来,还是只占位?Can the user-level taste profile actually emerge within demo scope, or is it a placeholder for v1?
+- **[已决 / v1 decision]** 口味画像(用户级记忆)不进 v1;本版只交付豆级轨迹记忆。User-level taste memory is out of v1; this build only ships bean-level trajectory memory.
 
 ---
 

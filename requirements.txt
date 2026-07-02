@@ -1,2 +1,4 @@
-google-adk[db,eval]
-mcp
+# Versions pinned to the local combination used for the committed demo/eval runs.
+google-adk[db,eval]==2.3.0
+google-genai==2.10.0
+mcp==1.28.1

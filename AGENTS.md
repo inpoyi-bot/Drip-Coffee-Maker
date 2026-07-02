@@ -27,7 +27,7 @@
 - `agents/hello_agent/agent.py` 已实现 V60、冻结手法、只调研磨的单轴收敛教练。
 - `agents/hello_agent/memory.py` 已实现豆级记忆:`start_bag` 冷启动、`record_cup` 逐杯落账、`render_trajectory` 注入这包豆的轨迹。
 - `docs/demo-arc.md` 已有一条 5 杯干净 demo 弧线:冷启动 → 欠萃 → 磨细 → 读梯度 → 满意停手。
-- `docs/evals.md` + `agents/hello_agent/*evalset.json` / `*_metric.py` 已开始把高危边界 case 编成 ADK eval,重点覆盖口味层 E11、砍豆机 E3、plateau E5。
+- `docs/evals.md` + `agents/hello_agent/*evalset.json` / `*_metric.py` now encode the main high-risk boundary cases: E3 grinder attribution, E5 plateau contract integrity, E7c unknown roast age, E11 taste-layer admission, and E12 graduation gate.
 
 当前重点不是扩功能,而是:
 1. 把现有研磨单轴闭环讲清楚、跑稳、用 eval 锁住。

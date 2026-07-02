@@ -128,6 +128,8 @@ Committed eval histories live under:
 agents/hello_agent/.adk/eval_history/
 ```
 
+Some older eval history files are intentionally kept as iteration traces. For pass/fail evidence, use the latest passing runs called out in `docs/evals.md` rather than treating every historical run as current status.
+
 ## Local Deployability
 
 This project does not claim production or cloud deployment. It claims a locally deployable and reproducibly runnable ADK agent.
@@ -157,7 +159,7 @@ This section maps repo artifacts back to the course/project concepts in SPEC §6
 | ADK agent | `agents/hello_agent/agent.py` defines `root_agent` with ADK tools. | The runtime agent owns the V60 convergence loop, tool orchestration, gradient reading, and termination decisions. |
 | Cross-round memory | `agents/hello_agent/memory.py` stores `bag` and `cups`; `render_trajectory` injects the trajectory into each turn. | The agent reasons from structured cup history, not just chat transcript recollection. |
 | Convergence loop | `docs/demo-arc.md` shows cold start -> feedback -> grind moves -> satisfied stop. | The demo evidence is a stateful hill-climb over one bag of beans, not a one-shot recipe answer. |
-| Eval-driven development | `docs/evals.md` plus E3/E5/E7c/E11/E12 evalsets, custom metrics, and committed eval histories. | High-risk behavior is guarded by deterministic eval gates where possible. |
+| Eval-driven development | `docs/evals.md` plus E3/E5/E7c/E11/E12 evalsets, custom metrics, and committed eval histories. | High-risk behavior is guarded by deterministic eval gates where possible; earlier failed histories are kept as build trace, while latest passing evidence is called out in `docs/evals.md`. |
 | Guardrails | `record_cup` in `memory.py` rejects contradictory structured records; evals check contract-sensitive failures. | The build protects the memory trajectory from invalid action/termination records. |
 | MCP Server | `mcp_server/coffee_server.py` and `mcp_server/README.md` define and smoke-test static seed/precheck tools. | MCP demonstrates the external static-tool boundary; it is standalone and intentionally separate from the ADK runtime path. |
 | Deployability | `requirements.txt`, `.env.example`, local `adk web` commands, SQLite session command, verified SQLite session persistence, and eval run commands are documented here. | The project has a reproducible local ADK run path with SQLite-backed sessions; it does not claim cloud or production deployment. |
@@ -179,7 +181,8 @@ This version is a focused capstone build, not a full coffee product.
 - Only grind is actively adjusted.
 - Water temperature, ratio, dose, and technique are frozen after the seed.
 - User-level taste memory is not implemented.
-- Some remaining rubric gaps are documented in `docs/evals.md`, including multi-symptom reports and an E11b "not sweet" mirror case.
+- Some remaining rubric gaps are documented in `docs/evals.md`.
+- Contradictory multi-symptom sensory reports are out of scope for v1. The current agent can pause and ask a calibration probe, but it does not yet run a full sensory interview that decomposes multiple conflicting descriptors into separate diagnostic hypotheses.
 - E11b's `taste_unaddressable` behavior is a version boundary, not a permanent product principle. If brew axes are unlocked later, the gold should be rejudged.
 
 ## Project Status
