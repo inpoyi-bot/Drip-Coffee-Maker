@@ -164,6 +164,21 @@ This section maps repo artifacts back to the course/project concepts in SPEC §6
 | MCP Server | `mcp_server/coffee_server.py` and `mcp_server/README.md` define and smoke-test static seed/precheck tools. | MCP demonstrates the external static-tool boundary; it is standalone and intentionally separate from the ADK runtime path. |
 | Deployability | `requirements.txt`, `.env.example`, local `adk web` commands, SQLite session command, verified SQLite session persistence, and eval run commands are documented here. | The project has a reproducible local ADK run path with SQLite-backed sessions; it does not claim cloud or production deployment. |
 
+## Failure-mode Evidence Table
+
+This table names the dangerous wrong behaviors the project actively prevents, and how strong the current proof is.
+
+| Failure mode | Wrong behavior prevented | Guardrail / eval | Evidence status | Portfolio value |
+|---|---|---|---|---|
+| Agent degenerates into a one-shot recipe recommender | Gives a static "perfect recipe" and stops using prior cups | 5-cup demo arc + memory trajectory | **Completed demo evidence**: clean 5-cup arc; structured trajectory persisted across session restart | Shows why this is an agentic loop, not a chatbot wrapper |
+| Hardware-unreliable grind axis | Treats blade-grinder sour+bitter as normal extraction feedback; keeps adjusting grind or blames pouring | E3/E3b grinder attribution evalset + `e3_metric.py` | **Partial / encoded gate**: deterministic gate exists; latest live pass should only be claimed if a passing result file is cited | Shows causal diagnosis and tool/axis reliability judgment |
+| Plateau termination record contradiction | User-facing answer says stop, but `record_cup` writes `adjust + finer` and pollutes memory | `record_cup` contract invariants + E5 plateau metric | **Partial / encoded gate**: invariants reject contradictory records; E5 metric checks terminate contract | Shows guardrail placement at the state-write boundary, not only prompt wording |
+| Unknown roast age cold start | Over-trusts first-cup degassing / flow instability and keeps grinding finer | E7c unknown roast age evalset + `e7c_metric.py` | **Completed e2e**: documented `Tests passed: 1`, `Tests failed: 0` | Shows uncertainty handling and low-confidence cold-start behavior |
+| Taste-layer acid preference split | After extraction graduation, either keeps grinding finer or reflexively recommends changing beans | E11a/E11b taste-layer twin + `e11_metric.py` | **Partial live**: E11a/E11b minimal live rerun passed; full E11 group is not claimed live-passed | Shows Taste Diagnostician IP: same symptom, different user preference, different correct exit |
+| "Not sweet" admission gate before taste layer | Misroutes true underextraction into `taste_unaddressable`, or mislabels preference uncertainty before extraction graduation | E11c/E11d admission gate twin in E11 evalset | **Partial / offline + encoded**: encoded and offline-validated; no full live pass claim | Shows boundary control between extraction layer and taste layer |
+| Underextraction disguised as graduation | Treats relative improvement or "some sweetness" as absolute extraction graduation; enters taste layer too early | E12 graduation gate evalset + `e12_metric.py` | **Completed e2e**: documented `Tests passed: 2`, `Tests failed: 0` | Shows upstream qualification before downstream trust; prevents false taste-layer handoff |
+| Multiple contradictory sensory descriptors in one report | Pretends to decompose conflicting symptoms into reliable causal hypotheses | Known Boundary / no full sensory interview | **Limitation**: v1 pauses/probes but does not fully decompose multi-symptom contradiction | Shows honest product boundary; prevents portfolio overclaim |
+
 ## Why MCP Is Separate
 
 SPEC §6.5 says seed matching and pre-recipe checks are static-rule territory, not agent reasoning. The MCP server intentionally only covers that commodity layer:
