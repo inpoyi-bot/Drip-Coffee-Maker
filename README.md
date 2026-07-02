@@ -128,6 +128,26 @@ Committed eval histories live under:
 agents/hello_agent/.adk/eval_history/
 ```
 
+## Local Deployability
+
+This project does not claim production or cloud deployment. It claims a locally deployable and reproducibly runnable ADK agent.
+
+Supported:
+
+- Documented dependency setup from `requirements.txt`.
+- Documented environment-variable setup via `.env.example`.
+- Documented local ADK runtime launch command.
+- Verified SQLite-backed session persistence across restarts.
+- Documented ADK eval regression commands and committed eval artifacts.
+
+Not claimed:
+
+- No hosted URL.
+- No Docker image.
+- No Cloud Run or production deployment.
+- No CI/CD pipeline.
+- No production auth, monitoring, or scaling guarantees.
+
 ## Evidence Map
 
 This section maps repo artifacts back to the course/project concepts in SPEC §6.4. It is intentionally evidence-based: each claim points to a file or reproducible command in this repo.
@@ -140,7 +160,7 @@ This section maps repo artifacts back to the course/project concepts in SPEC §6
 | Eval-driven development | `docs/evals.md` plus E3/E5/E7c/E11/E12 evalsets, custom metrics, and committed eval histories. | High-risk behavior is guarded by deterministic eval gates where possible. |
 | Guardrails | `record_cup` in `memory.py` rejects contradictory structured records; evals check contract-sensitive failures. | The build protects the memory trajectory from invalid action/termination records. |
 | MCP Server | `mcp_server/coffee_server.py` and `mcp_server/README.md` define and smoke-test static seed/precheck tools. | MCP demonstrates the external static-tool boundary; it is standalone and intentionally separate from the ADK runtime path. |
-| Deployability | `requirements.txt`, `.env.example`, local `adk web` commands, SQLite session command, and eval run commands are documented here. | The project has a reproducible local ADK run path with optional SQLite-backed sessions; it does not claim cloud or production deployment. |
+| Deployability | `requirements.txt`, `.env.example`, local `adk web` commands, SQLite session command, verified SQLite session persistence, and eval run commands are documented here. | The project has a reproducible local ADK run path with SQLite-backed sessions; it does not claim cloud or production deployment. |
 
 ## Why MCP Is Separate
 
