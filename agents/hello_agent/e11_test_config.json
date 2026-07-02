@@ -7,7 +7,7 @@
       "code_config": {
         "name": "hello_agent.e11_metric.taste_layer_gate"
       },
-      "description": "口味层孪生 E11a/E11b + 不甜 admission gate twin E11c/E11d 的确定性 gate:只判 record_cup 结构化字段(turn_type/decision/gradient/terminate_reason/direction/flags_asserted),不判话术/rationale。"
+      "description": "口味层孪生 E11a/E11b + 不甜 admission gate twin E11c/E11d 的确定性 gate:只判 record_cup 结构化字段,不判话术/rationale。报告 action_path_pass 与 taste_gate_state_pass 两个子分数;overall 必须两者都通过。"
     }
   }
 }

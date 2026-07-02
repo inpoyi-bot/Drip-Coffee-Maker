@@ -420,10 +420,11 @@ E12a / E12b 建议新增 flags:
 - [x] 口味层诊断出口已补(E11 三分:`satisfied`/`flavor_mismatch`/`taste_unaddressable`);brew 端**实际微调**仍版本冻结(见 §九 + SPEC §6.6)
 - [x] 把 §九 编码为 ADK `*.evalset.json` + 确定性自定义 metric,接入 `adk eval` 自动回归
   - 数据:`agents/hello_agent/e11_taste_twin.evalset.json`(4 case × 2 轮;E11a/E11b 开局精度由 `session_input.state` 预设——末杯 `gradient=已收敛` 触发 agent.py 第-1步守卫;E11c/E11d 共享「不甜」admission gate 入口,第一轮不得预设 `gradient=已收敛`)。
-  - 评分:`agents/hello_agent/e11_metric.py::taste_layer_gate`(自定义 metric)。**只判 record_cup 结构化字段**(turn_type/decision/gradient/terminate_reason/direction/flags_asserted),**不判探针话术/rationale**(§5#2 判动作不判说法)。E11c/E11d 第一轮用 `gradient != 已收敛` 表达 admission 未确认,并要求 `flags_asserted=["info_insufficient"]`、不得误标 `preference_unspecified` / `limitation_noted`;E11c negative 第二轮要求 `direction=finer` 且不得带 `limitation_noted`;E11d positive 第二轮要求 `taste_unaddressable + limitation_noted`。
+  - 评分:`agents/hello_agent/e11_metric.py::taste_layer_gate`(自定义 metric)。**只判 record_cup 结构化字段**(turn_type/decision/gradient/terminate_reason/direction/flags_asserted),**不判探针话术/rationale**(§5#2 判动作不判说法)。metric 报 `action_path_pass` / `taste_gate_state_pass` 两个子分数;overall 必须两者都过。E11c/E11d 第一轮用 `gradient != 已收敛` 表达 admission 未确认,并要求 `flags_asserted=["info_insufficient"]`、不得误标 `preference_unspecified` / `limitation_noted`;E11c negative 第二轮要求 `direction=finer` 且不得带 `limitation_noted`;E11d positive 第二轮要求 `taste_unaddressable + limitation_noted`。E11a/E11b 若使用 `preference_unspecified` / `flavor_mismatch` / `taste_unaddressable`,则 `gradient` 必须是携带的萃取层状态 `已收敛`,不能降级成当前主观 delta `没变`。
   - 配置:`agents/hello_agent/e11_test_config.json`(criteria → custom_metrics)。
   - 跑:`PYTHONPATH=agents ./.venv/bin/python -m google.adk.cli eval agents/hello_agent agents/hello_agent/e11_taste_twin.evalset.json --config_file_path agents/hello_agent/e11_test_config.json`。
   - ⚠️ 已离线验证:E11a/E11b/E11c/E11d gold 自比全 PASSED;磨细/直接终止/误填 `flavor_mismatch`/漏 `limitation_noted` 等结构化错误会 FAILED;仅改 rationale 仍 PASSED。**端到端真跑需 gemini API 配额 + 上游可靠置位 `gradient=已收敛`**(handoff §6#1)。
+  - ✅ 最小 live 复跑(2026-07-02):`agents/hello_agent/.adk/eval_history/hello_agent_e11_taste_twin_ab_only_1782977662.0231612.evalset_result.json` → E11a/E11b `Tests passed: 2`, `Tests failed: 0`;两条的 `action_path_pass=1.0`、`taste_gate_state_pass=1.0`。
   - ⚠️ evalset 里 `roast_date` 是固定 ISO 日期;跑得太晚豆龄会漂进 stale(只多派生 `bean_aged` 旗标,不影响守卫与 E11 gold)。
 - [x] 把 E5 plateau 结构化终止记录编码为 ADK evalset + 确定性 custom metric
   - 数据:`agents/hello_agent/e5_plateau.evalset.json`(第12杯连续无改善 + 香气掉/纸板感)。

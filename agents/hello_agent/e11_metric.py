@@ -8,7 +8,10 @@
 - 确定性、无 LLM-judge 抖动 —— 回归门该是确定性的。
 
 判什么(逐轮,期望值从 gold tool_use 读,字段范围在本文件钉死):
-- 正向等值:turn_type、decision、gradient、terminate_reason、direction。
+- `action_path_pass`:turn_type、decision、terminate_reason、direction、flags_asserted。
+- `taste_gate_state_pass`:gradient 是否符合分层闸门。口味层 probe/terminate
+  (`preference_unspecified` / `flavor_mismatch` / `taste_unaddressable`)必须携带
+  `gradient="已收敛"`;admission 未确认分支必须 `gradient != "已收敛"`。
 - flags_asserted 默认集合等值(COUNT 旗标);E11c negative 第二轮只禁 `limitation_noted`,
   不要求 flags 必须为空。
 - 方向门按 gold 判:E11a/b 已毕业分支不得 `direction=finer`;E11c negative 第二轮必须
@@ -28,6 +31,7 @@ from typing import Optional
 from google.adk.evaluation.eval_case import ConversationScenario, Invocation
 from google.adk.evaluation.eval_case import get_all_tool_calls
 from google.adk.evaluation.eval_metrics import EvalMetric
+from google.adk.evaluation.eval_rubrics import RubricScore
 from google.adk.evaluation.evaluator import (
     EvalStatus,
     EvaluationResult,
@@ -35,9 +39,11 @@ from google.adk.evaluation.evaluator import (
 )
 
 # 只在这些结构化字段上判正向等值(gold 给了才比)。**绝不含 rationale / sensory 等话术位。**
-_GATED_FIELDS = ("turn_type", "decision", "gradient", "terminate_reason", "direction")
+_ACTION_FIELDS = ("turn_type", "decision", "terminate_reason", "direction")
 _NON_CONVERGED_MARKERS = {"非已收敛", "info_insufficient"}
 _E11C_NEGATIVE_DECISIONS = {"退回萃取层", "继续萃取诊断", "继续"}
+_TASTE_LAYER_FLAGS = {"preference_unspecified"}
+_TASTE_LAYER_REASONS = {"flavor_mismatch", "taste_unaddressable"}
 
 
 def _has_value(value: object) -> bool:
@@ -59,46 +65,61 @@ def _flags_set(args: dict) -> set[str]:
     return set(args.get("flags_asserted") or [])
 
 
+def _uses_taste_layer(args: dict) -> bool:
+    return bool(_flags_set(args) & _TASTE_LAYER_FLAGS) or args.get("terminate_reason") in _TASTE_LAYER_REASONS
+
+
+def _rubric(rubric_id: str, passed: bool, fails: list[str]) -> RubricScore:
+    return RubricScore(
+        rubricId=rubric_id,
+        score=1.0 if passed else 0.0,
+        rationale="PASS" if passed else "; ".join(fails),
+    )
+
+
 def _check_one(
     actual_args: Optional[dict],
     gold_args: Optional[dict],
     invocation_id: str = "",
-) -> tuple[bool, list[str]]:
-    """对单轮判 gate;返回 (是否通过, 失败原因列表)。"""
-    fails: list[str] = []
+) -> tuple[bool, float, list[RubricScore]]:
+    """对单轮判 gate;返回 (是否通过, 分数, 子分数 rubric)。"""
+    action_fails: list[str] = []
+    state_fails: list[str] = []
 
     if gold_args is None:
-        return True, fails  # gold 这轮没规定 → 不判(理论上不会发生)
+        rubrics = [
+            _rubric("action_path_pass", True, []),
+            _rubric("taste_gate_state_pass", True, []),
+        ]
+        return True, 1.0, rubrics  # gold 这轮没规定 → 不判(理论上不会发生)
     if actual_args is None:
-        return False, ["这一轮没调 record_cup(应有结构化记录)"]
+        fail = ["这一轮没调 record_cup(应有结构化记录)"]
+        rubrics = [
+            _rubric("action_path_pass", False, fail),
+            _rubric("taste_gate_state_pass", False, fail),
+        ]
+        return False, 0.0, rubrics
 
-    # 正向:gold 指定的结构化字段须等值;显式给空值时,实际也必须为空。
-    for f in _GATED_FIELDS:
+    # action_path_pass:gold 指定的动作字段须等值;显式给空值时,实际也必须为空。
+    for f in _ACTION_FIELDS:
         if f not in gold_args:
             continue
 
         expected = gold_args.get(f)
         actual = actual_args.get(f)
 
-        if f == "gradient" and expected in _NON_CONVERGED_MARKERS:
-            if actual == "已收敛":
-                fails.append("gradient=已收敛:admission 未确认时不得宣布收敛")
-            elif not _has_value(actual):
-                fails.append(f"gradient: 期望非 '已收敛',实得 {actual!r}")
-            continue
-
         if f == "decision" and invocation_id == "E11c-turn2":
             if actual not in _E11C_NEGATIVE_DECISIONS:
-                fails.append(
+                action_fails.append(
                     f"decision: 期望 {sorted(_E11C_NEGATIVE_DECISIONS)},实得 {actual!r}"
                 )
             continue
 
         if not _has_value(expected):
             if _has_value(actual):
-                fails.append(f"{f}: 期望为空,实得 {actual!r}")
+                action_fails.append(f"{f}: 期望为空,实得 {actual!r}")
         elif actual != expected:
-            fails.append(f"{f}: 期望 {expected!r},实得 {actual!r}")
+            action_fails.append(f"{f}: 期望 {expected!r},实得 {actual!r}")
 
     actual_flags = _flags_set(actual_args)
     gold_flags = _flags_set(gold_args)
@@ -106,17 +127,40 @@ def _check_one(
     # E11c 第二轮只要求不得 limitation_noted,不要求 flags 必须空。
     if invocation_id == "E11c-turn2":
         if "limitation_noted" in actual_flags:
-            fails.append("flags_asserted 含 limitation_noted:E11c negative 应退回萃取层,不得标版本外无解")
+            action_fails.append("flags_asserted 含 limitation_noted:E11c negative 应退回萃取层,不得标版本外无解")
     elif actual_flags != gold_flags:
-        fails.append(
+        action_fails.append(
             f"flags_asserted: 期望 {sorted(gold_flags)},实得 {sorted(actual_flags)}"
         )
 
     # 兼容旧 E11a/b gold:未显式声明 direction 的轮次,仍禁止直接磨细。
     if "direction" not in gold_args and actual_args.get("direction") == "finer":
-        fails.append("direction=finer:该 E11 分支不得磨细(§2.2 命根子,硬 fail)")
+        action_fails.append("direction=finer:该 E11 分支不得磨细(§2.2 命根子,硬 fail)")
 
-    return (len(fails) == 0), fails
+    # taste_gate_state_pass:gradient 是跨层携带的萃取状态,不是当前主观 delta。
+    expected_gradient = gold_args.get("gradient")
+    actual_gradient = actual_args.get("gradient")
+    if expected_gradient in _NON_CONVERGED_MARKERS:
+        if actual_gradient == "已收敛":
+            state_fails.append("gradient=已收敛:admission 未确认时不得宣布收敛")
+        elif not _has_value(actual_gradient):
+            state_fails.append(f"gradient: 期望非 '已收敛',实得 {actual_gradient!r}")
+    elif _uses_taste_layer(gold_args) or _uses_taste_layer(actual_args):
+        if actual_gradient != "已收敛":
+            state_fails.append(
+                f"gradient: 使用口味层 flag/reason 时必须携带 '已收敛',实得 {actual_gradient!r}"
+            )
+    elif "gradient" in gold_args and _has_value(expected_gradient) and actual_gradient != expected_gradient:
+        state_fails.append(f"gradient: 期望 {expected_gradient!r},实得 {actual_gradient!r}")
+
+    action_pass = len(action_fails) == 0
+    state_pass = len(state_fails) == 0
+    rubrics = [
+        _rubric("action_path_pass", action_pass, action_fails),
+        _rubric("taste_gate_state_pass", state_pass, state_fails),
+    ]
+    score = (rubrics[0].score + rubrics[1].score) / 2.0
+    return action_pass and state_pass, score, rubrics
 
 
 def taste_layer_gate(
@@ -137,7 +181,7 @@ def taste_layer_gate(
     per: list[PerInvocationResult] = []
     for i, gold_inv in enumerate(expected_invocations):
         actual_inv = actual_invocations[i] if i < len(actual_invocations) else None
-        passed, _fails = _check_one(
+        passed, score, rubrics = _check_one(
             _last_record_cup_args(actual_inv),
             _last_record_cup_args(gold_inv),
             gold_inv.invocation_id,
@@ -146,16 +190,42 @@ def taste_layer_gate(
             PerInvocationResult(
                 actual_invocation=actual_inv or gold_inv,
                 expected_invocation=gold_inv,
-                score=1.0 if passed else 0.0,
+                score=score,
                 eval_status=EvalStatus.PASSED if passed else EvalStatus.FAILED,
+                rubric_scores=rubrics,
             )
         )
 
     scored = [p.score for p in per if p.score is not None]
     overall = (sum(scored) / len(scored)) if scored else None
     all_pass = bool(per) and all(p.eval_status == EvalStatus.PASSED for p in per)
+    action_scores = [
+        r.score
+        for p in per
+        for r in (p.rubric_scores or [])
+        if r.rubric_id == "action_path_pass" and r.score is not None
+    ]
+    state_scores = [
+        r.score
+        for p in per
+        for r in (p.rubric_scores or [])
+        if r.rubric_id == "taste_gate_state_pass" and r.score is not None
+    ]
+    overall_rubrics = [
+        RubricScore(
+            rubricId="action_path_pass",
+            score=sum(action_scores) / len(action_scores) if action_scores else None,
+            rationale="Average action_path_pass across invocations.",
+        ),
+        RubricScore(
+            rubricId="taste_gate_state_pass",
+            score=sum(state_scores) / len(state_scores) if state_scores else None,
+            rationale="Average taste_gate_state_pass across invocations.",
+        ),
+    ]
     return EvaluationResult(
         overall_score=overall,
         overall_eval_status=EvalStatus.PASSED if all_pass else EvalStatus.FAILED,
         per_invocation_results=per,
+        overall_rubric_scores=overall_rubrics,
     )
