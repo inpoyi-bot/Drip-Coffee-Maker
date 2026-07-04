@@ -1,0 +1,177 @@
+{
+  "eval_set_id": "e13_overshoot",
+  "name": "E13 · overshoot reversal · 过冲后反向收步 vs 不确定先探针",
+  "description": "见 task E13。补 SPEC §3 第6/7步的 dirty-arc 分支:中途继续磨细后若明确变坏,应识别 overshoot,反向磨粗且收小步长继续;若只有模糊苦味且客观信号没动,不得反射反向,必须 probe。开局不预设 gradient=已收敛。",
+  "eval_cases": [
+    {
+      "eval_id": "E13a_mid_search_overshoot_reverse_shrink_continue",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-24",
+            "roast_age_status": "known",
+            "bean_age_days": 10,
+            "bean_age_band": "fresh",
+            "flags": [],
+            "bean_age_hypothesis": "fresh",
+            "bean_age_evidence_status": "known_from_roast_date",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "粗砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-27", "bean_age_days": 3, "axis": "grind",
+              "turn_type": "seed", "direction": null, "step": null, "grind_now": "基准",
+              "report": {"sensory": "酸空、寡淡", "vs_prev": "n/a", "brew_time": "1分35秒", "bed_shape": "浅", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "冷启动第一杯明显欠萃。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-28", "bean_age_days": 4, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸空, 1'40\"", "vs_prev": "变好", "brew_time": "1分40秒", "bed_shape": "浅", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "仍清楚欠萃,继续磨细 2格。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-29", "bean_age_days": 5, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细4格",
+              "report": {"sensory": "还是偏酸、没出甜", "vs_prev": "变好", "brew_time": "2分10秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "方向变好但尚未出甜,不是已收敛。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E13a-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "这杯比上杯明显差:发苦了,口腔有点发干,流速慢了不少,大概2分55秒,床面偏厚、下陷不足。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这杯是磨细越过头了:比上杯明显变差,出现发苦、发干和流速变慢。不要继续细了,这次往回磨粗一小步,比上次只回退 1 格,水温、粉量和注水手法继续保持不变。冲完再看苦涩是否退掉、甜感是否回来。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "adjust",
+                  "sensory": "发苦、口腔发干、流速慢、床面偏厚下陷不足",
+                  "vs_prev": "变坏",
+                  "brew_time": "2分55秒",
+                  "bed_shape": "偏厚下陷不足",
+                  "wall_ring": "无",
+                  "gradient": "变坏",
+                  "decision": "继续",
+                  "direction": "coarser",
+                  "step": "1格",
+                  "confidence": "high",
+                  "flags_asserted": ["overshoot_observed"],
+                  "rationale": "上一轮继续磨细后从仍酸未甜跳到苦涩发干且流速明显慢,说明越过最优点;反向并收小步长继续搜索。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "eval_id": "E13b_objective_silent_verify_no_reflex_reversal",
+      "session_input": {
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "bag": {
+            "roast": "浅",
+            "roast_date": "2026-06-24",
+            "roast_age_status": "known",
+            "bean_age_days": 10,
+            "bean_age_band": "fresh",
+            "flags": [],
+            "bean_age_hypothesis": "fresh",
+            "bean_age_evidence_status": "known_from_roast_date",
+            "dose_g": 15,
+            "ratio": "1:15~1:16",
+            "water_temp_baseline_c": 93,
+            "water_temp_actual_c": 93,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "粗砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1, "date": "2026-06-27", "bean_age_days": 3, "axis": "grind",
+              "turn_type": "seed", "direction": null, "step": null, "grind_now": "基准",
+              "report": {"sensory": "酸空、寡淡", "vs_prev": "n/a", "brew_time": "1分35秒", "bed_shape": "浅", "bed_note": "", "wall_ring": "无"},
+              "gradient": "n/a", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "冷启动第一杯明显欠萃。"
+            },
+            {
+              "cup_no": 2, "date": "2026-06-28", "bean_age_days": 4, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细2格",
+              "report": {"sensory": "酸空, 1'40\"", "vs_prev": "变好", "brew_time": "1分40秒", "bed_shape": "浅", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "仍清楚欠萃,继续磨细 2格。"
+            },
+            {
+              "cup_no": 3, "date": "2026-06-29", "bean_age_days": 5, "axis": "grind",
+              "turn_type": "adjust", "direction": "finer", "step": "+2格", "grind_now": "比基准细4格",
+              "report": {"sensory": "还是偏酸、没出甜", "vs_prev": "变好", "brew_time": "2分10秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
+              "gradient": "变好+同向", "decision": "继续", "terminate_reason": null, "confidence": "medium",
+              "flags_asserted": [], "flags_derived": [], "rationale": "方向变好但尚未出甜,不是已收敛。"
+            }
+          ]
+        }
+      },
+      "conversation": [
+        {
+          "invocation_id": "E13b-turn1",
+          "user_content": {
+            "role": "user",
+            "parts": [{"text": "好像有一点点苦?也说不太准。时间和上杯几乎没差,2分10秒左右,床面平,没挂粉环。"}]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [{"text": "这杯先不要急着反向。你对苦味也不确定,而时间、床面和挂粉环这些客观信号又几乎没变,所以我先把它记成梯度不确定。下一杯研磨先不变,其他也照旧,请重点确认这点苦是稳定出现,还是只是舌头上的一次波动。"}]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "record_cup",
+                "args": {
+                  "turn_type": "probe",
+                  "sensory": "一点点苦但说不准",
+                  "vs_prev": "不确定",
+                  "brew_time": "2分10秒左右",
+                  "bed_shape": "平",
+                  "wall_ring": "无",
+                  "gradient": "info_insufficient",
+                  "decision": "探针",
+                  "confidence": "low",
+                  "flags_asserted": ["gradient_uncertain"],
+                  "rationale": "舌头信号不确定,且时间/床面/挂粉环没有支持变坏;先验证梯度,不反射反向。"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

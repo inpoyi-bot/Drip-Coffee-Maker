@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "overshoot_reversal_gate": 1.0
+  },
+  "custom_metrics": {
+    "overshoot_reversal_gate": {
+      "code_config": {
+        "name": "hello_agent.e13_metric.overshoot_reversal_gate"
+      },
+      "description": "E13 overshoot reversal:overall 只由 record_cup 结构化字段决定;E13a 的注水/手法归因文本仅记 attribution_wording_warn,不参与 pass/fail。E13a 必须 adjust + decision=继续 + gradient 语义为变坏 + coarser + 小于2格 + overshoot_observed,且不得 terminate/probe/axis_limit_reached;E13b 必须 probe + gradient_uncertain,不得带 direction/step/terminate_reason,不得记录 gradient 语义为变坏。"
+    }
+  }
+}

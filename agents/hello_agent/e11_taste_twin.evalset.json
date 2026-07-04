@@ -5,6 +5,7 @@
   "eval_cases": [
     {
       "eval_id": "E11a_flavor_mismatch",
+      "description": "cup3 terminate_reason intentionally null/empty: system-inferred extraction graduation, not user satisfied; enum addition deferred (frozen).",
       "session_input": {
         "app_name": "hello_agent",
         "user_id": "eval_user",
@@ -20,7 +21,7 @@
             "grinder_type": "锥刀",
             "baseline_grind": "白砂糖粗细",
             "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
-            "phase": "active"
+            "phase": "grind_converged"
           },
           "cups": [
             {
@@ -39,7 +40,7 @@
             },
             {
               "cup_no": 3, "date": "2026-06-28", "bean_age_days": 11, "axis": "grind",
-              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "turn_type": "terminate", "grind_now": "比基准细3格",
               "report": {"sensory": "收尾化甜、有回甘", "vs_prev": "没变", "brew_time": "1分40秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
               "gradient": "已收敛", "decision": "停手", "terminate_reason": null, "confidence": "high",
               "flags_asserted": [], "flags_derived": [], "rationale": "客观四项到位(流速正常/床面平/收尾化甜)、再细就会过萃 → 萃取层已收敛。"
@@ -112,6 +113,7 @@
     },
     {
       "eval_id": "E11b_taste_unaddressable",
+      "description": "cup3 terminate_reason intentionally null/empty: system-inferred extraction graduation, not user satisfied; enum addition deferred (frozen).",
       "session_input": {
         "app_name": "hello_agent",
         "user_id": "eval_user",
@@ -127,7 +129,7 @@
             "grinder_type": "锥刀",
             "baseline_grind": "白砂糖粗细",
             "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
-            "phase": "active"
+            "phase": "grind_converged"
           },
           "cups": [
             {
@@ -146,7 +148,7 @@
             },
             {
               "cup_no": 3, "date": "2026-06-28", "bean_age_days": 11, "axis": "grind",
-              "turn_type": "adjust", "direction": "finer", "step": "+1格", "grind_now": "比基准细3格",
+              "turn_type": "terminate", "grind_now": "比基准细3格",
               "report": {"sensory": "收尾化甜、有回甘", "vs_prev": "没变", "brew_time": "1分40秒", "bed_shape": "平", "bed_note": "", "wall_ring": "无"},
               "gradient": "已收敛", "decision": "停手", "terminate_reason": null, "confidence": "high",
               "flags_asserted": [], "flags_derived": [], "rationale": "客观四项到位(流速正常/床面平/收尾化甜)、再细就会过萃 → 萃取层已收敛。"

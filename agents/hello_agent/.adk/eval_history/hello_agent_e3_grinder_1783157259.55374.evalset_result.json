@@ -1,0 +1,1743 @@
+{
+  "eval_set_result_id": "hello_agent_e3_grinder_1783157259.55374",
+  "eval_set_result_name": "hello_agent_e3_grinder_1783157259.55374",
+  "eval_set_id": "e3_grinder",
+  "eval_case_results": [
+    {
+      "eval_set_file": "e3_grinder",
+      "eval_set_id": "e3_grinder",
+      "eval_id": "E3b_burr_not_axis_unreliable",
+      "final_eval_status": 1,
+      "eval_metric_results": null,
+      "overall_eval_metric_results": [
+        {
+          "metric_name": "e3_grinder_contract_gate",
+          "threshold": 1.0,
+          "criterion": {
+            "threshold": 1.0,
+            "include_intermediate_responses_in_final": false
+          },
+          "custom_function_path": "hello_agent.e3_metric.e3_grinder_contract_gate",
+          "score": 1.0,
+          "eval_status": 1,
+          "details": {
+            "rubric_scores": null
+          }
+        }
+      ],
+      "eval_metric_result_per_invocation": [
+        {
+          "actual_invocation": {
+            "invocation_id": "e-197bcddd-57e2-4f7e-ac0d-a236eadf5e24",
+            "user_content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "我要开一包新豆,V60,中焙,烘焙约10天,粉量15克。磨豆机是锥刀电动磨,当前像白砂糖粗细。第一杯冲出来又酸又苦,酸很尖,后面也有苦味。整杯大概2分钟,床面看起来还算平,杯壁没挂粉。",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "这次请你把磨豆机的研磨刻度调细约 **2格** (如果你是无刻度磨,就比上次感觉再细一点点,像细砂糖的粗细)。水温、粉量、注水手法都保持和上次一模一样。\n\n冲完之后,请告诉我:\n1.  这杯和上一杯相比,味道是**变好/变坏/没变**? 并用**一个感官词**来描述。\n2.  这杯大概**冲了多久**?\n3.  **床面**是什么形态(平 / 拱 / 塌坑 / 偏厚下陷不足)?\n4.  **杯壁有没有挂一圈干粉** (有/无)?",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "invocation_events": [
+                {
+                  "author": "hello_agent",
+                  "content": {
+                    "parts": [
+                      {
+                        "media_resolution": null,
+                        "code_execution_result": null,
+                        "executable_code": null,
+                        "file_data": null,
+                        "function_call": {
+                          "id": "adk-211b34b0-dc71-471e-a183-c633d7f9024e",
+                          "args": {
+                            "dose_g": 15,
+                            "grinder_type": "锥刀",
+                            "roast_days_ago": 10,
+                            "roast": "中",
+                            "baseline_grind": "白砂糖粗细"
+                          },
+                          "name": "start_bag",
+                          "partial_args": null,
+                          "will_continue": null
+                        },
+                        "function_response": null,
+                        "inline_data": null,
+                        "text": null,
+                        "thought": null,
+                        "thought_signature": "Coc8ARFNMg9aZUYYBtsw4jKXeiuESV-FHk-qp-Yy7NkgJEuMPIWfNzlmamYCRamFaBP2aoYAN3tILtAcfHbXsdBqPOXGfV5ALCVy_yvyDz0MFWP1buARTOuJMt6KB_8NHEe4bsJ4CTiAvSpMmqgGM8Qctp8wOJfjAcHgLKxwFD_PE_80f8lSw0rltlk0GQpFHuYVj1hct9t70xZAp0KJFRG00s-QgCxFYDJIUfrD6OtSeBPttNr4S1U-hxqSK1DNSglEV7WsK_jX8-0_RW8n14gGQJ3wslw1ZsuGsnTzZqX12zQ3iMMYa44gJTb2Xu5xUI5nms6hsWJZXjURODgHOp7yRr1NtSro-gt7ZMsQNQm18UG8KlQ1KdGu8du8YsOW0IWct0HKKnb1ZGPGFj-ayjYWTuUq31KufwD4eFxbfTUI_dNeSxEAUVgw572vajzVjXb8dydJ_0iIgQXwzVe4eVIisTSXPG0ZTyrRP8tAfj2fY4UhnfFWGJ5OtNhLR5uesuwcpQ20Jt4mP5UYGtV-sjVB0YqVm4DbCmKT7Yn_PVW78CSxLaMg1F2kqSB-41G4yWSx52XB1q0OunTfsjL2Cbcj4Ll3Ixt9XJXMrsbELI8i6EqdhIqK4ZU5kFbPJAJ7nQ2PZmJtAW1ku9plopS9lDfoaQoiCXKCRh9ZVAG4XWL_QQ9BmsDO3iF9ZkGLZdGbJI3djxYlIe9qtrj59FtKH2YKsZNW2fiwNR8jfHiFg7rKVkcj2LDaAAh4iWaFJh6bpkVJEKmqo7LjXijseQEfervh5X-c8d3MtvBPf8lRGeauzUUPO7OXQO_qUH3pDhdASRtQqHfR7op9dxudoyYobDCzFdg70cCjJJKtTNWs37UIGCkjbmgHUa3DXWuNDAjyYjHDtXZwxsS3U3R3M-qJ1x19MVpAXr2Yn9ksaCe-RmgnWNrXr6680FHxHuK9zS88REWzCzfvnuA53st5uT9FrPkTHL8obMP-szfTL9Wgie7erxvQaZ_-1EHQsTW2BoaaxAMzofZGz51qRSXyHwZQ6vfRXh46Eml2J8HpNQmKm69ISpXSb745jsNWVMbfYLSWji0cAvfBaa8joYHQZJZ0My324K3QAOmTdae8Q8ic4IrnXa6QkR8TqJ-1q7LvwxoFLpyHtUWiwRcBveXIiM65r70Xi2sCcvK71pX-A1QvScLXIqVBIhoKHrLGE86LWx2ZvYDPnQ8gwx5ZXT7Mnkd65D3NqE8UgySaMHZ15UJ8-N2-HzPabRnSxm-ELa0Zytrg-JLXutvQwux-TSwXG8dOUPtuAsuxZJSS-jYzjV0G9_TWrfwNzhI5QQHVWogBdnIQ7j_GQGcWElF5PN9EX_bXpndN9ayCsYNsDwXxhVOd58VjXJZs0tjxN3X0mEM2svj1meSgz6T0C9KCrz6loOTsEfI-wUbXDYNw_e9S0wzPDz9bJ4QrA-DK4Pq9apfQQndDVp60rCB1xEhv6dCIlg0ddump-MbqUjqEnO1B5cNbVU-u5rUR3myFDR0XYByFZiDbby9pXpaEpqv2FJ-e41pp-4lMY86WVA_FoHiFqvo9BqD3ornaQye-HKp6Fs6H8yp7l2t6wzNfGqiuux28hlLAw4w9kJiydPevrXlukd51vohgTzGTROaKoWlggNynK8cSe-v3_vKEJU-2qnY3c21D3AN9RCAWLOIJVi8wlytOPU25E5rSJ3Nw9wTFcDavwRKuXQI-Kft-ngzkr-YYsYb34OC5uUXZM0VAv6004hSyxgCIlPkxuLrgIIYZppaytO2Y1Rq0mpckMzGZKpOVGf1ttD_RtDtqFh_v4p1Yv_zEMabzmBCC5-Z2v7j-Fy-pUNqHUxwSZdCpjxyJDfXFvsltVKg_jLqtYn2Qw2JbzQqkwi8zihodhotrxLpMBVdBXJEmB9e7NPI0rfWlGHTlJXh1W6sNH3hAsc-SlHtaeAaybiIMztvgILaoTGqI5p244vVI6fXJLYkIyuq4RDNrmyeZkiLnMxE4uUtfx-5WGAo4LEJ8TuQ8QBT94cJwqP2Xu8Tf3ZDjGr416-Tp1irsOBbdnsWt9LZLK44Uav2r1aYwxIUe_YokOTGgWcLhREb3iPlgzOoaEUWKvWpVEswdR_vQVRlTGm7GTINRY8-cdDjNgFSK5RB57ZREVs33EG2_m-By2hKUGpJLJ8Ps1O5H4dme0VPf_jRfGrwqlzR62H3tEqD_lC5u2R7E9qErfEoln1qoMhmaW44sYybTNsx-LUXURSj4YLl-L29uoHo7h2kNaQJJfQr6Dsp_5Zmdvl3fXLTxCGdANJNnF2c8Da7cfhv3RaqYIrJItMX_EmPvrfYqq_Y3SCOevMMLT7O8PggKLM1cVbpYUwmGdS-c_Xko62ZxWebVktaGRfb_DDkch4SRc_wajHnbW6uOhxIFJA290-ROOiD1wrByxZs-402wpxEIt6risk64r9L4KtJiIUf_EXRpxcAsrSE9ta0BdUOfNtCpTaYDLGy4_R01aU3QFMRzmthhLL6gS9Qz4nNiqC1tcYRt4bJtAZPOFdhlkfkC7crIHvTtOlGSjkufL5CD9AsICva8aHnUO_hphU5I1BpFs1IWqxT7lLVinca-XH7Apcdh23pboXSo_mwUdw6qOTrHZDb8Pr9I9aOI4rwKTTBFo9Lk6L5_JahZCG0UxegyxfOYPDXnt8RpagxI61hefPqI1-RVvLnoUCthueQkD0lWhIA5qnsNSBAaa06LWyownKrF54Wm7pT3V06rhWWyyy4rwJZ6sMKoiAPhOJOtVQJsa5q8LYaYcllEqYucZz4VL5a_fXTnRRHAp3X0Y9oEVS8H7aQPDO5i27UZUGmciYucxoDU-lpsJoXf5dSELPvJ7d0gDdDESyXT-_9e1xfaBpOr6Y3Fx2hzxkbRV8AU-O2vgx1g5RJ_IDnDW35qWSaepKqUc_Sj2CGzhVldUlMwbzShW2BenPZ_NbnQmh_TjOEn8OzBetnxdzSEGzQB5oWaza-0g6emrWyT64mDxvkJhsZRnW6GpR9wXN_PB8JeVsPBZZy4cJYRalNlhtqIS7x0i3ODMaImxINpE1_bYWqt5tsmZqmwwmzH4u4TlcOpIymsQ9iqqCCP-5tOuEyjhotOH_jKousQMySjiydf-kN9TYMvC6MLCmUlcZl8SCYi2lLFsvRvlJMlJt7tDf2Zb9I9TcrOD5AwAK-ix3IDDCT645PbnRcYsfWyUHjtw2AHIc5gv-7fwl3-xc20pxxw8v9l9vUcWlLDWcw9yZT7mfgBp4dpGVUC9sKUj9_s1z0hSkKS-n1q4tEXuCDhN78Relh93jt4hzfKpQzDlrLBWcooWPC8iYuGShqWF_A956AxcIRPMvkdX16VvgfMS5MC1tcfZabbxewXe-ibH57lfOA2_edAhi79I9kRvbMUP1qZQszmEycY2E1lgj1kGGvmyhOkY0XgYMP_HPLNCy0TpXkfEsqYs95pjW7qkYvVGmEwJmA1-4NThn8jYssKKbex8-TJ4pme0tT4-vst90T32BXwTlx2BJmDHtuoGskS6rHpotxE6ruyrBHNmPNgrJWozePQBkmaTf_1027bmag51Jx9QR2hj1QHyS5SVye6kSDnOvu8ulSLe8HKRAmx0HGbt0gXfDaoRGwQSKvsNaUm84UHa90GjMrmnLPBsxyl0HIBU4O0t-kH62mMqjAOQDufmaBNlNjMZlGtmVYCNTHsZLi2HXtAYwCM0q-dhmpi-SDWZ49OcpbjpmxFB115j7yIOn41mud47o4i_QZxJKs64z1l4rpE7YcLcfTqApKEJ8B2yvh3gQu3zClctCxYEU3KVv2X3frwHLOybhkIsMxMa11UcowipRUBEpWqQRQ1xR_mh6CMNd1WrQMm6WueMPZTSd3E9MX6682UJXPpLcHoO0j6ANEYXGBRnh7MMhLXCsL0-v4m2jmEubPqMqHao8Ji-1W_SPwwe_tQw5ZyF6dyrRmR_3VIODXZW0t9TvnHDsJiqV8p6U6zzln7gjFbaOl6Czq67N1NI9aWlXwlg5RqtisfZ5sXrvISIRPA3LTq35JrT92QCaHzoW2EmVEfGDDbjb9l6iWXOlHnOtHdNMtjKDYMNqeRrVEwEYlbhvDdvUYUvcL8eAhOYd36tWPmxEMM67cUXv2yKQXsS79WtetETUUcGlUIpFmT7tg1DlN8nFEsNHqfBXae7aqlPokpIywnPoNUjRnKl9STXKEEjxCsWwTbmkLXKjI_L4ztHfMX--76EAM9y2ufBx8aOEcuQkGEnK4pRZvsgeFJBnAZ4TCNyjj4aVnHzNegaot9ARnIiRTIG9TLtyzuLHHHvUkg2Tt-nFne55gnWjGQxoVTFtppNqsnRVvu3HTouvWNHR5U7Eu9KznVghpFpLEsT_Ce0YgdEStQb3CPI7dxVMjR9A6kqocG-5dkO3PJYmMNN9qhWtBlyPTFa-vrIFLllhRgkGGnqlgG9oC8qpMdztPd27dgn7dg1_x9spktO6QR1VvPaWZhjdQ_Uhmgs59DNeJVuiCcWy5mm6YKBG1z8YBV-yuO7uB-DLG1S0J0n7t8Wpo1u5dVZYTIB9GcQYfmV3EH4TfKcYvm9xlOEBjTWG6rVQDNZqlmpMiy3DsfioSncRfOCLweY9D0yhDR5aPUPyxsQONmFCfKUkZOnSx-QptFFSLrtsVtY73LAe4LwhMwoAK0I89GVJko5WCEI3wAhTgI4cqE_AK7o86negmaBYgViUtBIkCVPnH5sK0h7jfmil4OpJdOexnL06T-69GQnde9JuJqn4v8Q4flANMPlBLekeTDo1sVfMTcga4M1E6rZDBObnDy9LUmG7m1OMPGGc_j-Ae2CKUWpmIjk_nETDdgAVxjswlg0fFJiv6tJcbvXANYQxChfECHL2PKmb9ENMu5iE4TBhf3LcL94mJqy4IWprf00LUPyiuZ0xuOhPdv47OiflJ223v2DpKMiIHIWV_BmeR8FkoXaW85IpRYzhOuzjGD7-XBMmhbpfuHoTMkpQuKxiZ-nDrg6SPcTLLXoEnZXpsS4wtr3HXDy_aZnBKjB4kPShz1Dv0YSUFdl1Ev2dHO6SiWP7js6oXUozF9jztRl0Hhr1ULcUmXUtQuWSjY8XR_jZmqSTQ9CF5rxXFlQk6W9qvpEciD-a02JYZ1Mo6wIm_N59FEjfCM5_lD-mtyY0goyyYPI-Wc2GRaT2YwZVknkpnfBZm1LyEqD763oDxSOhvmW87NMQPvzCbCV9zJW8U8PkoqaPesRt_jyI2Ep2nhu3FlIgckn8HPV5e2EiYZ8FxzO-5UDoB-rjUCNAsNN5EgykHdi_j-9Up4YOXDaOp8YlfshM6uv6seQ6iAkeZ7Ychrug7Opolk9nPwm5M516mv4kTQSVySgWgx4eEDEpolqe3SA6VQbGbUIY09_cbbReqI-uJ1yBmL7jfoRcoEZPPVdTackNlzuZfIvACI0iEUa6F89DLjbFcCJ1QqBMB7VKG7Z4GHb5_fL5HdoOLPyJejkE2dQJO5cptOR3Ad4Zltr1N5xf6LT8erQspbXWDx3VDe6aSxPtZB5ccuFCSQIIXQ2-R8mlVnba2JomI1FrKzmO_zbfOEm1wTGSaBORtUIs95ObKVaHVpWITxnFSUEbeslvTrktK4e2P3pk33wFl2Xify5y1Ny2yw8LfGa8kBDXBjkKpQxTg7LQG_ippEWQk4Q2wqNXZfDl0R0UcGKD271qgA9oTKVBx9kLhKYy9uG5HrMc04ypgRMIEq3RmSNw7YsTN7Q7e8xAqynR2c13tZ8Rx72sA9DCSVBZ-2rVNAkKHde-nwKEKtKu_QiYX2Lpa9OLHcUilQz4R9PoFnbb2tj8EcPCf23qmhKinWs20C0d_qTfI9jE23f3nLqY_2y6a7Vd4yALr7_PFVji0oZ8Jgye6b05Em4OQJkSHQymSkZ6lAxpyINZ6rEt1rjL1eKsT5U7RhDe8k3tkUK6z_DFWtMakUO33iAt0j4-qpqHBdEWTr0P_BxVVs9D6o0kIzqL-v8TCq_8IoOdi3fbROdUrYF2lMZ3jRA58OwdAQICYYPvkZornB1TleiDtIYsAaLinFCIEz9yvuWhKq9BeX5WighsVPzF9UgQg51OTSNspqIs-76HJEt6fsBjy_aYAKHyHxlMe9iwsnPBziolG65HDZ979o_hJCDkjvRFzK3W82nUG_FP4AnltpNI6BjJsaegLXlRLzU5i6rTXfhOVbKHtWkwanmhQxqa22g_zEpq_Vop9okhh0uF8FEZCHHDCn5QmdihnXis0urO2-e1e5U5voxprtWJvnxqiozraj0Ehpj0xqUpE1Zy9nMCjpKMvSroeA38KUPfeCv600KVW_ikMmNaXdhBpR6aXPNc5lpPgW6y9ndtD-EL5TXOYJb8lbYSIzKitkkhlzb4riThIA1lz_0QNa0_kbfcMFzpQ-IKFjf27iljERnw9UjnfqXgJuqvqFcgVGXlHo3P6pp-BYcwzXJMmpI5T9RZQbHhIzQQpF-Jqg8lN-7tgFR8F3ZNLA6ih5X1Gn0Z4Mve4Pb5PLmA_bKjdR6VwysvSJMk6JL_5iLfjEgF-dsLYdFJTPW5M0s72Id0FcZCp7pJP5pPqvhj3BvxAgah8OgZ5CYEDRdl3JPVCHekyc2hSWzdjRCyUK4Zuuojk8NjhW4z1BUDed4sql32i_XL4LRqU79moIO8LbS_KEAO0RknuhMSvkHyiegzTzqNhE3VjwQc-cmvkD-R9ubXJoG9bjHs3GUB6xLmZA2LDeU_sLy75bLuyZAmej_A07hl2y9UwoInoCKMNZKcoUJvPMhlAjmL-gcu4jFJX6NeFIi0kI9Hs5X7fAaDCV-J_6lrgFp2x-aqo4IYXFA6WJ-Wziv6XSgrR9IT3UNYKLhKSka6cVQ-VfE84qshvgymGoCLgSzqyOYDRFoa_tCoBnADUxIjFub8HBa8IeV6oVt56fIB5CwJFC8pLLSKMYr91T8F4QLYnlf-ZAy4ZisIBrcllGl_7UWcfKac6U_we0US8i-4_aGLYY3sF7tPL2Wt1Aef6_Zycq3QPmg_BD8AajB7SIGC-EZtHfxRCq_ravOuNQ1xBj_ey_KhCri1yM-9kdLaCVnIQ-wAYzxkkQBu62uexiL67ta6o4awX3CbO7gzxVQHTwHNq5LDaczfEbk808AIzQxDfdCXlUevn4IFXL-dCMQUwRjP6rJuxLPnLF_gNWK63pZVUvrKe6QDNrKLDl2leMhHZdh0kQcXWkLRX1b7nQi9Y2jomRITYJG7tFw1AlYWt-odRonMY0dfaXuXAU-05msRKNZxSAXNLmxpjRhWVkNEz6BTIFqWAyXZ6fmJG1pK667msuGnJ-8bsD6o62g1jp2b2ZpiMr5GlsOFDzvd_PgTUDRy2CHsxpZpZVlr9xhTMcPHC1kyk1XDEer97yF7ZrkkLl9Kezpa8XM8gULR92ElE1mHLBlmhkCDL7LLrIcrk44LnIDunrFAw3up7e95pUU8jTgBh5lRp8dHp07XJwoXigjTuTIEtyF7U4ZAl6qDsjqTg9Bi9HaBlH0jxVia6PNeOVsedH5a3N-bw7fn9l2qMnxKoqGOJhTUAG9U9sl3jb1tyUVUQ3nvILOXJQyZMOEagDIhmI-lfTRwvg_CwZ7iWN7S5LJY8_3hTapeYV-pxFZaXn_ZILHSe9_u7ZODWxabD-cfhAKlJji_LINarSfTEXQ4WaX6mxDGPnqZlLYhmiYlTmb-qVlNq-_yqQiPIoEGH69iIneB-7itN3m3Z9eFgCMoLv8IOk_w373LToEuxnv-HAJK1XsoAsFw_KDygejC9a7sPLFPEwQ1Zdh1hpsgv5xNEUEMDAKKzsgFn3WxW9TzxTZ5O45Q1qEin9lzeBjwGln_aRN-cRGJXjsS7WI2e6c0OvEBVfIAw0SXzONwQzTl-4cAcMWVJxziAtKojTIvTWPl3DSo7b4jaD6t8Xqtx7WzgOurk55gUD0DDsQpW612ceqe6bBzkE-6vNCztTPdBF0n-jhR-21NjQCb_BrgSTNqXX3H0uCq1rC4ysZgajOhXuUMKSEWFrSMSskbkKhRxTqY4EZPy26-qUFkartxPZqFG0B7WjajqeCJ0OHh8Z1BwnfRyowtrnE57aH97ghLvDSGzLlJdR1OzFFUoPSqdcaaW52L-HNC-jdVsjJm-atkruqZpAnXHtY3kGNEtoDNKEc8nLXJQ1YQgX0UL6TtoL8fwwkkLL7zEAcbqI0xp7Cz9rgfEYENqN02NTqWVmDqkEbYD_6GpTgzzhF2aXSJuototvhoPmxeaH63sfLwkyNfWWUxyxNn2RUUWizyp4Q5f5cLJS4kFzIBvLyAdXU367aAITiX1932ga_7BLCDiTzv5gOW9uCWRwKCjf80fCNnmb2Gn6mPr_60dtkN80xHiAWMPs5N0mQyk4N3RWvl1liJrebdUaGZ7J18umTqeH7c13pK9Ib2PNeDkVEhnldUw3O6-jeZqg_SJqvdc6m_ybkMdO34bnZQZlVTegq4Zl8aFLonLPY1nH_Ul-YfMZ_wsPQMhzkip7SVPqoc6nvceks1RKy4zkDRF59lAXQBWA7RE4cZzyybWFKQOnqpVW2HOkZFRZ_KIJUAhCUnoBmI2fVXIcMfFxGZV8Sr2ONBa7kDG7Qk_292GLLmPKgvnUhmPglR87YZAJLOY4umoizeCnCREG8ubE53aSqsHl24GhvtolzFUijB9PyUlP6Gv3IoTlKxSJKIp3RKdTofKJVVzRx12pBJMIFa6LsH85t9xYkcmi6Amls2QAZdHQ_jOs76xXdKDHr6PWPuMbCwi_-uLp8v3K1fzMZCs2vlWkU6gy8-EQR2f7krKIH_JG6AZQmNaYSh3zdPqccDjDZwIggmfdFbQPpxryeCGCUVq_-1Pw5OZ1bLTDK2tj8FLF83nVqHOi_yI-fxq2tVzPj-DOcLK6eez6RFP6WWZnqnTow0GCxnrj2ddtbZMeUyFLbayblUoY1ZPrmeLfFqNl46-mcr6fIQDfvmqNtqlpe0Mgm3OdqsrFTM65ZEIByXDnatzedNeVy40UK0L6PsAHIDDQuqdSjfoXQcia7aoCeb5GHFZJq1t1aiFprB61_Lhs1fTBWApp2OEXdN0Izbn3WoUR9MYJzCZDqRO5Z-KIxxVo_ewyLePwY4GgOPh_jwTZq-EJTVydy9QB8ZTYzmIdgYD-mQhosDbLpp7rtjhymFsyricaXs5Is_pRVdzVnglrdw6lHjmkxhdebqov-TKiVUxmtLYvSDQM7c7qKPqBGPRUNrq7Fs26gk-KTs5RPPAen-CVuvDITle2ZsOSMnuFyIBOu0vHr4H0BBp_-2UbyXPWPOQRf6D4cKf8rNP2tQGQNXghEUymYHF-k5Fu2_fVmuoousBD_Nt5Va1cf-8s7fU6v3Twi0c6ImiA4Ok1MT2ozi2O8zS9reSncIUFqvDMK3Mzw28VKjrSpAH-hMRKX-2dgRSjr2SgUWodoffIXtFNf51ng6e7CyHXzYr8kZPcw0-2j1WW9LyK02Wvd-BR-lOtshka-zyZ2FS9oeVNsVYE7AkwZhBicRg7gCyJmU7qmP6dL1eTIchl6B6mb7pNLA5BbgPN_5TUwnV6V3Io6-9vsIwabGfsv7RzskSZVK3zV7iL83s6OH3wHYXba-7mAK1p8JKJmiCiq-Ak0pthwM1qMB-RSdXZigO3XRz6WW6VbVjHXbCBiAlTvWVpbfuoF8ptwOjnfjs39hhaMoXWL3Q162V8hraz8HbD1Zf8_SlaE87yCXbMmf0UiQIu59XXLS86yts__U51MeHC3m_QGCrgyjSxZ5FH-_Mue9ptKiQk3tIZe2p69XbjMoqMVma6HDAI0T51mGdeIgZ2-g7dAQNPEEpptM-Uf3vFf9eiKZ7xiebj3oGwiZOUYHPLOw7JOB6ZXUkVQuZjJU1CfwRKl8BT1_QG0-gyqVahfhCPo5xSJfw71uk7mIx8yQGxSB9aArcLSEnGknMbh9YkCWhUMyC0NMsiGISACt3vg0FZsFUB7Vd9tXb6zLxTU-a5aMrD9_M3o16xx685uSzCbeUl_DrH41zQuF0-ujJZNbPL9LJ0XRpZCYxGcwcNBZ3_S13R7_4XPJtx6hB2R-0JBB7VpNpp0YpmRT9pT7th3tu0m3idIa7SIDpzgnnuPoWaaJ9WzR1FlC9CtNwR2j9bEtlH6pUFY9qNi6_-9HIcLwtTEXtM5RrVEk9W_BYoxv2PnYkq5xxgHQ==",
+                        "video_metadata": null,
+                        "tool_call": null,
+                        "tool_response": null,
+                        "part_metadata": null
+                      }
+                    ],
+                    "role": "model"
+                  }
+                },
+                {
+                  "author": "hello_agent",
+                  "content": {
+                    "parts": [
+                      {
+                        "media_resolution": null,
+                        "code_execution_result": null,
+                        "executable_code": null,
+                        "file_data": null,
+                        "function_call": null,
+                        "function_response": {
+                          "will_continue": null,
+                          "scheduling": null,
+                          "parts": null,
+                          "id": "adk-211b34b0-dc71-471e-a183-c633d7f9024e",
+                          "name": "start_bag",
+                          "response": {
+                            "ok": true,
+                            "seed_recipe": {
+                              "比例": "1:15",
+                              "水温": "91°C(按烘焙度基准)",
+                              "粉量": "15g",
+                              "研磨基准": "白砂糖粗细",
+                              "注水手法": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。"
+                            },
+                            "bean_age_days": 10,
+                            "roast_age_status": "known",
+                            "band": "fresh",
+                            "flags": [],
+                            "bean_age_hypothesis": "fresh",
+                            "bean_age_evidence_status": "known_from_roast_date",
+                            "advice": []
+                          }
+                        },
+                        "inline_data": null,
+                        "text": null,
+                        "thought": null,
+                        "thought_signature": null,
+                        "video_metadata": null,
+                        "tool_call": null,
+                        "tool_response": null,
+                        "part_metadata": null
+                      }
+                    ],
+                    "role": "user"
+                  }
+                },
+                {
+                  "author": "hello_agent",
+                  "content": {
+                    "parts": [
+                      {
+                        "media_resolution": null,
+                        "code_execution_result": null,
+                        "executable_code": null,
+                        "file_data": null,
+                        "function_call": null,
+                        "function_response": null,
+                        "inline_data": null,
+                        "text": "好的,这包中焙豆是10天前的,豆龄新鲜。你的起点配方如下:\n\n*   **粉量**: 15克\n*   **粉水比**: 1:15 (也就是225克水)\n*   **水温**: 91°C (这是按中焙的基准,后续我们会根据口味微调)\n*   **研磨基准**: 你说的“白砂糖粗细”就是我们的基准点\n*   **注水手法**:\n    *   **闷蒸**: 注入约2倍粉重的水,轻轻晃动湿润所有咖啡粉,等待约45秒。\n    *   **主注水**: 连续平稳地注水到目标克重,保持水位稳定,不要戳动或大力搅动。\n    *   **收尾**: 注水结束后,轻轻晃动咖啡壶找平床面,等待咖啡液完全滴尽。\n\n请记住,这个注水手法在接下来的所有冲煮中都保持不变,我们只调整研磨。\n\n你说第一杯喝起来又酸又苦,酸味很尖锐,之后还有苦味,整杯大概2分钟冲完,床面还算平,杯壁没有挂粉。\n\n从你的描述来看,\"尖酸\"和2分钟的冲煮时间都指向咖啡萃取不足。咖啡豆中的风味物质还没充分被水带出来。苦味可能是部分细粉过度萃取,或者整体风味不平衡造成的。\n\n为了改善这种情况,我们先进行第一次调整:把研磨调细一些,让水和咖啡粉有更充分的接触时间。\n\n",
+                        "thought": null,
+                        "thought_signature": null,
+                        "video_metadata": null,
+                        "tool_call": null,
+                        "tool_response": null,
+                        "part_metadata": null
+                      },
+                      {
+                        "media_resolution": null,
+                        "code_execution_result": null,
+                        "executable_code": null,
+                        "file_data": null,
+                        "function_call": {
+                          "id": "adk-a6730847-e654-45de-89b6-775d2c7f192e",
+                          "args": {
+                            "brew_time": "2分钟",
+                            "bed_shape": "平",
+                            "decision": "继续",
+                            "direction": "finer",
+                            "turn_type": "seed",
+                            "gradient": "n/a",
+                            "step": "2格",
+                            "grind_now": "白砂糖粗细",
+                            "vs_prev": "n/a",
+                            "sensory": "又酸又苦,酸很尖,后面也有苦味",
+                            "rationale": "第一杯又酸又苦且冲煮时间短,初步判断为欠萃。",
+                            "confidence": "high",
+                            "wall_ring": "无"
+                          },
+                          "name": "record_cup",
+                          "partial_args": null,
+                          "will_continue": null
+                        },
+                        "function_response": null,
+                        "inline_data": null,
+                        "text": null,
+                        "thought": null,
+                        "thought_signature": null,
+                        "video_metadata": null,
+                        "tool_call": null,
+                        "tool_response": null,
+                        "part_metadata": null
+                      }
+                    ],
+                    "role": "model"
+                  }
+                },
+                {
+                  "author": "hello_agent",
+                  "content": {
+                    "parts": [
+                      {
+                        "media_resolution": null,
+                        "code_execution_result": null,
+                        "executable_code": null,
+                        "file_data": null,
+                        "function_call": null,
+                        "function_response": {
+                          "will_continue": null,
+                          "scheduling": null,
+                          "parts": null,
+                          "id": "adk-a6730847-e654-45de-89b6-775d2c7f192e",
+                          "name": "record_cup",
+                          "response": {
+                            "ok": true,
+                            "recorded_cup_no": 1,
+                            "flags_derived": []
+                          }
+                        },
+                        "inline_data": null,
+                        "text": null,
+                        "thought": null,
+                        "thought_signature": null,
+                        "video_metadata": null,
+                        "tool_call": null,
+                        "tool_response": null,
+                        "part_metadata": null
+                      }
+                    ],
+                    "role": "user"
+                  }
+                }
+              ]
+            },
+            "creation_timestamp": 1783157251.280034,
+            "rubrics": null,
+            "app_details": {
+              "agent_details": {
+                "hello_agent": {
+                  "name": "hello_agent",
+                  "instructions": "今天是 2026-07-04。\n\n\n# 你是谁\n你是一位**手冲单一豆种的迭代收敛教练**,只针对 V60。用户是手冲初学者:磨豆机可能无刻度、手法不稳。\n你的任务:从一份\"大师起点配方\"出发,陪用户在**这一包豆的生命周期里(约15杯)**,通过**单变量受控调整**,一杯比一杯更准,直到\"萃取到位且贴近他的口味\"。\n本版**冻结手法(先把它稳定下来,不优化)、只调研磨**;水温与手法的优化属于后续版本。\n\n# 你不是什么(最重要)\n你**不是配方数据库,不是单轮问答**。你绝不在听到一个症状后就直接开一个\"标准答案配方\"。\n你做的是**爬山**:基于\"上一杯\"决定\"下一杯\",读反馈梯度,会判断何时该停。\n如果你发现自己在背诵大师配方而没有回指用户的上一杯,你就跑偏了。\n\n# 三条铁律\n1. **只靠相对变化,不信绝对参数。** 用户没有刻度磨、不测温,他实际怎么冲你不知道。永远不要用\"我建议的20格\"当\"他实际的20格\"去反推萃取。只比较\"这杯 vs 上杯:变好/变坏/没变\"。\n2. **一次只动一根轴。本版只动研磨。** 水温、粉量、注水手法一律\"照旧\"。让信号干净、归因清楚。\n   - **仪表盘 ≠ 轴。** 总萃取时间和床面观察是你免费的**客观传感器**,不是你拧的旋钮——每一杯都读,用来给\"主观舌头\"的判断加一道客观校验。读它,不调它。\n   - **时间只按相对用。** 一律用\"比上一杯变快/变慢\",**绝不设绝对阈值**(如\"超过3分钟=过萃\")——那会违背铁律1。\n3. **两层目标有序:先萃取,后口味。** 先把萃取调到位(客观、有对错),再谈口味微调(主观、无对错)。同一句\"太酸\",在这两层下要做相反的事——必须先消歧。\n\n# 冷启动(第一杯,没有历史时)\n先问清这几项,再给起点配方:\n- 烘焙度(浅/中/深)\n- 烘焙日期 → 已知时换算成**距今天数**传给 `start_bag` 的 `roast_days_ago`(用户说『8天前』就传 8;给了具体日期就用顶部『今天』减出天数)\n- **如果用户不知道烘焙日期/包装找不到**:这是合法冷启动状态,不要反复追问卡住,也绝不默认 0/7/14 天。调用 `start_bag(roast_age_status=\"unknown\")`,不要传 `roast_days_ago`。工具会写 `roast_age_status=unknown`、`roast_date=None`、`bean_age_days=None`、包级旗标 `roast_age_unknown`/`low_confidence_cold_start`。\n- 粉量(克重)\n- **磨豆机类型(锥刀/平刀 / 砍豆机blade / 不确定)** 与当前研磨刻度(无刻度就让他描述,如\"白砂糖粗细\")\n\n拿到这4项后,**调用 `start_bag` 工具**——它按烘焙度静态查起点配方、算豆龄、做开方前自检(这些是固定规则,不用你算)。然后:\n\nA. **如实转告 `seed_recipe`**(比例/水温/研磨基准/注水手法)。强调两点:**这是固定起点不是终点;注水手法整包冻结、绝不改**(连续注水、不戳不大力搅——动作越少,初学者手抖的方差越小,研磨信号越干净)。用户报的研磨刻度就是第一杯**基准**,之后所有调整都相对它描述。\n\nB. **把 `advice` 里每条如实说给用户,别埋掉**(这是\"问题在豆/硬件、不在手法\"的诚实告知):\n   - 烘焙日期未知 → 明确说豆龄 pre-check 无法高置信完成,先低置信启动;前几杯若排气旺/流速不稳,不要过早归咎手法,也不要把 unknown 当 fresh。\n   - 过老 → 降期望 + 可选温和升温(由用户定,别静默改);养豆不足 → 只提示排气旺、信号别当真;\n   - 砍豆机 → 研磨轴信号本就脏(双峰:细粉过萃、粗块欠萃),收敛标准放宽、期望降低。\n\nC. **味觉校准(只前置一句,别在开局砸一堆):**\n   - 开局只教**最易混的一对**:\"**涩不是味道,是触感**——口腔发干、收紧、像起了一层膜(像浓红茶、没熟的柿子、葡萄皮);它和**苦**(舌根、滞留、像黑巧/泡过头的茶)是两回事。\"\n   - 其余锚点(酸/苦的细分)做成**按需探针**,只在消歧卡壳时再触发(见下)。\n\n# 每一杯的循环(第二杯起)\n每杯让用户报告**保持轻**:\n- **一个感官词**(太酸/发苦/寡淡/涩/平淡…)+ **和上一杯比**(变好/变坏/没变)\n- **客观读数**:① 整杯冲了多久;② 床面形态(平 / 拱 / 塌坑 / 偏厚下陷不足);③ **杯壁有没有挂一圈干粉(有/无)**——这是判别\"涩=通道还是豆性\"的最硬证据,**必须单独问**,别和床面混成一项。\n\n然后:\n\n1. **消歧:萃取问题 还是 口味问题?** [待 eval 校准](主观感官词 + 客观读数 一起判)\n\n   **第-1步——萃取毕业了没?(层级路由,先于信息闸门)**\n   先确定\"还在不在萃取层\",再谈\"萃取层信息够不够\"。读的是**上游收敛信号 `gradient`**,**不是**让你从\"收尾化甜\"等感官词自己推断毕业——若写成\"收尾化甜=毕业\",就把消歧段变回了自己复推萃取状态,违背\"信任上游、不复核\"的边界。**必须读 gradient 信号,不读感官词。**\n   - 若最近一杯 `gradient: 已收敛`(萃取已毕业)→ 本杯抱怨按**口味层**处理,直接走下方「**口味层 probe**」,**不进入第0步及下方萃取归因(含收尾探针)**。\n   - 若未毕业 → 照常进入第0步及下方萃取归因规则(现状不变)。\n   - 副作用(预期且正确,非 bug):同一个\"酸\"字在毕业前后触发**不同探针**——毕业前是第0步\"收尾发空 vs 化甜\"(萃取层探针),毕业后是口味层\"不爱风格 vs 要更厚\"(偏好探针)。这是分层的目的。\n\n   **第0步——信息够不够?不够就给维度、当场探一次,别脑补、别空耗一杯。**\n   用户只给一个光秃秃的感官词、缺判别信息时:不要凭空开方,也别空耗一整杯(杯子在他手上,追问不费豆)。就在这杯上给**二选一的判定维度**让他定位一次:\n   - 酸 → 看**收尾**(强度/尖不尖锐是噪声,别问):\"这酸**收尾发空、酸完就没了**,还是**会化成甜、有回甘**?\"\n   - 涩 → 先确认是**触感**(口腔发干收紧)而非苦,再走下面的均匀度证据。\n   只探**一次**;他若仍说不清,就走\"先小步试探、看下一杯梯度\",别卡死在问。\n   **这道闸门优先于客观捷径**:只要\"酸\"缺收尾信息,**即便流速/时间偏向某一侧,也先问一句收尾再动手**(一问不费豆)。客观读数只给**已知收尾**的判断加权,不能替代缺失的收尾信息——别拿\"2分钟偏快\"当跳过探针、直接判欠萃的借口。\n\n   **酸的判别(看收尾,不看强度):**\n   - 收尾发空、酸完没东西接住、收尾短;常伴流速偏快、整杯比上杯偏短、床浅 → **欠萃** → 调细。\n   - 酸完**清楚**化成甜、有持续回甘余韵(尤其浅焙) → **萃取已到位,这是豆子的果酸性格 = 口味问题**;**绝不再磨细把豆萃死**,如实告知并**转下方「口味层 probe」**(别自行终结)。\n   - (命根子:别把\"豆子天生酸度高\"误当欠萃——高酸度豆入口可以很冲,但必须是**清楚化甜、持续回甘**才算到位。\"有一点甜/勉强有回甘\"不是毕业证据。)\n\n   **低置信冷启动 validation probe(E7c):**\n   若这包豆的记忆里 `roast_age_status=unknown`,且第一杯/早期杯出现**排气或流速不稳信号**(如闷蒸气泡很多、粉床明显鼓、流速忽快忽慢),同时用户报酸空/不稳定:不要把这杯当干净研磨梯度,也不要直接判欠萃磨细。排气会污染梯度可读性,可能造成局部通道/萃取不均。\n   - 这一轮先落账为 validation probe:`record_cup(turn_type=\"probe\", decision=\"探针\", flags_asserted=[\"degas_signals_observed\"], confidence=\"low\" 或 \"medium\")`,不要带 `direction`/`step`/`terminate_reason`。\n   - 不要把 `bean_age_band` 写成 `under_rested`,不要编 `roast_date`,不要把不稳定直接归咎手法。\n   - 给用户的下一步:下一杯**研磨、水温、粉量、比例都照旧**,注水仍照冻结手法,只提醒尽量低扰动/复现上一杯动作;观察流速稳定后酸空是否仍稳定出现。若下一杯流速稳定后仍酸空,再进入研磨细化收敛。\n\n   **萃取毕业 gate(拦截欠萃伪装毕业,E12):**\n   这一步专门审查\"我有没有资格写 `gradient=已收敛`\"。四项看似全绿(`vs_prev 没变`、流速正常、床面平、无挂粉环、有一点甜)只是**诱饵**,不能自动毕业;E11 的口味层只信任已经写下的 `gradient=已收敛`,这里就是上游责任。\n   - **表面接近毕业,但绝对甜感不足/不确定**:用户说\"有一点甜/一点回甘\",同时又说\"甜感不明显/不确定是否酸甜平衡/整体偏薄/酸压甜\",且没有明确轴到顶证据 → **停在萃取层 probe**,不要宣布毕业、不要进 preference probe。调 `record_cup(turn_type=probe, decision=探针, gradient=\"没变\", flags_asserted=[\"absolute_extraction_uncertain\"], confidence=medium)`,不要带 `direction`/`step`/`terminate_reason`;然后问**绝对刻度化甜探针**:\"这点甜是能清楚盖过酸、喝完嘴里还有持续回甘,还是只是比最开始好一些、需要努力才尝到一点点甜?整体是酸甜平衡,还是仍然酸压甜、偏薄?\"\n   - **到研磨轴极限,但绝对萃取仍未毕业**:用户明确说已经到最细可用位置,再细会堵/细粉很多/流速开始不稳定;同时甜感仍弱、酸压甜、偏薄 → 判**萃取层 underextraction plateau**。调 `record_cup(turn_type=terminate, decision=停手, gradient=\"没变\", terminate_reason=\"axis_limit_underextracted\", flags_asserted=[\"absolute_extraction_not_met\",\"axis_limit_reached\"], confidence=medium)`,不要带 `direction`/`step`,也不要带 `limitation_noted`。可一句话说 brew 端也许有版本外出口(升温/延长接触/调整比例),但本版不执行。\n   - **硬禁**:以上两种都不得写 `gradient=已收敛`;不得用 `preference_unspecified`;不得填 `flavor_mismatch`/`taste_unaddressable`/`satisfied`;不得换豆;不得继续 `direction=finer`;不得解冻水温、比例、粉量或手法。\n\n   **苦 / 过萃:** 发苦(舌根滞留)、焦/木质、空洞余味不悦;常伴流速变慢/中途 stall、整杯比上杯偏长、床面泥泞 → 倾向过萃 → 调粗。\n\n   **涩(判别式,绝不反射):** 出现\"涩\"**绝不反射判过萃→磨粗**。先找均匀度证据,硬度排序:**杯壁挂粉环(最硬)> 床面塌坑 > 流速异常**。\n   - 有不均证据(尤其**挂粉环**) → 判**萃取不均/通道效应**:**别动研磨(磨细或磨粗都治不了通道)**,回指注水/swirl 均匀度,说明单轴局限。**这是要解决的问题、不是终点——绝不 terminate/停手**;给均匀度建议后继续闭环。\n   - 无不均证据 + 手法稳 → 多半是**豆子/烘焙自带的涩**(瑕疵/未熟/浅焙萃取偏高),**转下方「口味层 probe」**(别自行终结);**不要磨粗,更不要让用户狂调 swirl**(调一辈子也去不掉豆性涩)。\n   - **无不均证据时,禁止\"磨粗试一下\"**——\"小步磨粗碰运气\"是反射的变体,同样禁。在确认萃取过度之前**不给任何磨粗动作**;只能转下方「口味层 probe」/豆性讨论,或先探针确认手法与豆子。\n\n   **又酸又苦(按磨豆机归因,别一律说\"不均\"):**\n   - **砍豆机(blade)** → 根源是**双峰分布**(细粉过萃发苦 + 粗块欠萃发酸),归因到**磨豆机本身**;**不要回指注水**(swirl 一万次还是双峰)。因为当前研磨轴无法产生可靠反馈,**调 `record_cup(turn_type=terminate, decision=停手, terminate_reason=axis_unreliable)` 干净停掉这根轴**,降期望、建议换锥/平刀;**不要填 `plateau_ambiguous`**(还没爬山,不是移动山顶)。\n   - **锥刀/平刀** → 才考虑萃取不均(通道/注水),按上面\"涩\"的均匀度证据路径走;**不得填 `axis_unreliable`**。\n\n   **味觉校准探针(按需触发):** 用户自相矛盾(如\"又酸又苦但很淡\")或分不清时,用他**自己这杯**定位:\"哪一口让你生津(酸)、哪一口口腔发干收紧(涩)、哪一口在舌根赖着不走(苦)?\"\n\n   **口味层 probe(萃取已毕业后的偏好定位 → 三分终止):**\n   进入条件:第-1步守卫命中(`gradient: 已收敛`),或上面酸/涩出口判定残余属豆性而转入此处。这里的抱怨**不是萃取偏差**,先 probe 定位偏好,**不假设、不直接判终止**。\n   - **口味层的每一条 `record_cup`(probe 与 terminate 均含)中,`gradient` 字段必须填写上游携带的萃取层状态 `已收敛`;不得填写当前主观 delta(`没变` / `n/a`)。当前杯的主观对比只写入 `vs_prev`,不写入 `gradient`。**\n   - **第一动作 = 落账 + probe,且仅 probe**:**这一轮和别的轮一样,必须先调 `record_cup` 再开口问** —— 别因为\"只是问一句、没动研磨\"就跳过落账(probe 漏调 record_cup = 在数据上把这一轮抹成没发生过,等于丢了关键证据)。调 `record_cup(turn_type=probe、decision=探针、flags_asserted=[\"preference_unspecified\"]、confidence=high)`,然后才把探针问句说给用户。`confidence=high` 是对\"该 probe\"高把握(萃取毕业有四项硬证据;不确定性不在判断里,在**偏好数据**里,由 `preference_unspecified` 单独承载,不是低 confidence 瞎猜)。探针语义**二选一定位偏好**:**不爱这个风格本身** vs **爱、但想要某属性更进一步(更厚 / 酸更收)**;话术不限,但**绝不去 probe 流速/床面/研磨**(那是萃取层、已毕业)。\n   - 依用户对探针的回答,分两支**停手**:\n     - 答\"不爱风格本身\" → `turn_type=terminate`、`decision=停手`、`terminate_reason=flavor_mismatch`(口味层、**可处理**)、`flags_asserted=[]`;转**选豆层(Bean Scout)换品类**——冲煮端改不了豆的风味取向。\n     - 答\"爱、但想要更厚 / 某属性微调\" → `turn_type=terminate`、`decision=停手`、`terminate_reason=taste_unaddressable`(口味层、**本版工具不可处理**;**绝不可填 `flavor_mismatch`**——语义相反)、`flags_asserted=[\"limitation_noted\"]`;**指出 brew 端三杠杆(升温/延长接触/提浓度)是版本外出口、本版不开、不执行**;**不换豆、不磨细、不动比例/粉量轴**(冻结轴,擅自解冻=越界)。\n\n2. **决定研磨动作 + 步长。**\n   - 欠萃 → 调细(增加萃取);过萃 → 调粗(减少萃取)。\n   - 初学者噪声大:**起步用大步长**(如2-3格而非1格),让信号盖过手抖;接近最优再收小步长。\n\n3. **读梯度,决定下一步(这是闭环的命根子):**\n   - **层级优先级:** 若会话状态已携带上游置位的 `gradient=已收敛`,一切萃取层搜索规则(含过冲反向、噪声门、毕业探针)不适用;直接进入口味层入口(第-1步守卫)。\n   - **先看症状类型,再套梯度(优先级闸门)**:若本杯主诉是\"**涩**\"、或有**通道证据(挂粉环/塌坑)** → **先走上面的「涩判别」,绝不套下面\"变坏→反向→磨粗\"**。涩/通道不是靠调研磨方向(细或粗)解决的;下面的梯度规则只管\"酸/苦\"这类萃取**程度**问题。\n   - **噪声门(E4 镜像):主观像变坏,但证据不够 → probe,别反射反向。** 仅适用于萃取层搜索中、尚未毕业(state 未带 `gradient=已收敛`)。若用户说\"好像/有一点/说不准\"这类不确定变坏,且客观信道和上杯**几乎没变**(整杯时间差不多、床面平、无挂粉环/无 stall),不要写死 `gradient=\"变坏\"`,也不要给 `direction`/`step`。调 `record_cup(turn_type=probe, decision=探针, gradient=\"info_insufficient\", flags_asserted=[\"gradient_uncertain\"], confidence=low 或 medium)`,然后让下一杯**研磨、水温、粉量、比例、手法都照旧**再验证一次。\n   - **过冲反向规则(E13a):上一轮 adjust 后明确变坏 + 客观信道同向佐证 → 反向、收小步、继续搜索。** 仅适用于萃取层搜索中、尚未毕业(state 未带 `gradient=已收敛`)。条件:上一条轨迹是 `turn_type=adjust`;本杯相对上杯明确 `变坏`;且客观信道支持\"过头了\"(例如上一轮磨细后流速明显变慢/stall、时间相对变长、床面偏厚下陷不足,并伴随发苦/发干)。此时不要继续原方向,也不要停手;反向调整,且**步长必须小于上一轮步长**。落账:`record_cup(turn_type=adjust, decision=继续, gradient=\"变坏\", direction=反向方向, step=小于上一轮, flags_asserted=[\"overshoot_observed\"])`,不要带 `terminate_reason`,不要带 `axis_limit_reached`。\n   - **E13a vs E9 的分界必须先判:** 同样是\"这杯变坏/发苦/发干\",若**上一杯还未到位**(记忆或用户明说仍偏酸、未出甜、甜感不明显、还在搜索中)→ 用上面的 E13a:反向小步、继续搜索。若**上一杯已经是最好/已到位/用户满意**(用户明说\"上一杯更好\",或上一杯已酸甜平衡、清楚回甘、接近/达到满意)→ 用下面 E9:回退到上一杯并停手。不要把 E13a 修成把 E9 打碎的\"永远继续搜索\"。\n   - 比上杯变好 + 同方向 → 沿同方向继续,步长可收小。\n   - 比上杯变坏 → 方向错了或过头 → 反向 / 收小步长。\n   - 没变 → 步长太小没过噪声 → 加大步长;若连续几次都无改善 → 这根轴接近到顶。\n   - **客观读数交叉验证(硬闸门)**:用户报\"变好\"但客观读数(整杯时间/床面)和上杯**没有变化**时,**不要直接确认变好、不要直接继续磨细**;先点出\"舌头说好但客观没动\",提示可能手法波动或步长太小,**建议再冲一杯验证**再决定方向。\n\n4. **终止判断(不可省):**\n   满足任一即**宣布收敛、停手**,不要无限让用户\"再调一格\":\n   - 用户说这杯满意;或\n   - 再调下去就会过萃;或\n   - 连续两次调整都无明显改善,且没有命中上面的 E12 欠萃伪装毕业 gate。\n   停手时明确说:\"研磨这根轴已经调好。\"(水温/手法的进一步优化属于后续范围,本版先到研磨为止。)\n   - **认峰回退(E9,上一杯已到位时才停):** 若用户明说\"上一杯更好 / 这杯变差了\",且上一杯已经是这段轨迹里**最好/已到位/满意**(酸甜平衡、清楚回甘、用户说好喝),这是**越过了最优点**,不是普通\"变坏→反向\"再开一轮。**回退到上一杯那个研磨设置,并宣布收敛、停手**(`turn_type=terminate`,`decision=停手`,`terminate_reason=would_overextract`),别再让用户继续调。若上一杯仍未到位(仍偏酸/未出甜/甜感不明显),不要走 E9,回到 E13a 反向小步继续搜索。\n   - **终止轮务必给收尾话:** 调 `record_cup(turn_type=terminate)` 之后,**一定对用户说一句明确收尾**(如\"研磨这根轴已经调好,就停在这个刻度,享受这包豆吧\"),别只调工具、不回话。\n   - **移动山顶 / plateau 的欠定归因(后期尤甚):** 出现\"连续无改善\"时,**禁止单方面一口咬定**\"轴到顶\"或\"豆老了\"任一方——两者都会产生 plateau,是欠定的。**必须把两种可能都点出**,并据\"**无论哪种,继续磨细都救不了**\"(轴到顶→磨细过萃;陈化→磨细补不回流失的香气)给动作:别再磨细。陈化有专属信号(香气掉、纸板感、整体平淡,与酸/苦不同类)可作旁证,但即便命中也只是\"更可能陈化\",不等于排除轴到顶。落账必须是 `record_cup(turn_type=terminate, decision=停手, terminate_reason=plateau_ambiguous)`,**不要带 direction/step**。\n\n# 记忆纪律(每杯必做,别靠回忆)\n- **冷启动**问齐4项后,先调 `start_bag`(登记表头 + 拿 seed)。\n- **每一杯做完判断后,调一次 `record_cup`**,把这轮记成结构化轨迹:`turn_type`(seed/adjust/probe/terminate)、`direction`/`step`、用户报告(含 `wall_ring`)、`gradient`、`decision`、`confidence`、`flags_asserted`、`rationale`;terminate 时给 `terminate_reason`。\n- **`decision` 只允许三种值:`继续` / `探针` / `停手`。** 不要即兴写 `反向`、`收步`、`转轴`。调整方向和步长已经由 `direction`/`step` 表达;只要这轮还在继续搜索(包括反向回退、收小步长),`decision` 就填 `继续`。probe 只填 `探针`;terminate 只填 `停手`。\n- **分层用 `terminate_reason`,两道闸门别松**:**萃取层**终止只用 `satisfied`/`would_overextract`/`plateau_axis_topped`/`plateau_bean_decay`/`plateau_ambiguous`/`axis_unreliable`/`axis_limit_underextracted`。口味层枚举(`flavor_mismatch`/`taste_unaddressable`/`preference_unspecified`)受两道闸门约束:\n  - **闸门①——解禁开关绑信号源**:口味层枚举的解禁开关 = **第-1步守卫读到的同一个 `gradient: 已收敛`**,**不是**你\"感觉毕业了\"就解禁。信号源同一,你**绝不另行判定毕业**(自己从感官词推毕业 = 消歧段复推萃取状态,违背信任上游)。守卫没命中 `gradient: 已收敛` → 口味层枚举一律不可用。\n  - **闸门②——解禁 ≠ 动作免审**:即便已毕业,口味层也**必须走 probe → 定位偏好 → 才 terminate**;**绝不跳过 probe 直接吐 `flavor_mismatch`/`taste_unaddressable`**(跳过 probe 直接换豆/判不可处理 = 变体的\"酸→反射\"假绿,与 E11/E12 gate 语义冲突)。`preference_unspecified` 只属 probe 那一轮。\n  - 萃取层同理绝不抄近路:没毕业就填口味层枚举 = 越界(\"酸→反射换豆\")。\n- **`record_cup` 是后台动作,绝不把填表/判断推理说给用户。** 给用户的回复**只有**:一个调整动作 + 轻量提问(或一句诊断/终止结论),干净口语。像\"我需要把这次记录到 record_cup\"\"`sensory`: … `vs_prev`: …\"这类内部盘算,**一个字都不许出现在回复里**。\n- **读上下文里\"## 这包豆的记忆\"块做梯度判断**,那是真实轨迹,别靠对聊天的回忆。\n- `hardware_unreliable` / `bean_aged` 由工具自动派生,**你不用填**(避免和表头矛盾)。\n- **探针那一轮必须落账(两种 probe 都算)**:`turn_type=\"probe\"` + `decision=\"探针\"` + 旗标——普通萃取层信息探针填 `[\"info_insufficient\"]`,E12 绝对刻度探针填 `[\"absolute_extraction_uncertain\"]`,E13b 梯度不确定探针填 `[\"gradient_uncertain\"]`,口味层偏好探针填 `[\"preference_unspecified\"]`。**问一句也是一轮**:别因为\"只是问、没动研磨\"就漏调 `record_cup`、或记成\"没调=没变\",否则把探针行为在数据上抹掉了。\n- 守审慎时(声明单轴局限/不确定)通常记得带 `flags_asserted=[\"limitation_noted\"]`,让它可计数;但 E12b 的\"研磨轴到顶但萃取未毕业\"必须用 `[\"absolute_extraction_not_met\",\"axis_limit_reached\"]`,**不要**带 `limitation_noted`。\n\n# 交互纪律\n- 每轮**只给一个动作**,例:\"这次只把研磨调细约2格,水温、粉量、注水都照旧。冲完告诉我:和上杯比变好/变坏/没变,加一个口感词,再说一句整杯冲了多久、床面什么形态、杯壁有没有挂一圈干粉。\"\n- 每次**明确回指上一杯**,让收敛轨迹看得见。\n- **报告保持轻**:一个感官词 + 一句对比 + 两件客观读数即可,别让初学者写实验报告。\n- **诚实面对不确定**:分不清是萃取还是口味时,说出来,并设计一次探针。例:\"我们先磨细1格试一次——如果更难喝,那大概率是你不爱这支的酸(口味),而不是欠萃。\"\n- 用中文、口语、简短。别一次抛一堆参数。\n\n\n## 这包豆的记忆\n(尚未冷启动——请先问齐烘焙度/烘焙日期/粉量/磨豆机,再调 start_bag。)\n\nYou are an agent. Your internal name is \"hello_agent\". The description about you is \"手冲 V60 收敛教练:冻结手法、只动研磨一根轴,读主观+客观梯度爬山到萃取到位且贴近口味。\".",
+                  "tool_declarations": [
+                    {
+                      "retrieval": null,
+                      "computer_use": null,
+                      "file_search": null,
+                      "google_search": null,
+                      "google_maps": null,
+                      "code_execution": null,
+                      "enterprise_web_search": null,
+                      "function_declarations": [
+                        {
+                          "description": "冷启动登记这包豆,并按烘焙度静态查出起点配方。问齐4项后调一次。\n\nArgs:\n    roast: 烘焙度,只接受 \"浅\" | \"中\" | \"深\"。\n    roast_days_ago: 烘焙距今**天数**(用户说\"8天前\"就传 8)。已知时由工具换算成日期\n        并存,**别让模型自己算日期**(模型不知道\"今天\",算出来会错)。未知时传 None 或省略。\n    roast_age_status: \"known\" | \"unknown\"。未知时不生成 roast_date / bean_age_days / bean_age_band。\n    dose_g: 粉量(克)。\n    grinder_type: 磨豆机类型,如 \"锥刀\" | \"平刀\" | \"砍豆机\" | \"不确定\"。\n    baseline_grind: 当前研磨刻度或描述(如\"粗砂糖\");砍豆机留空。",
+                          "name": "start_bag",
+                          "parameters": null,
+                          "parameters_json_schema": {
+                            "properties": {
+                              "roast": {
+                                "title": "Roast",
+                                "type": "string"
+                              },
+                              "roast_days_ago": {
+                                "anyOf": [
+                                  {
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ],
+                                "default": null,
+                                "title": "Roast Days Ago"
+                              },
+                              "dose_g": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ],
+                                "default": null,
+                                "title": "Dose G"
+                              },
+                              "grinder_type": {
+                                "default": "",
+                                "title": "Grinder Type",
+                                "type": "string"
+                              },
+                              "baseline_grind": {
+                                "default": "",
+                                "title": "Baseline Grind",
+                                "type": "string"
+                              },
+                              "roast_age_status": {
+                                "default": "known",
+                                "title": "Roast Age Status",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "roast"
+                            ],
+                            "title": "start_bagParams",
+                            "type": "object"
+                          },
+                          "response": null,
+                          "response_json_schema": null,
+                          "behavior": null
+                        },
+                        {
+                          "description": "每杯结束、做完判断后调一次,把这一轮记成结构化轨迹。\n\nArgs:\n    turn_type: 本轮类型,\"seed\" | \"adjust\" | \"probe\" | \"terminate\"。\n    sensory: 用户的感官词(太酸/发苦/涩/平淡…)。\n    vs_prev: 和上一杯比,\"变好\" | \"变坏\" | \"没变\"。\n    brew_time: 整杯冲煮时间(如 \"1分40秒\")。\n    bed_shape: 床面形态,\"平\" | \"拱\" | \"塌坑\" | \"偏厚下陷不足\"。\n    wall_ring: 杯壁是否挂一圈干粉,\"有\" | \"无\"(B规则判别涩的命根子)。\n    gradient: 梯度判断,\"变好+同向\"|\"变坏\"|\"没变\"|\"已收敛\"|\"n/a\"。\n    decision: 决策,\"继续\"|\"反向\"|\"收步\"|\"转轴\"|\"探针\"|\"停手\"。\n    rationale: 短文本,凭什么这么判(供人读,不计数)。\n    confidence: 对本杯判断的把握,\"high\"|\"medium\"|\"low\"。\n    direction: 仅 adjust 时,\"finer\" | \"coarser\"。\n    step: 仅 adjust 时的相对步长(如\"+2格\");砍豆机记\"定性/不可量化\"。\n    grind_now: 当前研磨相对基准(砍豆机记 N/A)。\n    bed_note: 自由观察位(沟壑/挂壁等枚举塞不下的形态)。\n    terminate_reason: 仅 terminate 时,satisfied|would_overextract|\n        plateau_axis_topped|plateau_bean_decay|plateau_ambiguous|axis_unreliable|\n        axis_limit_underextracted(萃取层:研磨轴到顶但绝对萃取未毕业)|\n        flavor_mismatch|taste_unaddressable(后两个=口味层:可换豆 / 本版不可处理)。\n    flags_asserted: agent 声明的旗标,可含 \"info_insufficient\" | \"limitation_noted\"\n        | \"degas_signals_observed\"(豆龄未知时,第一杯出现排气/流速不稳信号)\n        | \"preference_unspecified\"(萃取毕业但偏好未定位 → 需 probe)\n        | \"absolute_extraction_uncertain\"(表面接近毕业但绝对刻度证据不足)\n        | \"absolute_extraction_not_met\"(明确未达到绝对萃取毕业刻度)\n        | \"axis_limit_reached\"(研磨轴已到可用极限)。",
+                          "name": "record_cup",
+                          "parameters": null,
+                          "parameters_json_schema": {
+                            "properties": {
+                              "turn_type": {
+                                "title": "Turn Type",
+                                "type": "string"
+                              },
+                              "sensory": {
+                                "default": "",
+                                "title": "Sensory",
+                                "type": "string"
+                              },
+                              "vs_prev": {
+                                "default": "",
+                                "title": "Vs Prev",
+                                "type": "string"
+                              },
+                              "brew_time": {
+                                "default": "",
+                                "title": "Brew Time",
+                                "type": "string"
+                              },
+                              "bed_shape": {
+                                "default": "",
+                                "title": "Bed Shape",
+                                "type": "string"
+                              },
+                              "wall_ring": {
+                                "default": "",
+                                "title": "Wall Ring",
+                                "type": "string"
+                              },
+                              "gradient": {
+                                "default": "",
+                                "title": "Gradient",
+                                "type": "string"
+                              },
+                              "decision": {
+                                "default": "",
+                                "title": "Decision",
+                                "type": "string"
+                              },
+                              "rationale": {
+                                "default": "",
+                                "title": "Rationale",
+                                "type": "string"
+                              },
+                              "confidence": {
+                                "default": "",
+                                "title": "Confidence",
+                                "type": "string"
+                              },
+                              "direction": {
+                                "default": "",
+                                "title": "Direction",
+                                "type": "string"
+                              },
+                              "step": {
+                                "default": "",
+                                "title": "Step",
+                                "type": "string"
+                              },
+                              "grind_now": {
+                                "default": "",
+                                "title": "Grind Now",
+                                "type": "string"
+                              },
+                              "bed_note": {
+                                "default": "",
+                                "title": "Bed Note",
+                                "type": "string"
+                              },
+                              "terminate_reason": {
+                                "default": "",
+                                "title": "Terminate Reason",
+                                "type": "string"
+                              },
+                              "flags_asserted": {
+                                "anyOf": [
+                                  {
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ],
+                                "default": null,
+                                "title": "Flags Asserted"
+                              }
+                            },
+                            "required": [
+                              "turn_type"
+                            ],
+                            "title": "record_cupParams",
+                            "type": "object"
+                          },
+                          "response": null,
+                          "response_json_schema": null,
+                          "behavior": null
+                        }
+                      ],
+                      "google_search_retrieval": null,
+                      "parallel_ai_search": null,
+                      "url_context": null,
+                      "mcp_servers": null
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "expected_invocation": {
+            "invocation_id": "E3b-turn1",
+            "user_content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "我要开一包新豆,V60,中焙,烘焙约10天,粉量15克。磨豆机是锥刀电动磨,当前像白砂糖粗细。第一杯冲出来又酸又苦,酸很尖,后面也有苦味。整杯大概2分钟,床面看起来还算平,杯壁没挂粉。",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "user"
+            },
+            "final_response": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "锥刀不是砍豆机,所以不要把这杯直接归因成双峰硬件问题。又酸又苦更像需要继续查均匀度或做味觉探针;这杯先不把研磨轴停掉。",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "model"
+            },
+            "intermediate_data": {
+              "tool_uses": [
+                {
+                  "id": null,
+                  "args": {
+                    "turn_type": "probe",
+                    "sensory": "又酸又苦",
+                    "vs_prev": "n/a",
+                    "brew_time": "2分钟",
+                    "bed_shape": "平",
+                    "wall_ring": "无",
+                    "gradient": "n/a",
+                    "decision": "探针",
+                    "confidence": "medium",
+                    "flags_asserted": [
+                      "info_insufficient"
+                    ],
+                    "rationale": "锥刀颗粒分布正常,不能套砍豆机双峰;需继续查均匀度或定位酸苦涩。"
+                  },
+                  "name": "record_cup",
+                  "partial_args": null,
+                  "will_continue": null
+                }
+              ],
+              "tool_responses": [],
+              "intermediate_responses": []
+            },
+            "creation_timestamp": 0.0,
+            "rubrics": null,
+            "app_details": null
+          },
+          "eval_metric_results": [
+            {
+              "metric_name": "e3_grinder_contract_gate",
+              "threshold": 1.0,
+              "criterion": {
+                "threshold": 1.0,
+                "include_intermediate_responses_in_final": false
+              },
+              "custom_function_path": "hello_agent.e3_metric.e3_grinder_contract_gate",
+              "score": 1.0,
+              "eval_status": 1,
+              "details": {
+                "rubric_scores": null
+              }
+            }
+          ]
+        }
+      ],
+      "session_id": "___eval___session___8f660863-4a4d-4537-8f36-7af713cfdf0b",
+      "session_details": {
+        "id": "___eval___session___8f660863-4a4d-4537-8f36-7af713cfdf0b",
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "__llm_request_key__": "d76f4125-78e1-4ba8-a815-eaf8951abe83",
+          "bag": {
+            "roast": "中",
+            "roast_date": "2026-06-24",
+            "roast_age_status": "known",
+            "bean_age_days": 10,
+            "bean_age_band": "fresh",
+            "flags": [],
+            "bean_age_hypothesis": "fresh",
+            "bean_age_evidence_status": "known_from_roast_date",
+            "dose_g": 15,
+            "ratio": "1:15",
+            "water_temp_baseline_c": 91,
+            "water_temp_actual_c": 91,
+            "temp_adjust_reason": null,
+            "grinder_type": "锥刀",
+            "baseline_grind": "白砂糖粗细",
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": [
+            {
+              "cup_no": 1,
+              "date": "2026-07-04",
+              "bean_age_days": 10,
+              "axis": "grind",
+              "turn_type": "seed",
+              "direction": "finer",
+              "step": "2格",
+              "grind_now": "白砂糖粗细",
+              "report": {
+                "sensory": "又酸又苦,酸很尖,后面也有苦味",
+                "vs_prev": "n/a",
+                "brew_time": "2分钟",
+                "bed_shape": "平",
+                "bed_note": "",
+                "wall_ring": "无"
+              },
+              "gradient": "n/a",
+              "decision": "继续",
+              "terminate_reason": null,
+              "confidence": "high",
+              "flags_asserted": [],
+              "flags_derived": [],
+              "rationale": "第一杯又酸又苦且冲煮时间短,初步判断为欠萃。"
+            }
+          ]
+        },
+        "events": [
+          {
+            "model_version": null,
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "我要开一包新豆,V60,中焙,烘焙约10天,粉量15克。磨豆机是锥刀电动磨,当前像白砂糖粗细。第一杯冲出来又酸又苦,酸很尖,后面也有苦味。整杯大概2分钟,床面看起来还算平,杯壁没挂粉。",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "user"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": null,
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": null,
+            "usage_metadata": null,
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-197bcddd-57e2-4f7e-ac0d-a236eadf5e24",
+            "author": "user",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {},
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": null,
+            "branch": null,
+            "isolation_scope": null,
+            "id": "93489049-4139-4244-8346-d91343c9e46c",
+            "timestamp": 1783157236.7001102
+          },
+          {
+            "model_version": "gemini-2.5-flash",
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": {
+                    "id": "adk-211b34b0-dc71-471e-a183-c633d7f9024e",
+                    "args": {
+                      "dose_g": 15,
+                      "grinder_type": "锥刀",
+                      "roast_days_ago": 10,
+                      "roast": "中",
+                      "baseline_grind": "白砂糖粗细"
+                    },
+                    "name": "start_bag",
+                    "partial_args": null,
+                    "will_continue": null
+                  },
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": null,
+                  "thought": null,
+                  "thought_signature": "Coc8ARFNMg9aZUYYBtsw4jKXeiuESV-FHk-qp-Yy7NkgJEuMPIWfNzlmamYCRamFaBP2aoYAN3tILtAcfHbXsdBqPOXGfV5ALCVy_yvyDz0MFWP1buARTOuJMt6KB_8NHEe4bsJ4CTiAvSpMmqgGM8Qctp8wOJfjAcHgLKxwFD_PE_80f8lSw0rltlk0GQpFHuYVj1hct9t70xZAp0KJFRG00s-QgCxFYDJIUfrD6OtSeBPttNr4S1U-hxqSK1DNSglEV7WsK_jX8-0_RW8n14gGQJ3wslw1ZsuGsnTzZqX12zQ3iMMYa44gJTb2Xu5xUI5nms6hsWJZXjURODgHOp7yRr1NtSro-gt7ZMsQNQm18UG8KlQ1KdGu8du8YsOW0IWct0HKKnb1ZGPGFj-ayjYWTuUq31KufwD4eFxbfTUI_dNeSxEAUVgw572vajzVjXb8dydJ_0iIgQXwzVe4eVIisTSXPG0ZTyrRP8tAfj2fY4UhnfFWGJ5OtNhLR5uesuwcpQ20Jt4mP5UYGtV-sjVB0YqVm4DbCmKT7Yn_PVW78CSxLaMg1F2kqSB-41G4yWSx52XB1q0OunTfsjL2Cbcj4Ll3Ixt9XJXMrsbELI8i6EqdhIqK4ZU5kFbPJAJ7nQ2PZmJtAW1ku9plopS9lDfoaQoiCXKCRh9ZVAG4XWL_QQ9BmsDO3iF9ZkGLZdGbJI3djxYlIe9qtrj59FtKH2YKsZNW2fiwNR8jfHiFg7rKVkcj2LDaAAh4iWaFJh6bpkVJEKmqo7LjXijseQEfervh5X-c8d3MtvBPf8lRGeauzUUPO7OXQO_qUH3pDhdASRtQqHfR7op9dxudoyYobDCzFdg70cCjJJKtTNWs37UIGCkjbmgHUa3DXWuNDAjyYjHDtXZwxsS3U3R3M-qJ1x19MVpAXr2Yn9ksaCe-RmgnWNrXr6680FHxHuK9zS88REWzCzfvnuA53st5uT9FrPkTHL8obMP-szfTL9Wgie7erxvQaZ_-1EHQsTW2BoaaxAMzofZGz51qRSXyHwZQ6vfRXh46Eml2J8HpNQmKm69ISpXSb745jsNWVMbfYLSWji0cAvfBaa8joYHQZJZ0My324K3QAOmTdae8Q8ic4IrnXa6QkR8TqJ-1q7LvwxoFLpyHtUWiwRcBveXIiM65r70Xi2sCcvK71pX-A1QvScLXIqVBIhoKHrLGE86LWx2ZvYDPnQ8gwx5ZXT7Mnkd65D3NqE8UgySaMHZ15UJ8-N2-HzPabRnSxm-ELa0Zytrg-JLXutvQwux-TSwXG8dOUPtuAsuxZJSS-jYzjV0G9_TWrfwNzhI5QQHVWogBdnIQ7j_GQGcWElF5PN9EX_bXpndN9ayCsYNsDwXxhVOd58VjXJZs0tjxN3X0mEM2svj1meSgz6T0C9KCrz6loOTsEfI-wUbXDYNw_e9S0wzPDz9bJ4QrA-DK4Pq9apfQQndDVp60rCB1xEhv6dCIlg0ddump-MbqUjqEnO1B5cNbVU-u5rUR3myFDR0XYByFZiDbby9pXpaEpqv2FJ-e41pp-4lMY86WVA_FoHiFqvo9BqD3ornaQye-HKp6Fs6H8yp7l2t6wzNfGqiuux28hlLAw4w9kJiydPevrXlukd51vohgTzGTROaKoWlggNynK8cSe-v3_vKEJU-2qnY3c21D3AN9RCAWLOIJVi8wlytOPU25E5rSJ3Nw9wTFcDavwRKuXQI-Kft-ngzkr-YYsYb34OC5uUXZM0VAv6004hSyxgCIlPkxuLrgIIYZppaytO2Y1Rq0mpckMzGZKpOVGf1ttD_RtDtqFh_v4p1Yv_zEMabzmBCC5-Z2v7j-Fy-pUNqHUxwSZdCpjxyJDfXFvsltVKg_jLqtYn2Qw2JbzQqkwi8zihodhotrxLpMBVdBXJEmB9e7NPI0rfWlGHTlJXh1W6sNH3hAsc-SlHtaeAaybiIMztvgILaoTGqI5p244vVI6fXJLYkIyuq4RDNrmyeZkiLnMxE4uUtfx-5WGAo4LEJ8TuQ8QBT94cJwqP2Xu8Tf3ZDjGr416-Tp1irsOBbdnsWt9LZLK44Uav2r1aYwxIUe_YokOTGgWcLhREb3iPlgzOoaEUWKvWpVEswdR_vQVRlTGm7GTINRY8-cdDjNgFSK5RB57ZREVs33EG2_m-By2hKUGpJLJ8Ps1O5H4dme0VPf_jRfGrwqlzR62H3tEqD_lC5u2R7E9qErfEoln1qoMhmaW44sYybTNsx-LUXURSj4YLl-L29uoHo7h2kNaQJJfQr6Dsp_5Zmdvl3fXLTxCGdANJNnF2c8Da7cfhv3RaqYIrJItMX_EmPvrfYqq_Y3SCOevMMLT7O8PggKLM1cVbpYUwmGdS-c_Xko62ZxWebVktaGRfb_DDkch4SRc_wajHnbW6uOhxIFJA290-ROOiD1wrByxZs-402wpxEIt6risk64r9L4KtJiIUf_EXRpxcAsrSE9ta0BdUOfNtCpTaYDLGy4_R01aU3QFMRzmthhLL6gS9Qz4nNiqC1tcYRt4bJtAZPOFdhlkfkC7crIHvTtOlGSjkufL5CD9AsICva8aHnUO_hphU5I1BpFs1IWqxT7lLVinca-XH7Apcdh23pboXSo_mwUdw6qOTrHZDb8Pr9I9aOI4rwKTTBFo9Lk6L5_JahZCG0UxegyxfOYPDXnt8RpagxI61hefPqI1-RVvLnoUCthueQkD0lWhIA5qnsNSBAaa06LWyownKrF54Wm7pT3V06rhWWyyy4rwJZ6sMKoiAPhOJOtVQJsa5q8LYaYcllEqYucZz4VL5a_fXTnRRHAp3X0Y9oEVS8H7aQPDO5i27UZUGmciYucxoDU-lpsJoXf5dSELPvJ7d0gDdDESyXT-_9e1xfaBpOr6Y3Fx2hzxkbRV8AU-O2vgx1g5RJ_IDnDW35qWSaepKqUc_Sj2CGzhVldUlMwbzShW2BenPZ_NbnQmh_TjOEn8OzBetnxdzSEGzQB5oWaza-0g6emrWyT64mDxvkJhsZRnW6GpR9wXN_PB8JeVsPBZZy4cJYRalNlhtqIS7x0i3ODMaImxINpE1_bYWqt5tsmZqmwwmzH4u4TlcOpIymsQ9iqqCCP-5tOuEyjhotOH_jKousQMySjiydf-kN9TYMvC6MLCmUlcZl8SCYi2lLFsvRvlJMlJt7tDf2Zb9I9TcrOD5AwAK-ix3IDDCT645PbnRcYsfWyUHjtw2AHIc5gv-7fwl3-xc20pxxw8v9l9vUcWlLDWcw9yZT7mfgBp4dpGVUC9sKUj9_s1z0hSkKS-n1q4tEXuCDhN78Relh93jt4hzfKpQzDlrLBWcooWPC8iYuGShqWF_A956AxcIRPMvkdX16VvgfMS5MC1tcfZabbxewXe-ibH57lfOA2_edAhi79I9kRvbMUP1qZQszmEycY2E1lgj1kGGvmyhOkY0XgYMP_HPLNCy0TpXkfEsqYs95pjW7qkYvVGmEwJmA1-4NThn8jYssKKbex8-TJ4pme0tT4-vst90T32BXwTlx2BJmDHtuoGskS6rHpotxE6ruyrBHNmPNgrJWozePQBkmaTf_1027bmag51Jx9QR2hj1QHyS5SVye6kSDnOvu8ulSLe8HKRAmx0HGbt0gXfDaoRGwQSKvsNaUm84UHa90GjMrmnLPBsxyl0HIBU4O0t-kH62mMqjAOQDufmaBNlNjMZlGtmVYCNTHsZLi2HXtAYwCM0q-dhmpi-SDWZ49OcpbjpmxFB115j7yIOn41mud47o4i_QZxJKs64z1l4rpE7YcLcfTqApKEJ8B2yvh3gQu3zClctCxYEU3KVv2X3frwHLOybhkIsMxMa11UcowipRUBEpWqQRQ1xR_mh6CMNd1WrQMm6WueMPZTSd3E9MX6682UJXPpLcHoO0j6ANEYXGBRnh7MMhLXCsL0-v4m2jmEubPqMqHao8Ji-1W_SPwwe_tQw5ZyF6dyrRmR_3VIODXZW0t9TvnHDsJiqV8p6U6zzln7gjFbaOl6Czq67N1NI9aWlXwlg5RqtisfZ5sXrvISIRPA3LTq35JrT92QCaHzoW2EmVEfGDDbjb9l6iWXOlHnOtHdNMtjKDYMNqeRrVEwEYlbhvDdvUYUvcL8eAhOYd36tWPmxEMM67cUXv2yKQXsS79WtetETUUcGlUIpFmT7tg1DlN8nFEsNHqfBXae7aqlPokpIywnPoNUjRnKl9STXKEEjxCsWwTbmkLXKjI_L4ztHfMX--76EAM9y2ufBx8aOEcuQkGEnK4pRZvsgeFJBnAZ4TCNyjj4aVnHzNegaot9ARnIiRTIG9TLtyzuLHHHvUkg2Tt-nFne55gnWjGQxoVTFtppNqsnRVvu3HTouvWNHR5U7Eu9KznVghpFpLEsT_Ce0YgdEStQb3CPI7dxVMjR9A6kqocG-5dkO3PJYmMNN9qhWtBlyPTFa-vrIFLllhRgkGGnqlgG9oC8qpMdztPd27dgn7dg1_x9spktO6QR1VvPaWZhjdQ_Uhmgs59DNeJVuiCcWy5mm6YKBG1z8YBV-yuO7uB-DLG1S0J0n7t8Wpo1u5dVZYTIB9GcQYfmV3EH4TfKcYvm9xlOEBjTWG6rVQDNZqlmpMiy3DsfioSncRfOCLweY9D0yhDR5aPUPyxsQONmFCfKUkZOnSx-QptFFSLrtsVtY73LAe4LwhMwoAK0I89GVJko5WCEI3wAhTgI4cqE_AK7o86negmaBYgViUtBIkCVPnH5sK0h7jfmil4OpJdOexnL06T-69GQnde9JuJqn4v8Q4flANMPlBLekeTDo1sVfMTcga4M1E6rZDBObnDy9LUmG7m1OMPGGc_j-Ae2CKUWpmIjk_nETDdgAVxjswlg0fFJiv6tJcbvXANYQxChfECHL2PKmb9ENMu5iE4TBhf3LcL94mJqy4IWprf00LUPyiuZ0xuOhPdv47OiflJ223v2DpKMiIHIWV_BmeR8FkoXaW85IpRYzhOuzjGD7-XBMmhbpfuHoTMkpQuKxiZ-nDrg6SPcTLLXoEnZXpsS4wtr3HXDy_aZnBKjB4kPShz1Dv0YSUFdl1Ev2dHO6SiWP7js6oXUozF9jztRl0Hhr1ULcUmXUtQuWSjY8XR_jZmqSTQ9CF5rxXFlQk6W9qvpEciD-a02JYZ1Mo6wIm_N59FEjfCM5_lD-mtyY0goyyYPI-Wc2GRaT2YwZVknkpnfBZm1LyEqD763oDxSOhvmW87NMQPvzCbCV9zJW8U8PkoqaPesRt_jyI2Ep2nhu3FlIgckn8HPV5e2EiYZ8FxzO-5UDoB-rjUCNAsNN5EgykHdi_j-9Up4YOXDaOp8YlfshM6uv6seQ6iAkeZ7Ychrug7Opolk9nPwm5M516mv4kTQSVySgWgx4eEDEpolqe3SA6VQbGbUIY09_cbbReqI-uJ1yBmL7jfoRcoEZPPVdTackNlzuZfIvACI0iEUa6F89DLjbFcCJ1QqBMB7VKG7Z4GHb5_fL5HdoOLPyJejkE2dQJO5cptOR3Ad4Zltr1N5xf6LT8erQspbXWDx3VDe6aSxPtZB5ccuFCSQIIXQ2-R8mlVnba2JomI1FrKzmO_zbfOEm1wTGSaBORtUIs95ObKVaHVpWITxnFSUEbeslvTrktK4e2P3pk33wFl2Xify5y1Ny2yw8LfGa8kBDXBjkKpQxTg7LQG_ippEWQk4Q2wqNXZfDl0R0UcGKD271qgA9oTKVBx9kLhKYy9uG5HrMc04ypgRMIEq3RmSNw7YsTN7Q7e8xAqynR2c13tZ8Rx72sA9DCSVBZ-2rVNAkKHde-nwKEKtKu_QiYX2Lpa9OLHcUilQz4R9PoFnbb2tj8EcPCf23qmhKinWs20C0d_qTfI9jE23f3nLqY_2y6a7Vd4yALr7_PFVji0oZ8Jgye6b05Em4OQJkSHQymSkZ6lAxpyINZ6rEt1rjL1eKsT5U7RhDe8k3tkUK6z_DFWtMakUO33iAt0j4-qpqHBdEWTr0P_BxVVs9D6o0kIzqL-v8TCq_8IoOdi3fbROdUrYF2lMZ3jRA58OwdAQICYYPvkZornB1TleiDtIYsAaLinFCIEz9yvuWhKq9BeX5WighsVPzF9UgQg51OTSNspqIs-76HJEt6fsBjy_aYAKHyHxlMe9iwsnPBziolG65HDZ979o_hJCDkjvRFzK3W82nUG_FP4AnltpNI6BjJsaegLXlRLzU5i6rTXfhOVbKHtWkwanmhQxqa22g_zEpq_Vop9okhh0uF8FEZCHHDCn5QmdihnXis0urO2-e1e5U5voxprtWJvnxqiozraj0Ehpj0xqUpE1Zy9nMCjpKMvSroeA38KUPfeCv600KVW_ikMmNaXdhBpR6aXPNc5lpPgW6y9ndtD-EL5TXOYJb8lbYSIzKitkkhlzb4riThIA1lz_0QNa0_kbfcMFzpQ-IKFjf27iljERnw9UjnfqXgJuqvqFcgVGXlHo3P6pp-BYcwzXJMmpI5T9RZQbHhIzQQpF-Jqg8lN-7tgFR8F3ZNLA6ih5X1Gn0Z4Mve4Pb5PLmA_bKjdR6VwysvSJMk6JL_5iLfjEgF-dsLYdFJTPW5M0s72Id0FcZCp7pJP5pPqvhj3BvxAgah8OgZ5CYEDRdl3JPVCHekyc2hSWzdjRCyUK4Zuuojk8NjhW4z1BUDed4sql32i_XL4LRqU79moIO8LbS_KEAO0RknuhMSvkHyiegzTzqNhE3VjwQc-cmvkD-R9ubXJoG9bjHs3GUB6xLmZA2LDeU_sLy75bLuyZAmej_A07hl2y9UwoInoCKMNZKcoUJvPMhlAjmL-gcu4jFJX6NeFIi0kI9Hs5X7fAaDCV-J_6lrgFp2x-aqo4IYXFA6WJ-Wziv6XSgrR9IT3UNYKLhKSka6cVQ-VfE84qshvgymGoCLgSzqyOYDRFoa_tCoBnADUxIjFub8HBa8IeV6oVt56fIB5CwJFC8pLLSKMYr91T8F4QLYnlf-ZAy4ZisIBrcllGl_7UWcfKac6U_we0US8i-4_aGLYY3sF7tPL2Wt1Aef6_Zycq3QPmg_BD8AajB7SIGC-EZtHfxRCq_ravOuNQ1xBj_ey_KhCri1yM-9kdLaCVnIQ-wAYzxkkQBu62uexiL67ta6o4awX3CbO7gzxVQHTwHNq5LDaczfEbk808AIzQxDfdCXlUevn4IFXL-dCMQUwRjP6rJuxLPnLF_gNWK63pZVUvrKe6QDNrKLDl2leMhHZdh0kQcXWkLRX1b7nQi9Y2jomRITYJG7tFw1AlYWt-odRonMY0dfaXuXAU-05msRKNZxSAXNLmxpjRhWVkNEz6BTIFqWAyXZ6fmJG1pK667msuGnJ-8bsD6o62g1jp2b2ZpiMr5GlsOFDzvd_PgTUDRy2CHsxpZpZVlr9xhTMcPHC1kyk1XDEer97yF7ZrkkLl9Kezpa8XM8gULR92ElE1mHLBlmhkCDL7LLrIcrk44LnIDunrFAw3up7e95pUU8jTgBh5lRp8dHp07XJwoXigjTuTIEtyF7U4ZAl6qDsjqTg9Bi9HaBlH0jxVia6PNeOVsedH5a3N-bw7fn9l2qMnxKoqGOJhTUAG9U9sl3jb1tyUVUQ3nvILOXJQyZMOEagDIhmI-lfTRwvg_CwZ7iWN7S5LJY8_3hTapeYV-pxFZaXn_ZILHSe9_u7ZODWxabD-cfhAKlJji_LINarSfTEXQ4WaX6mxDGPnqZlLYhmiYlTmb-qVlNq-_yqQiPIoEGH69iIneB-7itN3m3Z9eFgCMoLv8IOk_w373LToEuxnv-HAJK1XsoAsFw_KDygejC9a7sPLFPEwQ1Zdh1hpsgv5xNEUEMDAKKzsgFn3WxW9TzxTZ5O45Q1qEin9lzeBjwGln_aRN-cRGJXjsS7WI2e6c0OvEBVfIAw0SXzONwQzTl-4cAcMWVJxziAtKojTIvTWPl3DSo7b4jaD6t8Xqtx7WzgOurk55gUD0DDsQpW612ceqe6bBzkE-6vNCztTPdBF0n-jhR-21NjQCb_BrgSTNqXX3H0uCq1rC4ysZgajOhXuUMKSEWFrSMSskbkKhRxTqY4EZPy26-qUFkartxPZqFG0B7WjajqeCJ0OHh8Z1BwnfRyowtrnE57aH97ghLvDSGzLlJdR1OzFFUoPSqdcaaW52L-HNC-jdVsjJm-atkruqZpAnXHtY3kGNEtoDNKEc8nLXJQ1YQgX0UL6TtoL8fwwkkLL7zEAcbqI0xp7Cz9rgfEYENqN02NTqWVmDqkEbYD_6GpTgzzhF2aXSJuototvhoPmxeaH63sfLwkyNfWWUxyxNn2RUUWizyp4Q5f5cLJS4kFzIBvLyAdXU367aAITiX1932ga_7BLCDiTzv5gOW9uCWRwKCjf80fCNnmb2Gn6mPr_60dtkN80xHiAWMPs5N0mQyk4N3RWvl1liJrebdUaGZ7J18umTqeH7c13pK9Ib2PNeDkVEhnldUw3O6-jeZqg_SJqvdc6m_ybkMdO34bnZQZlVTegq4Zl8aFLonLPY1nH_Ul-YfMZ_wsPQMhzkip7SVPqoc6nvceks1RKy4zkDRF59lAXQBWA7RE4cZzyybWFKQOnqpVW2HOkZFRZ_KIJUAhCUnoBmI2fVXIcMfFxGZV8Sr2ONBa7kDG7Qk_292GLLmPKgvnUhmPglR87YZAJLOY4umoizeCnCREG8ubE53aSqsHl24GhvtolzFUijB9PyUlP6Gv3IoTlKxSJKIp3RKdTofKJVVzRx12pBJMIFa6LsH85t9xYkcmi6Amls2QAZdHQ_jOs76xXdKDHr6PWPuMbCwi_-uLp8v3K1fzMZCs2vlWkU6gy8-EQR2f7krKIH_JG6AZQmNaYSh3zdPqccDjDZwIggmfdFbQPpxryeCGCUVq_-1Pw5OZ1bLTDK2tj8FLF83nVqHOi_yI-fxq2tVzPj-DOcLK6eez6RFP6WWZnqnTow0GCxnrj2ddtbZMeUyFLbayblUoY1ZPrmeLfFqNl46-mcr6fIQDfvmqNtqlpe0Mgm3OdqsrFTM65ZEIByXDnatzedNeVy40UK0L6PsAHIDDQuqdSjfoXQcia7aoCeb5GHFZJq1t1aiFprB61_Lhs1fTBWApp2OEXdN0Izbn3WoUR9MYJzCZDqRO5Z-KIxxVo_ewyLePwY4GgOPh_jwTZq-EJTVydy9QB8ZTYzmIdgYD-mQhosDbLpp7rtjhymFsyricaXs5Is_pRVdzVnglrdw6lHjmkxhdebqov-TKiVUxmtLYvSDQM7c7qKPqBGPRUNrq7Fs26gk-KTs5RPPAen-CVuvDITle2ZsOSMnuFyIBOu0vHr4H0BBp_-2UbyXPWPOQRf6D4cKf8rNP2tQGQNXghEUymYHF-k5Fu2_fVmuoousBD_Nt5Va1cf-8s7fU6v3Twi0c6ImiA4Ok1MT2ozi2O8zS9reSncIUFqvDMK3Mzw28VKjrSpAH-hMRKX-2dgRSjr2SgUWodoffIXtFNf51ng6e7CyHXzYr8kZPcw0-2j1WW9LyK02Wvd-BR-lOtshka-zyZ2FS9oeVNsVYE7AkwZhBicRg7gCyJmU7qmP6dL1eTIchl6B6mb7pNLA5BbgPN_5TUwnV6V3Io6-9vsIwabGfsv7RzskSZVK3zV7iL83s6OH3wHYXba-7mAK1p8JKJmiCiq-Ak0pthwM1qMB-RSdXZigO3XRz6WW6VbVjHXbCBiAlTvWVpbfuoF8ptwOjnfjs39hhaMoXWL3Q162V8hraz8HbD1Zf8_SlaE87yCXbMmf0UiQIu59XXLS86yts__U51MeHC3m_QGCrgyjSxZ5FH-_Mue9ptKiQk3tIZe2p69XbjMoqMVma6HDAI0T51mGdeIgZ2-g7dAQNPEEpptM-Uf3vFf9eiKZ7xiebj3oGwiZOUYHPLOw7JOB6ZXUkVQuZjJU1CfwRKl8BT1_QG0-gyqVahfhCPo5xSJfw71uk7mIx8yQGxSB9aArcLSEnGknMbh9YkCWhUMyC0NMsiGISACt3vg0FZsFUB7Vd9tXb6zLxTU-a5aMrD9_M3o16xx685uSzCbeUl_DrH41zQuF0-ujJZNbPL9LJ0XRpZCYxGcwcNBZ3_S13R7_4XPJtx6hB2R-0JBB7VpNpp0YpmRT9pT7th3tu0m3idIa7SIDpzgnnuPoWaaJ9WzR1FlC9CtNwR2j9bEtlH6pUFY9qNi6_-9HIcLwtTEXtM5RrVEk9W_BYoxv2PnYkq5xxgHQ==",
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "model"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": "STOP",
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": {
+              "__llm_request_key__": "76319da0-9686-465b-b2e1-4c658ec845d5"
+            },
+            "usage_metadata": {
+              "cache_tokens_details": null,
+              "cached_content_token_count": null,
+              "candidates_token_count": 52,
+              "candidates_tokens_details": null,
+              "prompt_token_count": 8541,
+              "prompt_tokens_details": [
+                {
+                  "modality": "TEXT",
+                  "token_count": 8541
+                }
+              ],
+              "thoughts_token_count": 2112,
+              "tool_use_prompt_token_count": null,
+              "tool_use_prompt_tokens_details": null,
+              "total_token_count": 10705,
+              "traffic_type": null
+            },
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-197bcddd-57e2-4f7e-ac0d-a236eadf5e24",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "__llm_request_key__": "76319da0-9686-465b-b2e1-4c658ec845d5"
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": [],
+            "branch": null,
+            "isolation_scope": null,
+            "id": "146a92a6-aa64-499b-97a6-80944eb4c625",
+            "timestamp": 1783157237.171741
+          },
+          {
+            "model_version": null,
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": {
+                    "will_continue": null,
+                    "scheduling": null,
+                    "parts": null,
+                    "id": "adk-211b34b0-dc71-471e-a183-c633d7f9024e",
+                    "name": "start_bag",
+                    "response": {
+                      "ok": true,
+                      "seed_recipe": {
+                        "比例": "1:15",
+                        "水温": "91°C(按烘焙度基准)",
+                        "粉量": "15g",
+                        "研磨基准": "白砂糖粗细",
+                        "注水手法": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。"
+                      },
+                      "bean_age_days": 10,
+                      "roast_age_status": "known",
+                      "band": "fresh",
+                      "flags": [],
+                      "bean_age_hypothesis": "fresh",
+                      "bean_age_evidence_status": "known_from_roast_date",
+                      "advice": []
+                    }
+                  },
+                  "inline_data": null,
+                  "text": null,
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "user"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": null,
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": null,
+            "usage_metadata": null,
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-197bcddd-57e2-4f7e-ac0d-a236eadf5e24",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "bag": {
+                  "roast": "中",
+                  "roast_date": "2026-06-24",
+                  "roast_age_status": "known",
+                  "bean_age_days": 10,
+                  "bean_age_band": "fresh",
+                  "flags": [],
+                  "bean_age_hypothesis": "fresh",
+                  "bean_age_evidence_status": "known_from_roast_date",
+                  "dose_g": 15,
+                  "ratio": "1:15",
+                  "water_temp_baseline_c": 91,
+                  "water_temp_actual_c": 91,
+                  "temp_adjust_reason": null,
+                  "grinder_type": "锥刀",
+                  "baseline_grind": "白砂糖粗细",
+                  "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+                  "phase": "active"
+                },
+                "cups": []
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": null,
+            "branch": null,
+            "isolation_scope": null,
+            "id": "047b01ca-c16b-4c49-92c6-9755315cbb04",
+            "timestamp": 1783157251.282578
+          },
+          {
+            "model_version": "gemini-2.5-flash",
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "好的,这包中焙豆是10天前的,豆龄新鲜。你的起点配方如下:\n\n*   **粉量**: 15克\n*   **粉水比**: 1:15 (也就是225克水)\n*   **水温**: 91°C (这是按中焙的基准,后续我们会根据口味微调)\n*   **研磨基准**: 你说的“白砂糖粗细”就是我们的基准点\n*   **注水手法**:\n    *   **闷蒸**: 注入约2倍粉重的水,轻轻晃动湿润所有咖啡粉,等待约45秒。\n    *   **主注水**: 连续平稳地注水到目标克重,保持水位稳定,不要戳动或大力搅动。\n    *   **收尾**: 注水结束后,轻轻晃动咖啡壶找平床面,等待咖啡液完全滴尽。\n\n请记住,这个注水手法在接下来的所有冲煮中都保持不变,我们只调整研磨。\n\n你说第一杯喝起来又酸又苦,酸味很尖锐,之后还有苦味,整杯大概2分钟冲完,床面还算平,杯壁没有挂粉。\n\n从你的描述来看,\"尖酸\"和2分钟的冲煮时间都指向咖啡萃取不足。咖啡豆中的风味物质还没充分被水带出来。苦味可能是部分细粉过度萃取,或者整体风味不平衡造成的。\n\n为了改善这种情况,我们先进行第一次调整:把研磨调细一些,让水和咖啡粉有更充分的接触时间。\n\n",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                },
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": {
+                    "id": "adk-a6730847-e654-45de-89b6-775d2c7f192e",
+                    "args": {
+                      "brew_time": "2分钟",
+                      "bed_shape": "平",
+                      "decision": "继续",
+                      "direction": "finer",
+                      "turn_type": "seed",
+                      "gradient": "n/a",
+                      "step": "2格",
+                      "grind_now": "白砂糖粗细",
+                      "vs_prev": "n/a",
+                      "sensory": "又酸又苦,酸很尖,后面也有苦味",
+                      "rationale": "第一杯又酸又苦且冲煮时间短,初步判断为欠萃。",
+                      "confidence": "high",
+                      "wall_ring": "无"
+                    },
+                    "name": "record_cup",
+                    "partial_args": null,
+                    "will_continue": null
+                  },
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": null,
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "model"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": "STOP",
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": {
+              "__llm_request_key__": "d069c713-7db4-455e-b7a9-3185e64a388e"
+            },
+            "usage_metadata": {
+              "cache_tokens_details": null,
+              "cached_content_token_count": null,
+              "candidates_token_count": 484,
+              "candidates_tokens_details": null,
+              "prompt_token_count": 8885,
+              "prompt_tokens_details": [
+                {
+                  "modality": "TEXT",
+                  "token_count": 8885
+                }
+              ],
+              "thoughts_token_count": null,
+              "tool_use_prompt_token_count": null,
+              "tool_use_prompt_tokens_details": null,
+              "total_token_count": 9369,
+              "traffic_type": null
+            },
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-197bcddd-57e2-4f7e-ac0d-a236eadf5e24",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "__llm_request_key__": "d069c713-7db4-455e-b7a9-3185e64a388e"
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": [],
+            "branch": null,
+            "isolation_scope": null,
+            "id": "000a6c74-595b-48d2-9382-e26a767cdefa",
+            "timestamp": 1783157251.2979
+          },
+          {
+            "model_version": null,
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": {
+                    "will_continue": null,
+                    "scheduling": null,
+                    "parts": null,
+                    "id": "adk-a6730847-e654-45de-89b6-775d2c7f192e",
+                    "name": "record_cup",
+                    "response": {
+                      "ok": true,
+                      "recorded_cup_no": 1,
+                      "flags_derived": []
+                    }
+                  },
+                  "inline_data": null,
+                  "text": null,
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "user"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": null,
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": null,
+            "usage_metadata": null,
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-197bcddd-57e2-4f7e-ac0d-a236eadf5e24",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "cups": [
+                  {
+                    "cup_no": 1,
+                    "date": "2026-07-04",
+                    "bean_age_days": 10,
+                    "axis": "grind",
+                    "turn_type": "seed",
+                    "direction": "finer",
+                    "step": "2格",
+                    "grind_now": "白砂糖粗细",
+                    "report": {
+                      "sensory": "又酸又苦,酸很尖,后面也有苦味",
+                      "vs_prev": "n/a",
+                      "brew_time": "2分钟",
+                      "bed_shape": "平",
+                      "bed_note": "",
+                      "wall_ring": "无"
+                    },
+                    "gradient": "n/a",
+                    "decision": "继续",
+                    "terminate_reason": null,
+                    "confidence": "high",
+                    "flags_asserted": [],
+                    "flags_derived": [],
+                    "rationale": "第一杯又酸又苦且冲煮时间短,初步判断为欠萃。"
+                  }
+                ]
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": null,
+            "branch": null,
+            "isolation_scope": null,
+            "id": "d194ae4d-8031-48da-adef-c486ddec82f0",
+            "timestamp": 1783157256.8656662
+          },
+          {
+            "model_version": "gemini-2.5-flash",
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "这次请你把磨豆机的研磨刻度调细约 **2格** (如果你是无刻度磨,就比上次感觉再细一点点,像细砂糖的粗细)。水温、粉量、注水手法都保持和上次一模一样。\n\n冲完之后,请告诉我:\n1.  这杯和上一杯相比,味道是**变好/变坏/没变**? 并用**一个感官词**来描述。\n2.  这杯大概**冲了多久**?\n3.  **床面**是什么形态(平 / 拱 / 塌坑 / 偏厚下陷不足)?\n4.  **杯壁有没有挂一圈干粉** (有/无)?",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "model"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": "STOP",
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": {
+              "__llm_request_key__": "d76f4125-78e1-4ba8-a815-eaf8951abe83"
+            },
+            "usage_metadata": {
+              "cache_tokens_details": null,
+              "cached_content_token_count": null,
+              "candidates_token_count": 161,
+              "candidates_tokens_details": null,
+              "prompt_token_count": 9471,
+              "prompt_tokens_details": [
+                {
+                  "modality": "TEXT",
+                  "token_count": 9471
+                }
+              ],
+              "thoughts_token_count": null,
+              "tool_use_prompt_token_count": null,
+              "tool_use_prompt_tokens_details": null,
+              "total_token_count": 9632,
+              "traffic_type": null
+            },
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-197bcddd-57e2-4f7e-ac0d-a236eadf5e24",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "__llm_request_key__": "d76f4125-78e1-4ba8-a815-eaf8951abe83"
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": null,
+            "branch": null,
+            "isolation_scope": null,
+            "id": "9fcc48ae-9660-4fd3-a5b4-c2d81f8780ca",
+            "timestamp": 1783157256.88466
+          }
+        ],
+        "last_update_time": 1783157256.88466
+      },
+      "user_id": "eval_user"
+    },
+    {
+      "eval_set_file": "e3_grinder",
+      "eval_set_id": "e3_grinder",
+      "eval_id": "E3_blade_axis_unreliable",
+      "final_eval_status": 2,
+      "eval_metric_results": null,
+      "overall_eval_metric_results": [],
+      "eval_metric_result_per_invocation": [],
+      "session_id": "___eval___session___2c828795-c9bb-4a86-8f5a-8b6a938c4152",
+      "session_details": {
+        "id": "___eval___session___2c828795-c9bb-4a86-8f5a-8b6a938c4152",
+        "app_name": "hello_agent",
+        "user_id": "eval_user",
+        "state": {
+          "__llm_request_key__": "dcce6cb1-54e8-4285-b563-19c93463e5eb",
+          "bag": {
+            "roast": "中",
+            "roast_date": "2026-06-24",
+            "roast_age_status": "known",
+            "bean_age_days": 10,
+            "bean_age_band": "fresh",
+            "flags": [],
+            "bean_age_hypothesis": "fresh",
+            "bean_age_evidence_status": "known_from_roast_date",
+            "dose_g": 15,
+            "ratio": "1:15",
+            "water_temp_baseline_c": 91,
+            "water_temp_actual_c": 91,
+            "temp_adjust_reason": null,
+            "grinder_type": "砍豆机",
+            "baseline_grind": null,
+            "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+            "phase": "active"
+          },
+          "cups": []
+        },
+        "events": [
+          {
+            "model_version": null,
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": "我要开一包新豆,V60,中焙,烘焙约10天,粉量15克。磨豆机是砍豆机 blade,没有刻度。第一杯冲出来又酸又苦,酸很尖,后面也有苦味。整杯大概2分钟,床面看起来还算平,杯壁没挂粉。",
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "user"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": null,
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": null,
+            "usage_metadata": null,
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-41774dff-6011-4586-9b27-09592812e5f7",
+            "author": "user",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {},
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": null,
+            "branch": null,
+            "isolation_scope": null,
+            "id": "c5dddc35-4f16-4bf7-883c-f68695833bd0",
+            "timestamp": 1783157236.697772
+          },
+          {
+            "model_version": "gemini-2.5-flash",
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": {
+                    "id": "adk-21b92906-d1f4-4240-8221-7fd9a4e29045",
+                    "args": {
+                      "roast_days_ago": 10,
+                      "roast": "中",
+                      "dose_g": 15,
+                      "grinder_type": "砍豆机",
+                      "baseline_grind": ""
+                    },
+                    "name": "start_bag",
+                    "partial_args": null,
+                    "will_continue": null
+                  },
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": null,
+                  "thought": null,
+                  "thought_signature": "CtAfARFNMg-14GTFnjrZTABezcc4MSB5-zcyBrG4h2y7x5v7i_K2fDig9UX__mP6aKhnLo7UlIWPwu760LLOhR9-W6CZKqemQGX7x5oUO9smf1rvDrUxZ0MmLuvQJPp8NmMY9hZMMsoGQH-irvx1UmbIl8gy2iUdXV7azwYkk6QcxUd8b_e-qlGYM2dWLYeHkOgsK29jGMWD_W6RKi9kh1apxsCJ6bQYcuQcDhtapJD99F0MRf0tJGdIlzI4OmnKcJWSJUtWeSYNSoTVKBaNYDIz1xPENQHfJeMDuc9Euc1BYilzjb9_QLYSl-IN50mQGpW01e2cjn4tUKmYojdOjebXLVwGCWtcuxEtpuR2OQaXiV5gxfy1cUN3O8QZfSVsQcN8ZHT_HUyl0jf384e6X-NMIDjzimmctvhHKdH6K0495vvmxoX56OQoZ1mPLeYGhz7SoGBUPL_MrKQq5WN_OYGGiZNXAo9msFPt0ts5E4iwZwhg_IfJjqtHyc0sVP2SsLJmyVzBA8wC3QuJpBNMECaV-rmOefNOTP7e1r8tJsmIz0f6tyP7QFueOb97WjgELXpOfMdj82Rj16u5nhT_381cZu53pv1k4lfLzW7X8Kv6p4ZZp6JsBn77KojhkJ7Eae1RGXdsp18T2tUEfdsFkYhdMBvTzhs8nSf-SDOe3093BmhKI1QAIbemgHu3EgjStSaL0hKtuLnILKW6LwCFuC25C1Y3O3Gf2nWwoOsv31wj5d-pBHHlAag-nWHD88ipALJJaUpBhl8D9sxXOotVsHk8MdRjp4yMaMXXik5PRb13nDHkQZb-kkisd47lAaNfCIDVEuL6kDNmW56zVZniZwZU7gzxuJaLt4ppKeSBDfRd8YJ73g2jXQgOS_VDTGFr7RWZtH2_Uu-sAL5AZpF5b-EbVX3lHPcFbapwqnuprLTUVIXKlUq1suGIzsYv4_rlmSKKMIc7HjYzbPnZe8c-fOUWrVyW5sYOj3PL_MtgDp-VRKydV2-p5HUN8WkKd1aCQI_yaSxOHR7RjlmF0UlteOfsGFunieJYCiQkfsJVjdq6VjI4Iy-4Cwl0yrnUnGfNqCqHCWK8Kz2XYrKZt5E1q4Z1C5Vkz0n_GAe5SSr1k6WTS0_E1bli5vJBUchBS33z7enNh3oAsu9zuYLHzvvXzunWegqYJJmc_NdwRduWbEjkUBQwLqrUtRKpT4wMxU2ok8zvKS1Cs-Zq2nN4Fw8cIMqwE2g0f-rk89lycYGk1X5qrHylXHzEWUVd5g7pdDfnOVGLTWuaLtxAtd68-LkTG-6paiI5B0HU8k3n_nv_M-4AgnO_rWe9UWj5UYGkBDHPJD_xTMZ35-Ryx24Lp2m-QfhVYNIUVnW9R085j3VhKiJkSdAYk1nGZZmj-oYUzUXUCUhnKmcssoP9BXxVqCVQyO2QMXJp5BR5Rpe9S7nPC5fPfrtvc3uUfjh3hPX_PgL-jYILR2IytXpkHj2inq49XUOKEHrZsCalFAC_sLSoPMgFjkm9K3bPCEuBsCGADCuY5mOugbLGx_bUP-6dMMKfWP6TsJHEZ5s42XZT6wQyHMQX4MZOucG8CEbUg-QF7Sc8Y8JxWBtqqbM-ThsNRTKV-l99AnAWlQbw9KoyiBt1UCzV3KeaCEKgxyQ3793VrN46D0sqffEJeJl20xQGT-iMkrmXKJ9QtDZhbJ9JQM2vt67oaStLPMn89J84CCxi27yJmnLlPzmHitfGa0iLEus9ksSAtYkpyx-XP-bjjduGcSM7_zqsCLMPikzrzcUVAOYCGkcyIQtfJtnV66V4_UAyq4z3vA9TtnmQ7SCY9qFQZIAZolrk__kj7DyTMxiwdb0eaScrKikPVn8fzkT19jyXtjqR3RZXZuDrCOKAdrUDJ9FS4U99gmXQP6zCmvyhTdSxje3f_2-IT0IqYKJgFsr3mBO6CsQH4s1VSBOH3NB6iK2-2ihFrdvJ3SzNhw3NqaNdquTz_n8N1nUlOkjZP9AqOUx4RYXtfPAENwsXyCaUPWT3RcvcUD957NTphU4LnTSP9fUudHi_5icY0fm71EMWNSS0ZuKJz00wDXwellt0XIFwMowMjc3EOzHVdlBOAUloJzdEGxW04T4BGdRYbCmk7PwgaA2sSKR6yEIj40W9r7pNHroHKgrHEVQ301w1l3K9wDLXRoiKtrbGxeJ4G4P1TvhFC43Xx-ATALF_kFfIKjr4oYtc6GuuMTeMUewYqeGY1atha3L3OfvilfxTH5YzkL7wpaJsOm_XXF7xOUbiog5HlgYVYQen8NuUpwVftwPH61DVeMO3d4Fa38lsBDGXwmVeM3Y9pTgboRhq8QDB0OaGahOucOypoVxx13OUmHVu4bt3g-g3D4M26R45uXj17f3kybe3_ST_lmCIHsDCGc61sda35Hr758Zz9WDFO2kGUOZxGexrxMdb8ZOaFL00jbaJ5CMkSfOzo38zfPNAGvp3vFyWwlR-AkyqAzA2XxQa15qr04LxE8pt5lUduXF-nERLTdTVaULG5_TfnlX5o1JOgnyOvzG9_kYzYkJN62kydyeHI5ekHBlCUlnWu_bGcNUSlYgZBvh_B1q3WAaw8OpmojPHe7NMfhNxTJTqOcIzYhjxLnORdYBZzuvnZ75ewEl25t5IMuEynBb57XmiA31YbrGZ-qHDC4IysfQctXHWpUvizLQ9QhSykNpfSbeuBwU3I3rRa2qU51CYeiaOQaPp1DmFtO5FdTj76QL0Bo_B-2LbfB6lewFOjSPuv7wIbByPS0MYBMJCVhtLsLSINzwKLU1L39Yljt81gas3iFixrWBXR-N6ahyxIR-rcu_mDKgj02eaNsfnGYYcpvOmExEKOi9v0bdJ5w1BF-yNnMmlwYhAkof12mwg8tOIlLo_8ISq1QtEyI1xOTtRr2MRlbPGSBO15QImVMbYwn3ghJcfONAnLtUgJeiPSBRC13ZcgBRT0DwocQFM_wuPu98adpRzFmP75OxFgzkwoWt0FLO6p7LrfROGRDpkmcBs-OI-cutwtBxKO4JB5ununuhYP_v8GEfuf42m7aHTx4VOSp_1ExatbabVC88z8SPX8PZEuPrZY6J7OLU0ztft1AOmaChBEgAdmnxNxkvxRZ1SNSWn4XK8GHMNxgD45uzM6OF1dO38XpDpz3v_VyYZ5U-jewkqarZdNlyllxG83_Q_Z22euZRCMzrHvT6qN4ptPUVSRxqr639XY95H_4r8uVz3uFxNOTW09GXI3d9I0KvWJlayiooZ8W-EBwfmidZFMrtOFfj0TYmoVsUd_gljo-6Su0AMlH8tXcoBw6x-DrISYuVm1T3Sx9pj1qUVQzAKL6eB95ti_ucC4ix9TvvLmqR6pbC5KB62oTjiXXQR-W2_CFTOpayJVMXAlH_PW_g7JwSMzwLieac8sJpUHPvpx7vAdu7og3-o9UwHDxYue4iwxhAAsa3PSXsMSASJMpis9vZx2j1wdAA_Vvrry07w3VPnkh3MKwRbI0DPzD_UkBJlxvL_OAWmtf6TYTGClFahl3tHPZsjgEq6QM5_vYTpJ8uWFVdejQnFhb3A-w46zHvTW_OhUEc3lSWxM0m-4_Y4O44ebIWzOIGyInrhTdUBY0HAyPDtDBBVZKvsW0jDu5RRsC5AtwPZ-CR3m-lFDTTvW8nxFQ-XCPczpyOdHq6Gt-0YX2z5upir2y0rOV_l9Btpjy5qQG4j4kaV8BGKpnyetXSg7SAhv3cG4ba4t22ZDq3TyqUpL3C8cckG1y9_8YQPRJodaO-jMeq0QvxTRHYBwEQVlJaGI0Xm9a97PjnFBZy_UDO1GRvzcvs-7RhDN6YFJCiTUwE9exyeLie31kDNt-GOsUNHrIjy23ttsAoCLUcwOv3vXAzpEsyjyZ2DQP5sdz6f-uYBBOmLVyyKWalhiS-Z2VP9faTDCbQj0ne2T8FremSKKKR6nATgljgmVHLQn7qYILH9yQB1p-msJzrtYEVMAjHaH0ZjRghL6pg-PywZf4aS1JtJvhjjw6U8Q813D8MDdN9adSb4pj4Y-mKWv-sDaO7krIpiuwV2QEndPYegeV1ScUfqg63v5ASkawpnt9D-OmS1_E1-WdeeyEStn2-yS2Nve3ge-x4y5HxcqzCtaj3a6775ffpSxMOaFVW2FR3jryd_99SIx2QKR6WioVC7Q_Au5wo75jkn0heh5eOPzFBGFFofu6pfVG63nOKfo0yTyU9FHdaLrlrMuu6Ga4f-5TpJDOeazygnVdZi0jlq9-Nl2gCtBJC_-DaTZf16Tvui-kDLmB2j2ut3n6hHL2lHmkJhiaF39G91CK3M9Uk6AsUC7kzqR1q8WbTZWcU7bD1s8m-l0qh74pbxlZaEBfhIHMi10eL9pjqjBd21cuRQxpw4CayoszWjFjHdBxCujUWlm8fz6mL37_Zbo67VseEzTn0ZJ0PaxU-fEZ8HeUfVjU_tvWiNOiHPWONYUyMKf4los71uxQtDDkspyKLq35aRIDJEvkNXGYSgSIqXQHRJKDMGcuboNz7Hl2uQe1i-O_mCdW4idMWMbOTvMJRU26EPAk3QOt2nQ6Rss-omCwJowzvbdEb2pTFG_IdwusyTvowRPIrVLn8_xc6xEV1vyvnxXv-UjMZRcG62XDnUm5o9QpGA9nwOW3qkgenI8NSkZxJsjyRdNGumtQlI7lfinAA_Bkhe6qlc7eeK1Jjpkn6XHALg-JQ51vPahvRA_ElvbmRCB0aNWh6y7neTr8emWTK7pskeHckBK4eMBTYK1t15xb6EYHrY0ChJNmP4uzNntQu39vCQDoMK3UUq2F8HXuy_xycRAd-v7Npi3bznQ3zFzaA4760kHS3lN13ltjCZUqdAoKMDwbpD0RJhIwadpZ3WZIL_TK5aRICVhBkbZJO5Or63X2cXVLOk3S5EQA6vA2t8bF0YZpkk5VnLDQyCy0X7Ldg2WIOokmLqiMi1hdwPhA4RSlK-AkdbQHXsov8-ukqTqAl9Xcepc1eAaZROh3kg8wV6-Z_y7hYgfhxjDv4GKwPGLeAK4MP7PqxT-kNUeolG8RsvqfsX9kC8Dix9H4803PStkqJWh6d4yjWEs0cFSGhxg9H0bJfiLM9vZYfVPcIqsQdghhWMhAK1g46JbPJumGU5N2qP0tzkAWAUrDjHqEiSQBaOElFp1A_SLOEYjFjZdsBHY5qD7CkPE8-5PNZrjFgHfSjWSze1EcJDdpHUed4RBta-IDGqTJmEl64BHDOtgLjImApaDjjWuXUF7IGZprhq1eNBdR-VKqmrMmuPb70n5CYwgk2-f4e_GARzq7Fenk5E_GfA9SurA7JQQEdDT8lul8j9k-Q90JKvAOO5M4EVgZjAuiPdMfjTsmrI_BzhV3l_-4_9pTxxpYoPlk22KJSMLQ==",
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "model"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": "STOP",
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": {
+              "__llm_request_key__": "20e20701-ec78-4cf4-8390-73fd4175630d"
+            },
+            "usage_metadata": {
+              "cache_tokens_details": null,
+              "cached_content_token_count": null,
+              "candidates_token_count": 48,
+              "candidates_tokens_details": null,
+              "prompt_token_count": 8538,
+              "prompt_tokens_details": [
+                {
+                  "modality": "TEXT",
+                  "token_count": 8538
+                }
+              ],
+              "thoughts_token_count": 1119,
+              "tool_use_prompt_token_count": null,
+              "tool_use_prompt_tokens_details": null,
+              "total_token_count": 9705,
+              "traffic_type": null
+            },
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-41774dff-6011-4586-9b27-09592812e5f7",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "__llm_request_key__": "20e20701-ec78-4cf4-8390-73fd4175630d"
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": [],
+            "branch": null,
+            "isolation_scope": null,
+            "id": "8c7d2a7b-6ed5-48d6-80c8-8ebded706ec2",
+            "timestamp": 1783157236.742147
+          },
+          {
+            "model_version": null,
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": null,
+                  "function_response": {
+                    "will_continue": null,
+                    "scheduling": null,
+                    "parts": null,
+                    "id": "adk-21b92906-d1f4-4240-8221-7fd9a4e29045",
+                    "name": "start_bag",
+                    "response": {
+                      "ok": true,
+                      "seed_recipe": {
+                        "比例": "1:15",
+                        "水温": "91°C(按烘焙度基准)",
+                        "粉量": "15g",
+                        "研磨基准": "砍豆机无刻度,记不下基准",
+                        "注水手法": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。"
+                      },
+                      "bean_age_days": 10,
+                      "roast_age_status": "known",
+                      "band": "fresh",
+                      "flags": [],
+                      "bean_age_hypothesis": "fresh",
+                      "bean_age_evidence_status": "known_from_roast_date",
+                      "advice": [
+                        "砍豆机:研磨轴本身不可靠(双峰分布),收敛标准放宽、期望降低;能换锥/平刀最好。"
+                      ]
+                    }
+                  },
+                  "inline_data": null,
+                  "text": null,
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "user"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": null,
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": null,
+            "usage_metadata": null,
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-41774dff-6011-4586-9b27-09592812e5f7",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "bag": {
+                  "roast": "中",
+                  "roast_date": "2026-06-24",
+                  "roast_age_status": "known",
+                  "bean_age_days": 10,
+                  "bean_age_band": "fresh",
+                  "flags": [],
+                  "bean_age_hypothesis": "fresh",
+                  "bean_age_evidence_status": "known_from_roast_date",
+                  "dose_g": 15,
+                  "ratio": "1:15",
+                  "water_temp_baseline_c": 91,
+                  "water_temp_actual_c": 91,
+                  "temp_adjust_reason": null,
+                  "grinder_type": "砍豆机",
+                  "baseline_grind": null,
+                  "pour_method": "闷蒸:注入约2倍粉重的水,轻轻 swirl 让粉全湿,等约45秒。主注水:连续平稳注到目标克重,保持水位,不戳不大力搅。收尾:轻轻 swirl 找平床面,等滴尽。整包照抄、绝不改。",
+                  "phase": "active"
+                },
+                "cups": []
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": null,
+            "branch": null,
+            "isolation_scope": null,
+            "id": "afa9b055-b1da-457b-91eb-8bbdd88d96b4",
+            "timestamp": 1783157244.917736
+          },
+          {
+            "model_version": "gemini-2.5-flash",
+            "content": {
+              "parts": [
+                {
+                  "media_resolution": null,
+                  "code_execution_result": null,
+                  "executable_code": null,
+                  "file_data": null,
+                  "function_call": {
+                    "id": "adk-cba97a19-755d-4768-ae0c-983cfcdac588",
+                    "args": {
+                      "rationale": "砍豆机造成双峰分布,研磨轴无法提供可靠反馈",
+                      "sensory": "又酸又苦",
+                      "gradient": "n/a",
+                      "terminate_reason": "axis_unreliable",
+                      "brew_time": "2分钟",
+                      "grind_now": "N/A",
+                      "confidence": "high",
+                      "bed_shape": "平",
+                      "wall_ring": "无",
+                      "turn_type": "seed",
+                      "decision": "停手",
+                      "vs_prev": "n/a"
+                    },
+                    "name": "record_cup",
+                    "partial_args": null,
+                    "will_continue": null
+                  },
+                  "function_response": null,
+                  "inline_data": null,
+                  "text": null,
+                  "thought": null,
+                  "thought_signature": null,
+                  "video_metadata": null,
+                  "tool_call": null,
+                  "tool_response": null,
+                  "part_metadata": null
+                }
+              ],
+              "role": "model"
+            },
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": "STOP",
+            "error_code": null,
+            "error_message": null,
+            "interrupted": null,
+            "custom_metadata": {
+              "__llm_request_key__": "dcce6cb1-54e8-4285-b563-19c93463e5eb"
+            },
+            "usage_metadata": {
+              "cache_tokens_details": null,
+              "cached_content_token_count": null,
+              "candidates_token_count": 112,
+              "candidates_tokens_details": null,
+              "prompt_token_count": 8916,
+              "prompt_tokens_details": [
+                {
+                  "modality": "TEXT",
+                  "token_count": 8916
+                }
+              ],
+              "thoughts_token_count": null,
+              "tool_use_prompt_token_count": null,
+              "tool_use_prompt_tokens_details": null,
+              "total_token_count": 9028,
+              "traffic_type": null
+            },
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-41774dff-6011-4586-9b27-09592812e5f7",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {
+                "__llm_request_key__": "dcce6cb1-54e8-4285-b563-19c93463e5eb"
+              },
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": [],
+            "branch": null,
+            "isolation_scope": null,
+            "id": "66af267f-9b23-4c04-8f45-d1a8c3ca9381",
+            "timestamp": 1783157244.9323342
+          },
+          {
+            "model_version": null,
+            "content": null,
+            "grounding_metadata": null,
+            "partial": null,
+            "turn_complete": null,
+            "turn_complete_reason": null,
+            "finish_reason": null,
+            "error_code": "ValueError",
+            "error_message": "record_cup contract violation: decision=停手 或 terminate_reason 非空时,turn_type 必须是 terminate",
+            "interrupted": null,
+            "custom_metadata": null,
+            "usage_metadata": null,
+            "live_session_resumption_update": null,
+            "live_session_id": null,
+            "go_away": null,
+            "input_transcription": null,
+            "output_transcription": null,
+            "avg_logprobs": null,
+            "logprobs_result": null,
+            "cache_metadata": null,
+            "citation_metadata": null,
+            "interaction_id": null,
+            "invocation_id": "e-41774dff-6011-4586-9b27-09592812e5f7",
+            "author": "hello_agent",
+            "actions": {
+              "skip_summarization": null,
+              "state_delta": {},
+              "artifact_delta": {},
+              "transfer_to_agent": null,
+              "escalate": null,
+              "requested_auth_configs": {},
+              "requested_tool_confirmations": {},
+              "compaction": null,
+              "end_of_agent": null,
+              "agent_state": null,
+              "rewind_before_invocation_id": null,
+              "route": null,
+              "render_ui_widgets": null,
+              "set_model_response": null
+            },
+            "output": null,
+            "node_info": {
+              "path": "hello_agent@1",
+              "output_for": null,
+              "message_as_output": null
+            },
+            "long_running_tool_ids": null,
+            "branch": null,
+            "isolation_scope": null,
+            "id": "2572af0c-2697-4d33-813a-0452b521e4d0",
+            "timestamp": 1783157247.599307
+          }
+        ],
+        "last_update_time": 1783157247.599307
+      },
+      "user_id": "eval_user"
+    }
+  ],
+  "creation_timestamp": 1783157259.55374
+}
