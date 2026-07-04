@@ -431,10 +431,12 @@ E12a / E12b 建议新增 flags:
   - 数据:`agents/hello_agent/e5_plateau.evalset.json`(第12杯连续无改善 + 香气掉/纸板感)。
   - 评分:`agents/hello_agent/e5_metric.py::e5_plateau_contract_gate`。只判最后一次 `record_cup` 的结构化字段:`turn_type=terminate`、`decision=停手`、`terminate_reason=plateau_ambiguous`,且 `direction`/`step` 为空;话术不计分。
   - 配置:`agents/hello_agent/e5_test_config.json`。
+  - ✅ 端到端结果:`agents/hello_agent/.adk/eval_history/hello_agent_e5_plateau_1782811532.15476.evalset_result.json` → `Tests passed: 1`, `Tests failed: 0`。
 - [x] 把 E3/E3b 砍豆机条件化归因编码为 ADK evalset + 确定性 custom metric
   - 数据:`agents/hello_agent/e3_grinder.evalset.json`(砍豆机 vs 锥刀,同样"又酸又苦")。
   - 评分:`agents/hello_agent/e3_metric.py::e3_grinder_contract_gate`。E3 必须 `terminate_reason=axis_unreliable`;E3b 不得使用 `axis_unreliable` 或直接停手。
   - 配置:`agents/hello_agent/e3_test_config.json`。
+  - ✅ 端到端结果:`agents/hello_agent/.adk/eval_history/hello_agent_e3_grinder_1782811481.160905.evalset_result.json` → E3/E3b `Tests passed: 2`, `Tests failed: 0`。
 - [x] **【萃取层 · 拦截欠萃伪装 · E12 已编码】** 四项全绿但实为**欠萃 plateau**(vs_prev 无变化是因**到研磨极限**、化甜是**相对最优**而非绝对到位)→ gold:agent **不得直接盖 `gradient:已收敛` 进口味层**;E12a 继续打「**绝对刻度化甜探针**」,E12b 识别为 `axis_limit_underextracted`。接 E1/E4 萃取线、**不进 E11**;是萃取层↔口味层交接点的"哑弹拆除器",被 SPEC §2.4 输入契约的 ⚠️ 指派。
   - 数据:`agents/hello_agent/e12_graduation_gate.evalset.json`(E12a probe / E12b axis-limit terminate;开局不预设 `gradient=已收敛`)。
   - 评分:`agents/hello_agent/e12_metric.py::graduation_gate`。只判 `record_cup` 结构化字段;两条都硬禁 `gradient=已收敛`、口味层 flag/reason、继续磨细。
