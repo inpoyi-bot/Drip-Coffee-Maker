@@ -1,0 +1,838 @@
+<!--
+  Drip Coffee Maker demo frontend
+
+  Start the backend:
+    adk api_server agents --host 0.0.0.0 --port 8000 --allow_origins='*' --session_service_uri=sqlite:///./sessions.db
+
+  Open this frontend:
+    cd demo/frontend && python -m http.server 8080
+    then visit http://localhost:8080
+    You may also open this file directly in a browser.
+
+  This frontend contains no credentials. API keys are held only by the server process.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drip Coffee Maker Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f3;
+      --panel: #ffffff;
+      --line: #d9ddd2;
+      --text: #20241f;
+      --muted: #687063;
+      --accent: #2f6651;
+      --accent-dark: #214b3a;
+      --agent: #eef3ed;
+      --user: #dfece7;
+      --error-bg: #fff1f0;
+      --error-line: #e6aaa5;
+      --error-text: #8a2018;
+      --focus: #7aa891;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .shell {
+      width: min(1120px, calc(100vw - 40px));
+      margin: 28px auto;
+    }
+
+    header {
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .session-bar,
+    .chat-panel,
+    .trajectory-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .session-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto;
+      gap: 12px;
+      align-items: end;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    input,
+    textarea,
+    button {
+      font: inherit;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input {
+      height: 38px;
+      padding: 0 10px;
+    }
+
+    textarea {
+      min-height: 76px;
+      max-height: 180px;
+      resize: vertical;
+      padding: 10px;
+      line-height: 1.45;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(122, 168, 145, 0.18);
+    }
+
+    button {
+      height: 38px;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      padding: 0 14px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--accent);
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    button.secondary:hover {
+      background: #eef3ed;
+      color: var(--accent-dark);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+
+    .status-line {
+      min-height: 22px;
+      margin: -6px 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .error-bar {
+      display: none;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--error-line);
+      border-radius: 6px;
+      background: var(--error-bg);
+      color: var(--error-text);
+      font-size: 14px;
+    }
+
+    .error-bar.visible {
+      display: block;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .chat-panel {
+      display: grid;
+      grid-template-rows: minmax(360px, 58vh) auto;
+      overflow: hidden;
+    }
+
+    .messages {
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .empty-state {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .message-row {
+      display: flex;
+      margin: 0 0 12px;
+    }
+
+    .message-row.agent {
+      justify-content: flex-start;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: min(680px, 78%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      line-height: 1.48;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+
+    .agent .bubble {
+      background: var(--agent);
+    }
+
+    .user .bubble {
+      background: var(--user);
+    }
+
+    .composer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      background: #fbfcf9;
+    }
+
+    .send-area {
+      display: grid;
+      gap: 8px;
+    }
+
+    .loading {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .trajectory-panel {
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcf9;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .trajectory-content {
+      padding: 14px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .bag-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .bag-item {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px;
+      background: #fbfcf9;
+      min-width: 0;
+    }
+
+    .bag-key {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
+
+    .bag-value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      padding: 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f2f4ef;
+      color: var(--muted);
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      margin: 0 4px 4px 0;
+      padding: 2px 6px;
+      border: 1px solid #bfd2c8;
+      border-radius: 999px;
+      background: #eef5f1;
+      color: #274c3d;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <h1>Drip Coffee Maker Demo</h1>
+      <p class="subtitle">Real ADK session chat for the V60 grind-convergence coach.</p>
+    </header>
+
+    <section class="session-bar" aria-label="Session controls">
+      <label>
+        User ID
+        <input id="userId" autocomplete="off" value="demo_user">
+      </label>
+      <label>
+        Session ID
+        <input id="sessionId" autocomplete="off" value="demo_session_1">
+      </label>
+      <button id="createSession" type="button">New Session</button>
+      <button id="connectSession" class="secondary" type="button">Connect Existing</button>
+    </section>
+
+    <div id="statusLine" class="status-line">Backend: http://localhost:8000 · app: hello_agent</div>
+    <div id="errorBar" class="error-bar" role="alert"></div>
+
+    <div class="workspace">
+      <section class="chat-panel" aria-label="Chat">
+        <div id="messages" class="messages">
+          <div class="empty-state">Create or connect a session, then send the first cup note.</div>
+        </div>
+        <form id="composer" class="composer">
+          <div class="send-area">
+            <textarea id="messageInput" placeholder="Example: I just opened a new bag and want to brew my first V60 cup."></textarea>
+            <div id="loadingText" class="loading" aria-live="polite"></div>
+          </div>
+          <button id="sendMessage" type="submit">Send</button>
+        </form>
+      </section>
+
+      <section class="trajectory-panel" aria-label="Convergence trajectory">
+        <div class="panel-header">
+          <h2>Convergence Trajectory</h2>
+          <button id="refreshTrajectory" class="secondary" type="button">Refresh Trajectory</button>
+        </div>
+        <div class="trajectory-content">
+          <section aria-label="Bag state">
+            <p class="section-title">Bag</p>
+            <div id="bagFields" class="bag-grid">
+              <div class="muted">No bag state loaded.</div>
+            </div>
+          </section>
+
+          <section aria-label="Cup records">
+            <p class="section-title">Cups</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cup</th>
+                    <th>Turn Type</th>
+                    <th>Gradient</th>
+                    <th>Direction</th>
+                    <th>Step</th>
+                    <th>Decision</th>
+                    <th>Terminate Reason</th>
+                    <th>Flags Asserted</th>
+                    <th>Confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="cupsBody">
+                  <tr><td colspan="9" class="muted">No cups loaded.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const BASE_URL = "http://localhost:8000";
+    const APP_NAME = "hello_agent";
+
+    const userIdInput = document.querySelector("#userId");
+    const sessionIdInput = document.querySelector("#sessionId");
+    const createSessionButton = document.querySelector("#createSession");
+    const connectSessionButton = document.querySelector("#connectSession");
+    const statusLine = document.querySelector("#statusLine");
+    const errorBar = document.querySelector("#errorBar");
+    const messages = document.querySelector("#messages");
+    const composer = document.querySelector("#composer");
+    const messageInput = document.querySelector("#messageInput");
+    const sendMessageButton = document.querySelector("#sendMessage");
+    const loadingText = document.querySelector("#loadingText");
+    const refreshTrajectoryButton = document.querySelector("#refreshTrajectory");
+    const bagFields = document.querySelector("#bagFields");
+    const cupsBody = document.querySelector("#cupsBody");
+
+    const BAG_FIELD_ORDER = [
+      "roast",
+      "roast_date",
+      "roast_age_status",
+      "dose",
+      "grinder_type",
+      "baseline_grind",
+      "phase",
+    ];
+
+    const CUP_COLUMNS = [
+      { label: "Cup", keys: ["cup", "cup_number", "cup_index", "index"] },
+      { label: "Turn Type", keys: ["turn_type"] },
+      { label: "Gradient", keys: ["gradient"] },
+      { label: "Direction", keys: ["direction"] },
+      { label: "Step", keys: ["step"] },
+      { label: "Decision", keys: ["decision"] },
+      { label: "Terminate Reason", keys: ["terminate_reason"], badge: true },
+      { label: "Flags Asserted", keys: ["flags_asserted"], badge: true },
+      { label: "Confidence", keys: ["confidence"] },
+    ];
+
+    function currentSession() {
+      return {
+        userId: userIdInput.value.trim(),
+        sessionId: sessionIdInput.value.trim(),
+      };
+    }
+
+    function sessionPath() {
+      const { userId, sessionId } = currentSession();
+      if (!userId || !sessionId) {
+        throw new Error("User ID and Session ID are required.");
+      }
+      return `/apps/${APP_NAME}/users/${encodeURIComponent(userId)}/sessions/${encodeURIComponent(sessionId)}`;
+    }
+
+    function setBusy(isBusy, label = "") {
+      createSessionButton.disabled = isBusy;
+      connectSessionButton.disabled = isBusy;
+      sendMessageButton.disabled = isBusy;
+      refreshTrajectoryButton.disabled = isBusy;
+      loadingText.textContent = label;
+    }
+
+    function showError(message) {
+      errorBar.textContent = message;
+      errorBar.classList.add("visible");
+    }
+
+    function clearError() {
+      errorBar.textContent = "";
+      errorBar.classList.remove("visible");
+    }
+
+    function setStatus(message) {
+      statusLine.textContent = message;
+    }
+
+    async function requestJson(path, options = {}) {
+      let response;
+      try {
+        response = await fetch(`${BASE_URL}${path}`, {
+          headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+          ...options,
+        });
+      } catch (error) {
+        throw new Error(`Network error: ${error.message}. Is the ADK server running on ${BASE_URL}?`);
+      }
+
+      const text = await response.text();
+      let data = null;
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = text;
+        }
+      }
+
+      if (!response.ok) {
+        const detail = typeof data === "string" ? data : JSON.stringify(data);
+        throw new Error(`HTTP ${response.status} ${response.statusText}${detail ? `: ${detail}` : ""}`);
+      }
+
+      return data;
+    }
+
+    function ensureMessageList() {
+      const emptyState = messages.querySelector(".empty-state");
+      if (emptyState) {
+        emptyState.remove();
+      }
+    }
+
+    function appendMessage(role, text) {
+      ensureMessageList();
+      const row = document.createElement("div");
+      row.className = `message-row ${role}`;
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      row.append(bubble);
+      messages.append(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function extractAgentText(events) {
+      const eventList = Array.isArray(events) ? events : [events];
+      return eventList
+        .flatMap((event) => event?.content?.parts || [])
+        .filter((part) => typeof part.text === "string" && part.text.trim())
+        .map((part) => part.text.trim())
+        .join("\n\n");
+    }
+
+    function sessionState(sessionData) {
+      return sessionData?.state && typeof sessionData.state === "object" ? sessionData.state : {};
+    }
+
+    function isBlank(value) {
+      return value === null || value === undefined || value === "" || (Array.isArray(value) && value.length === 0);
+    }
+
+    function formatValue(value) {
+      if (isBlank(value)) {
+        return "—";
+      }
+      if (Array.isArray(value)) {
+        return value.map(formatValue).join(", ");
+      }
+      if (typeof value === "object") {
+        return JSON.stringify(value);
+      }
+      return String(value);
+    }
+
+    function firstPresent(record, keys) {
+      for (const key of keys) {
+        if (!isBlank(record?.[key])) {
+          return record[key];
+        }
+      }
+      return undefined;
+    }
+
+    function renderBadges(cell, value) {
+      const values = Array.isArray(value) ? value : [value];
+      const compactValues = values.filter((item) => !isBlank(item));
+
+      if (!compactValues.length) {
+        cell.textContent = "—";
+        cell.className = "muted";
+        return;
+      }
+
+      for (const item of compactValues) {
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = formatValue(item);
+        cell.append(badge);
+      }
+    }
+
+    function orderedBagEntries(bag) {
+      if (!bag || typeof bag !== "object" || Array.isArray(bag)) {
+        return [];
+      }
+
+      const known = BAG_FIELD_ORDER.filter((key) => !isBlank(bag[key]));
+      const extras = Object.keys(bag)
+        .filter((key) => !BAG_FIELD_ORDER.includes(key) && !isBlank(bag[key]))
+        .sort();
+
+      return [...known, ...extras].map((key) => [key, bag[key]]);
+    }
+
+    function renderBag(bag) {
+      bagFields.innerHTML = "";
+      const entries = orderedBagEntries(bag);
+
+      if (!entries.length) {
+        const empty = document.createElement("div");
+        empty.className = "muted";
+        empty.textContent = "No bag state loaded.";
+        bagFields.append(empty);
+        return;
+      }
+
+      for (const [key, value] of entries) {
+        const item = document.createElement("div");
+        item.className = "bag-item";
+
+        const label = document.createElement("span");
+        label.className = "bag-key";
+        label.textContent = key;
+
+        const data = document.createElement("span");
+        data.className = "bag-value";
+        data.textContent = formatValue(value);
+
+        item.append(label, data);
+        bagFields.append(item);
+      }
+    }
+
+    function renderCups(cups) {
+      cupsBody.innerHTML = "";
+      const cupRows = Array.isArray(cups) ? cups : [];
+
+      if (!cupRows.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = CUP_COLUMNS.length;
+        cell.className = "muted";
+        cell.textContent = "No cups loaded.";
+        row.append(cell);
+        cupsBody.append(row);
+        return;
+      }
+
+      cupRows.forEach((cup, index) => {
+        const row = document.createElement("tr");
+
+        CUP_COLUMNS.forEach((column, columnIndex) => {
+          const cell = document.createElement("td");
+          const value = columnIndex === 0 ? firstPresent(cup, column.keys) ?? index + 1 : firstPresent(cup, column.keys);
+
+          if (column.badge) {
+            renderBadges(cell, value);
+          } else {
+            cell.textContent = formatValue(value);
+            if (cell.textContent === "—") {
+              cell.className = "muted";
+            }
+          }
+
+          row.append(cell);
+        });
+
+        cupsBody.append(row);
+      });
+    }
+
+    function renderTrajectory(sessionData) {
+      const state = sessionState(sessionData);
+      renderBag(state.bag);
+      renderCups(state.cups);
+    }
+
+    async function refreshTrajectory({ showLoading = true } = {}) {
+      clearError();
+      if (showLoading) {
+        setBusy(true, "Refreshing trajectory...");
+      }
+
+      try {
+        const { userId, sessionId } = currentSession();
+        const sessionData = await requestJson(sessionPath());
+        renderTrajectory(sessionData);
+        setStatus(`Trajectory loaded for ${userId} / ${sessionId}`);
+        return sessionData;
+      } catch (error) {
+        showError(error.message);
+        throw error;
+      } finally {
+        if (showLoading) {
+          setBusy(false);
+        }
+      }
+    }
+
+    async function createSession() {
+      clearError();
+      setBusy(true, "Creating session...");
+      try {
+        const { userId, sessionId } = currentSession();
+        const sessionData = await requestJson(sessionPath(), { method: "POST", body: "{}" });
+        messages.innerHTML = '<div class="empty-state">Session created. Send the first cup note.</div>';
+        renderTrajectory(sessionData);
+        setStatus(`Session ready: ${userId} / ${sessionId}`);
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function connectSession() {
+      clearError();
+      setBusy(true, "Connecting session...");
+      try {
+        const { userId, sessionId } = currentSession();
+        const sessionData = await requestJson(sessionPath());
+        renderTrajectory(sessionData);
+        setStatus(`Connected existing session: ${userId} / ${sessionId}`);
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function sendMessage(event) {
+      event.preventDefault();
+      clearError();
+
+      const text = messageInput.value.trim();
+      if (!text) {
+        return;
+      }
+
+      setBusy(true, "Sending to agent...");
+      appendMessage("user", text);
+
+      try {
+        const { userId, sessionId } = currentSession();
+        const events = await requestJson("/run", {
+          method: "POST",
+          body: JSON.stringify({
+            app_name: APP_NAME,
+            user_id: userId,
+            session_id: sessionId,
+            new_message: {
+              role: "user",
+              parts: [{ text }],
+            },
+          }),
+        });
+
+        const reply = extractAgentText(events);
+        if (!reply) {
+          throw new Error("The server returned no final text response.");
+        }
+
+        appendMessage("agent", reply);
+        messageInput.value = "";
+        setStatus(`Last reply received for ${userId} / ${sessionId}`);
+        await refreshTrajectory({ showLoading: false });
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        setBusy(false);
+        messageInput.focus();
+      }
+    }
+
+    createSessionButton.addEventListener("click", createSession);
+    connectSessionButton.addEventListener("click", connectSession);
+    refreshTrajectoryButton.addEventListener("click", () => {
+      refreshTrajectory().catch(() => {});
+    });
+    composer.addEventListener("submit", sendMessage);
+  </script>
+</body>
+</html>
