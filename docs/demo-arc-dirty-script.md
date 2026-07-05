@@ -34,11 +34,57 @@
 | 1 | seed | n/a | — | — | — | `start_bag` 写包级表头;若 agent 同轮记录第一杯反馈,允许作为起点欠萃记录落账 |
 | 2 | adjust | 变好+同向 | finer | 2格 | — | 欠萃签名明确,只调研磨 |
 | 3 | adjust | 变好+同向 | finer | 2格 | — | 方向对,但用户仍偏酸、未出甜,不得写 `已收敛` |
-| 4 | adjust | 变坏 | coarser | 1格 | — | E13a gold:`flags_asserted` 含 `overshoot_observed`,不得含 `axis_limit_reached` |
-| 5 | probe | 没变 / info_insufficient | — | — | — | E12a-style gold:`decision=探针`,`flags_asserted` 含 `absolute_extraction_uncertain` |
+| 4 | adjust | 变坏 | coarser | 见重判注 | — | 实际 v1 行为 + 已知局限豁免;过冲被识别并反向,步长纪律见下方重判 |
+| 5 | probe | 变好 | — | — | — | E12a-style gold:`decision=探针`,`flags_asserted` 含 `absolute_extraction_uncertain`;见校正注 |
 | 6 | terminate | 已收敛 | — | — | satisfied | 用户明确满意,研磨轴收敛停手 |
 
 ---
+
+### 杯 4 预期重判（2026-07-04 · E13 instruction route rollback 后生效）
+
+原 E13a gold（decision=继续 + 收步 + overshoot_observed）经两次独立 live run
+确认不可达（REPORT.md：baseline 1783152917 + snapshot 1783171082，同一失败
+形态，N=2，已定性 reproducible known v1 limitation）。杯 4 验点据此重判：
+
+**硬性验点（任一不满足 = 本次尝试失败，计入 3 次额度）**
+- `turn_type=adjust`（不得 terminate / probe）
+- `direction=coarser`（反向回退被识别——这是 N=2 里稳定成立的部分）
+- `gradient` 含 `变坏`、不含 `变好`
+- 无 `terminate_reason`；`flags_asserted` 不含 `axis_limit_reached`
+- 对话层给出明确"调粗"动作，且不解冻水温/比例/粉量/手法
+- 不得把发苦归因到注水手法（E13a attribution 检查，人工复读判定）
+
+**已知局限豁免（出现不算失败，链 REPORT.md E13 known limitation）**
+- `decision` 可能为枚举外自由值 `反向`（而非 gold 的 `继续`）
+- `step` 可能未收步（`2格` / `-2格` 均豁免）
+- `flags_asserted` 可能缺 `overshoot_observed`
+
+
+杯 5 验点不变（E12a-style probe；E12 gate 当前绿，gold 可达）。
+
+### 杯 5 预期表校正（2026-07-04 · dirty arc run 1 accepted 后生效）
+
+dirty arc run 1 已接受为最终 demo 证据。杯 5 实际落账为
+`turn_type=probe`、`decision=探针`、`gradient=变好`、
+`flags_asserted=["absolute_extraction_uncertain"]`，SQLite 复读通过。
+
+原预期表把杯 5 `gradient` 写成 `没变 / info_insufficient`，但脚本用户消息明写
+"比上杯好"。这里不是 moving goalposts：预期表和脚本输入自相矛盾，矛盾体内
+必有一个错；错的是表格，不是 agent 行为。`变好` 是对输入的忠实记录；
+绝对刻度不确定性由 `absolute_extraction_uncertain` flag 承载，而不是强行塞进
+`gradient` 字段。此判断链 REPORT.md 的 `gradient` 语义过载 observation：
+当前 v1 的 `gradient` 同时承载 search delta / admission state 等含义，v2 应拆
+schema；v1 demo 只要求不伪造 `gradient=已收敛`、不继续磨细、不进入口味层出口。
+
+### Dirty arc 关闭记录（2026-07-04）
+
+- run 1 accepted 为最终 demo 证据。
+- 杯 4 重判通过：过冲被识别，动作反向到 `coarser`；`decision=反向`、未收步、
+  缺 `overshoot_observed` 均按已知局限豁免。
+- 杯 5 triage 定性为表格校正：probe 行为与 E12a-style gate 对齐，`gradient=变好`
+  是对脚本输入的忠实记录。
+- SQLite 复读通过：同一 `sessions.db` 可读回 `bag` 与 5 条 `cups` 轨迹。
+- 3 次额度中只使用 run 1，剩余 2 次未动。
 
 ## Run checklist
 

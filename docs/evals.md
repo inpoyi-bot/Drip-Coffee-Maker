@@ -143,6 +143,17 @@
 - **❌ 绝不**:继续磨细;无视"上一杯更好"这条信息。
 - **设计说明**:与 E8(满意而停)区分——这是"再调会变坏而停",测的是"认峰回退"。
 
+#### E9 ↔ E13a 边界表
+| 维度 | E9 · 认峰回退并停 | E13a · 中途过冲反向继续 |
+|---|---|---|
+| 共同表象 | 当前杯比上一杯变坏,可能出现发苦 / 发干 / 流速变慢 | 当前杯比上一杯变坏,可能出现发苦 / 发干 / 流速变慢 |
+| 上一杯状态 | 上一杯已经是最好 / 已到位 / 用户满意 | 上一杯仍未到位,仍偏酸 / 未出甜 / 甜感不清楚 |
+| 正确动作 | 回退到上一杯研磨设置,宣布研磨轴收敛并停手 | 反向磨粗,但收小步长继续搜索 |
+| 结构化意图 | `turn_type=terminate`,`decision=停手`;停手原因表达"再调会过萃 / 已越过峰值" | `turn_type=adjust`,`decision=继续`,`direction=coarser`,`step` 小于上一轮 |
+| 防的误修 | 不要把 E13a 修成"永远继续搜索",打碎 E9 的终止条件 | 不要把 E9 泛化成"一变坏就停",漏掉 dirty arc 里的可恢复过冲 |
+
+> **一句话边界**:同样是"变坏",E9 的上一杯已经够好,所以回退并停;E13a 的上一杯还在半山腰,所以反向收步继续。这张表回接 SPEC §3 第 6/7 步:读梯度后,下一步不只有"继续 / 停",还要看上一杯是不是已经构成峰值。
+
 ### E5 — 移动山顶 / 陈化(plateau 的欠定归因)
 - **场景**:第12杯,**烘后约35天**(锚烘焙日期,非开封天数)。
 - **用户报告**:"连续两杯都没改善;而且**香气明显掉了、有点纸板感、整体变平淡**。"(陈化专属风味词,与酸/苦的萃取轴不同类)
@@ -383,7 +394,45 @@ E12a / E12b 建议新增 flags:
 
 ---
 
-## 十一、B 档后 7 条高危 live 回归观测(现象记录)
+## 十一、E13 overshoot reversal(已编码 · v1 known limitation)
+
+> **归属**:SPEC §3 第 6/7 步的 dirty-arc 分支:读到"变坏"后,要区分"中途过冲可反向继续"与"已经越过峰值应回退停手"。
+> **提交口径**:E13 eval artifact 已存在,但当前 live baseline 稳定失败,标为 **v1 known limitation**,不作为 final submission blocker。v1 对外 claim 仍保持 `docs/demo-arc.md` 的干净 5 杯弧线;dirty arc 归入 v2 backlog。
+
+### E13a — 中途过冲 → 反向收步继续
+- **场景**:浅焙,前几杯一路磨细后从明显欠萃变好,但上一杯仍偏酸 / 未出甜 / 不算到位;当前杯继续磨细后明显发苦、发干,流速明显变慢。
+- **✅ gold**:识别为 mid-search overshoot;不要继续磨细,也不要停手。反向磨粗,且步长小于上一轮,继续搜索。
+- **结构化 gold**:`turn_type=adjust`,`decision=继续`,`gradient=变坏`,`direction=coarser`,`step < 上一轮步长`,`flags_asserted` 含 `overshoot_observed`;不得带 `terminate_reason` / `axis_limit_reached`。
+- **当前 observed failure**:live baseline 能识别方向(`direction=coarser`,`gradient=变坏`),但没有稳定做到"收小步长 + decision=继续 + `overshoot_observed`";快照中出现 `decision=反向`,`step=-2格`,缺 `overshoot_observed`。
+
+### E13b — 主观疑似变坏但客观没动 → 先 probe
+- **场景**:用户说"好像有一点点苦,也说不准";整杯时间、床面、挂粉环等客观信号和上杯几乎没变。
+- **✅ gold**:不得把不确定舌头信号写死成 `gradient=变坏`;不得反射磨粗。应记录 validation probe,下一杯研磨 / 水温 / 粉量 / 比例 / 手法照旧,验证这点苦是否稳定出现。
+- **结构化 gold**:`turn_type=probe`,`decision=探针`,`gradient=info_insufficient`,`flags_asserted` 含 `gradient_uncertain`;不得带 `direction` / `step` / `terminate_reason`。
+- **当前 observed failure**:live baseline 重复把 E13b 当成明确变坏,写成 `turn_type=adjust`,`decision=反向`,`direction=coarser`,`step=-2格`,`gradient=变坏`。
+
+### E13 状态与证据
+- 数据:`agents/hello_agent/e13_overshoot.evalset.json`。
+- 评分:`agents/hello_agent/e13_metric.py::overshoot_reversal_gate`;只判 `record_cup` 结构化字段,E13a 的注水 / 手法归因文本只记 warning,不进 overall pass/fail。
+- 配置:`agents/hello_agent/e13_test_config.json`。
+- smoke contract:`scripts/smoke_e13_contract.py` 证明现有 `record_cup` contract **接受** E13a adjust 形状和 E13b probe 形状,所以 E13 失败不是 schema 无法表达。
+- 最终快照(2026-07-04):`agents/hello_agent/.adk/eval_history/hello_agent_e13_overshoot_1783171082.880841.evalset_result.json` → `Tests passed: 0`, `Tests failed: 2`。
+- **结论**:E13 从单次失败升级为可复现 v1 known limitation(N=2)。不再在 feature freeze 内修 instruction;未来应作为 v2 dirty-arc/梯度架构项处理。
+
+### E13a / E9 交接边界
+| 维度 | E13a · 中途过冲 | E9 · 认峰回退 |
+|---|---|---|
+| 上一杯是否已到位 | 否。上一杯仍偏酸 / 未出甜 / 还在搜索 | 是。上一杯最好 / 已到位 / 用户满意 |
+| 当前杯变坏后的动作 | 反向、收小步长、继续 | 回退到上一杯设置、停手 |
+| `turn_type` | `adjust` | `terminate` |
+| `decision` | `继续` | `停手` |
+| 是否写 `direction` | 是,`coarser` | 否。terminate 记录不带方向 |
+| 是否写 `step` | 是,小于上一轮 | 否。目标来自轨迹中的上一杯 |
+| 核心风险 | 误停会错过真正峰值 | 误继续会把已经最好的一杯调坏 |
+
+---
+
+## 十二、B 档后 live 回归观测 + 提交前 known observations
 
 > **来源**:实现侧 live 跑真模型(`gemini-2.5-flash`)后的观察记录。
 > **性质**:现象记录,供判断侧追溯。不把两处瑕疵归因给 B 档,也不倒推诊断策略。
@@ -406,6 +455,30 @@ E12a / E12b 建议新增 flags:
 - **结构化瑕疵**:live 跑曾出现话术说停手,但 `record_cup` 写成 `turn_type=adjust` + `direction=finer` + `step=+1格`,同条又带 `decision=停手` / `terminate_reason=plateau_ambiguous`。
 - **判断侧决策**:这属于 record contract integrity bug,不是诊断策略变更。E5 正确记录为 `turn_type=terminate` + `decision=停手` + `terminate_reason=plateau_ambiguous`,且 `direction`/`step` 为空。
 - **当前状态**:已在 `record_cup` 写入前加入 invariants,矛盾记录直接拒绝写入;并新增 E5 自动 eval artifact:`agents/hello_agent/e5_plateau.evalset.json` + `agents/hello_agent/e5_metric.py` + `agents/hello_agent/e5_test_config.json`。
+
+### 提交前 known observations(7条;不含 E9 gap)
+> **口径**:这些是 final packaging 阶段的证据同步,用于防止 README/writeup/video 过度 claim。除第 3 条已升格为 v2 架构项外,其余先作为测试/契约卫生记录,不在 v1 feature freeze 内扩功能。
+
+1. **Eval seed injection 可绕过 runtime invariant**  
+   本地 ADK eval 的 `session_input.state` 能注入 runtime `record_cup` 不会接受的轨迹。补偿控制是 seed linter;引用 eval 结果时默认先信通过 linter 的 seed。
+
+2. **`terminate_reason` 的 kwargs 与 stored shape 不完全等价**  
+   `record_cup` 可接受 terminate call 省略 / 空 `terminate_reason`,但存储形状仍含该 key。eval seed 应镜像存储后的 record,不要镜像函数入参。
+
+3. **`gradient` 语义超载 → v2 schema split 架构项**  
+   clean-input evidence 已确认同一字段在不同上下文承载两种含义:萃取搜索里的 current delta(`没变`/`变坏`/`变好`)以及口味层 handoff 里的 upstream graduation state(`已收敛`)。E11a/E11b clean run 中同样开局却出现 taste-layer probe 的 `gradient` 一条写 `没变`、一条写 `已收敛`;E11d admission probe 写 `没变` 又是正确的。这不再只是 seed pollution,而是 schema 层缺口。v2 应拆成类似 `extraction_state` / `current_delta` 两个字段。
+
+4. **Tool-call omission 有小账本**  
+   观察到 E7c Turn 2、E11c invocation 2 等少量 "回复正确但漏 `record_cup`" 的情况,多发生在多轮 case 后段。当前已记录为风险,引用结果时优先看有结构化落账的 run。
+
+5. **`step` 正负号语义未在 contract 层定义**  
+   `finer` 常写 `+2格`,但 `coarser` 既出现过 `-2格`,也出现过 `+1格`。当前 metric 应继续按 `direction` + 语义步长判断,不要把 raw sign 当唯一真值。
+
+6. **`decision` 仍是 contract-layer free text**  
+   多个 baseline 会写出枚举外的 `反向`;instruction 枚举曾有效,但因 E13 route 回滚未保留。若未来 `decision` 变 load-bearing,应做 contract-level validation,不要只靠 prompt。
+
+7. **Metric aggregation 会稀释 turn-level hard fail**  
+   E11a 曾出现 invocation 1 的 `taste_gate_state_pass=0.0`、invocation 2 为 `1.0`,但 case overall 平均成 `0.5`。引用 E11 时看 per-turn sub-score;v2 metric 可改成 load-bearing gate 的 all-turns-must-pass AND 语义。
 
 ---
 
@@ -446,4 +519,9 @@ E12a / E12b 建议新增 flags:
     - E12a 实际落账:`turn_type=probe`,`decision=探针`,`gradient=没变`,`flags_asserted=["absolute_extraction_uncertain"]`,且无 `direction`/`step`/`terminate_reason`。
     - E12b 实际落账:`turn_type=terminate`,`decision=停手`,`gradient=没变`,`terminate_reason=axis_limit_underextracted`,`flags_asserted=["absolute_extraction_not_met","axis_limit_reached"]`,且无 `direction`/`step`。
   - 认证排障留痕:本地 ADK 2.3.0 / google-genai 2.10.0 下,传统 `AIza...` key 走 Gemini Developer API 可直接跑通;AI Studio 新 `AQ...` auth key 需走 `GOOGLE_GENAI_USE_VERTEXAI=true` + Agent Platform API / billing / service-bound API key 配套,否则会分别遇到 `401 UNAUTHENTICATED`、`SERVICE_DISABLED`、`BILLING_DISABLED` 或 `API_KEY_SERVICE_BLOCKED`。
+- [ ] **【E9 认峰回退 · rubric-contract gap】** E9 rubric 已定义"当前杯变坏且上一杯更好 → 回退上一杯并停手",但尚未编码为 ADK eval / custom metric。未来应明确 `terminate_reason` 是沿用 `would_overextract` 还是新增更窄的 `peak_backtracked`;无论命名如何,terminate row **不得**携带 `direction` / `step`。
+  - 设计证据:`scripts/smoke_e13_contract.py` 的 c) invariant 已验证 contract 会拒绝带方向的 terminate 记录:`record_cup contract violation: terminate 记录不能带 direction`。
+  - 结论:未来 E9 backtrack termination 只记录停手原因;实际回退目标从轨迹上一杯恢复,不要把"回到上一杯"塞成 terminate row 的新 direction。
+  - 状态:feature freeze 内不新增 E9 gate;保持为 future automation backlog / claim consistency item。
+- [x] **【E13 dirty-arc · 已编码但标 v1 known limitation】** E13a/E13b eval artifact 已存在,最终快照 `Tests passed: 0`, `Tests failed: 2`;记录为可复现 v1 limitation,不作为当前提交 blocker。详见 §十一。
 - [x] **【E11 口味层 · admission gate twin 已编码】** E11b 前置消歧:用户报「不甜」要区分 **真欠萃**(违反开局前提 → 退回萃取层,E11c)vs **回甘被酸盖住**(符合开局 → 走口味层,E11d);用专家「**反向探针:寡淡没余味 vs 有回甘被酸盖住**」。这是 E11b「爱这个酸但要更厚」的镜像入口,已并入 `agents/hello_agent/e11_taste_twin.evalset.json` + `agents/hello_agent/e11_metric.py`。
