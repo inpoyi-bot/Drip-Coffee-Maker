@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "手冲咖啡诊断教练"
+version = "1.0.0"
+id = "artifacts/coffee-coach"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25983
+
+[services.development]
+run = "pnpm --filter @workspace/coffee-coach run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/coffee-coach", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/coffee-coach/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25983"
+BASE_PATH = "/"

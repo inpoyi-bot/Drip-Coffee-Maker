@@ -1,0 +1,26 @@
+[[pages]]
+path = "/"
+screenshotTimestamp = "2026-07-10T06:49:12.015Z"
+
+[pages.screenshotAssetRef]
+replId = "a656534b-bd23-4894-881b-3481cda7aa5f"
+kind = 2
+id = "019f4ac9-7cd4-700e-a7a0-d1bf79200e67"
+
+[[pages]]
+path = "/feedback"
+screenshotTimestamp = "2026-07-10T06:49:17.376Z"
+
+[pages.screenshotAssetRef]
+replId = "a656534b-bd23-4894-881b-3481cda7aa5f"
+kind = 2
+id = "019f4ac9-a01f-7740-af99-7f54e6366391"
+
+[[pages]]
+path = "/trajectory"
+screenshotTimestamp = "2026-07-10T06:49:19.223Z"
+
+[pages.screenshotAssetRef]
+replId = "a656534b-bd23-4894-881b-3481cda7aa5f"
+kind = 2
+id = "019f4ac9-a764-704a-9a5b-0d67f0e703ac"
