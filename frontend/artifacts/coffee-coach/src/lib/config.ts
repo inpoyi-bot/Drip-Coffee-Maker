@@ -13,4 +13,4 @@ export const ADK_BASE_URL: string =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 
 export const ADK_APP_NAME: string =
-  import.meta.env.VITE_ADK_APP_NAME ?? 'agents';
+  import.meta.env.VITE_ADK_APP_NAME ?? 'hello_agent';

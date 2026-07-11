@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 
 const SENSORY_OPTIONS = [
   { value: '酸', label: '酸' },
-  { value: '发苦(像烧焦/木头味)', label: '发苦 (像烧焦 / 木头味)' },
-  { value: '发涩(口腔收紧发干,像浓茶/生柿子,不是苦)', label: '发涩 (口腔收紧发干，不是苦)' },
+  { value: '发苦(像烧焦/木头味)', label: '发苦（像烧焦／木头味）' },
+  { value: '发涩(口腔收紧发干,像浓茶/生柿子,不是苦)', label: '发涩（口腔收紧发干，像浓茶／生柿子，不是苦）' },
   { value: '薄(寡淡、水感)', label: '薄 (寡淡、水感)' },
   { value: '有纸板味/闷味', label: '有纸板味 / 闷味、香气发闷' },
 ];
@@ -99,6 +99,12 @@ export default function Feedback() {
                 />
               </div>
             )}
+            <details className="border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
+              <summary className="cursor-pointer font-medium text-foreground">苦和涩怎么分？</summary>
+              <p className="mt-2 leading-relaxed">
+                发苦更像烧焦或木头味；发涩是口腔收紧、发干，像浓茶或生柿子。两者可能同时出现，请分别勾选，不要把“发干”一概当成苦。
+              </p>
+            </details>
           </div>
         </div>
 

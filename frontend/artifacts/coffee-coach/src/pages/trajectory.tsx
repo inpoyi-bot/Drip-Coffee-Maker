@@ -2,18 +2,71 @@ import { useMemo } from 'react';
 import { getCupHistory } from '@/lib/session';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { CupTimeline } from '@/components/timeline';
+import { adjustmentLabel, gradientLabel, terminateReasonLabel } from '@/lib/diagnosisCopy';
+
+function TrajectoryDot({ cx, cy, payload, r = 4 }: any) {
+  const color = payload?.isConverged
+    ? 'hsl(var(--converge))'
+    : 'hsl(var(--slate))';
+
+  return (
+    <g>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill={payload?.isConverged ? color : 'hsl(var(--paper))'}
+        stroke={color}
+        strokeWidth={2}
+      />
+      {payload?.turnbackLabel && (
+        <text
+          x={cx}
+          y={cy - 12}
+          textAnchor="middle"
+          fill="hsl(var(--slate))"
+          fontSize={10}
+          fontFamily="var(--app-font-mono)"
+        >
+          {payload.turnbackLabel}
+        </text>
+      )}
+    </g>
+  );
+}
 
 export default function Trajectory() {
   const history = getCupHistory();
 
   const chartData = useMemo(() => {
+    let relativeHeight = 0;
+
     return history.map((cup, i) => {
+      if (cup.gradient === '变好+同向' || cup.gradient === '变好' || cup.gradient === '已收敛') {
+        relativeHeight += 1;
+      } else if (cup.gradient === '变坏') {
+        relativeHeight -= 1;
+      }
+
+      const terminateReasonText = terminateReasonLabel(cup.terminate_reason);
+      const gradientText = gradientLabel(cup.gradient);
+      const adjustmentText = adjustmentLabel(cup.direction, cup.step);
+
       return {
         name: `Cup ${cup.cup_no || i + 1}`,
         cup_no: cup.cup_no || i + 1,
-        value: i + 1, // simplified climbing value
+        value: relativeHeight,
         date: cup.date || cup.recordedAt?.slice(0, 10),
-        reason: cup.terminate_reason || 'N/A'
+        tooltipText: terminateReasonText || gradientText || '暂未记录变化',
+        tooltipLabel: terminateReasonText ? '这一轮判断' : '变化',
+        turnbackLabel:
+          cup.gradient === '变坏' && cup.direction === 'coarser' && adjustmentText
+            ? `${gradientText} → ${adjustmentText}`
+            : undefined,
+        isConverged:
+          cup.gradient === '已收敛' ||
+          cup.terminate_reason === 'satisfied' ||
+          cup.terminate_reason === 'would_overextract',
       };
     });
   }, [history]);
@@ -44,16 +97,16 @@ export default function Trajectory() {
                 <Tooltip
                   contentStyle={{ backgroundColor: 'hsl(var(--fog))', border: '1px solid hsl(var(--mist))', borderRadius: '6px', fontSize: '12px', fontFamily: 'var(--app-font-mono)' }}
                   itemStyle={{ color: 'hsl(var(--ink))' }}
-                  formatter={(value: any, name: any, props: any) => [props.payload.reason, 'Reason']}
+                  formatter={(value: any, name: any, props: any) => [props.payload.tooltipText, props.payload.tooltipLabel]}
                   labelStyle={{ color: 'hsl(var(--slate))', marginBottom: '4px' }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="value" 
-                  stroke="hsl(var(--chart-1))" 
+                  stroke="hsl(var(--slate))"
                   strokeWidth={2} 
-                  dot={{ r: 4, fill: 'hsl(var(--paper))', stroke: 'hsl(var(--chart-1))', strokeWidth: 2 }} 
-                  activeDot={{ r: 6, fill: 'hsl(var(--chart-1))' }}
+                  dot={TrajectoryDot}
+                  activeDot={(props: any) => <TrajectoryDot {...props} r={6} />}
                 />
               </LineChart>
             </ResponsiveContainer>

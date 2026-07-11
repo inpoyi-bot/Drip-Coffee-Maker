@@ -12,12 +12,13 @@
  * every `record_cup` the agent has returned, used to render Cup Timeline
  * and the trajectory chart without re-deriving them from chat transcripts.
  */
-import type { RecordCup } from './adkClient';
+import type { RecordCup, SeedRecipe } from './adkClient';
 
 const USER_ID_KEY = 'coffee-coach:user-id';
 const SESSION_ID_KEY = 'coffee-coach:session-id';
 const CUPS_KEY = 'coffee-coach:cups';
 const SEED_KEY = 'coffee-coach:seed';
+const SEED_RECIPE_KEY = 'coffee-coach:seed-recipe';
 
 function randomId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
@@ -41,9 +42,9 @@ export function getSessionId(): string {
   return id;
 }
 
-/** Resets the ADK session (e.g. starting a new bag of beans) while keeping
- * the same persistent user id. Cup history is intentionally NOT cleared by
- * this -- the trajectory page persists across sessions by design. */
+/** Resets the ADK session while keeping the same persistent user id.
+ * The caller clears cup history only when the user explicitly starts a new
+ * bag; ordinary refreshes and reopened tabs keep the current bag's history. */
 export function startNewSession(): string {
   const id = randomId('session');
   localStorage.setItem(SESSION_ID_KEY, id);
@@ -85,4 +86,23 @@ export function getSeed(): string | null {
 
 export function setSeed(seedText: string): void {
   localStorage.setItem(SEED_KEY, seedText);
+}
+
+export function getSeedRecipe(): SeedRecipe | null {
+  const raw = localStorage.getItem(SEED_RECIPE_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? (parsed as SeedRecipe) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setSeedRecipe(recipe: SeedRecipe | null): void {
+  if (!recipe) {
+    localStorage.removeItem(SEED_RECIPE_KEY);
+    return;
+  }
+  localStorage.setItem(SEED_RECIPE_KEY, JSON.stringify(recipe));
 }

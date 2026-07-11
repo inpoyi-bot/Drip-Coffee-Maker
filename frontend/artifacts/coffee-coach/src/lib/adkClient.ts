@@ -26,10 +26,8 @@ export interface AdkEvent {
 }
 
 /** The structured diagnosis payload the agent reports back per turn.
- * Field names/values are the raw ADK output -- see FRONTEND.md for the
- * translation-layer mapping table. This app intentionally does NOT
- * translate them yet (downstream Codex pass owns that); it only surfaces
- * the raw value behind an explicit placeholder, per HANDOFF-replit.md §1. */
+ * Field names/values remain raw at the transport boundary; user-facing
+ * components translate them through diagnosisCopy.ts per FRONTEND.md. */
 export interface RecordCup {
   cup_no?: number;
   date?: string;
@@ -46,12 +44,30 @@ export interface RecordCup {
   [key: string]: unknown;
 }
 
+/** Structured seed returned by start_bag. Keep these user-facing fields
+ * separate from the agent's free-text explanation so the cold-start screen
+ * can reliably show the frozen baseline. */
+export interface SeedRecipe {
+  比例?: string;
+  水温?: string;
+  粉量?: string;
+  研磨基准?: string;
+  注水手法?: string;
+}
+
+export interface StartBagResult {
+  seed_recipe?: SeedRecipe;
+  [key: string]: unknown;
+}
+
 export interface AgentTurnResult {
   /** Every text part the agent said this turn, in order. */
   messages: string[];
   /** The most recent record_cup-shaped functionResponse/functionCall payload
    * seen in this turn's events, if any. */
   recordCup: RecordCup | null;
+  /** Structured start_bag output, present only on the cold-start turn. */
+  startBag: StartBagResult | null;
   /** Full raw event list, kept for debugging / IP-sensitive screens that
    * want to inspect more than messages + recordCup. */
   rawEvents: AdkEvent[];
@@ -94,16 +110,32 @@ export async function ensureSession(
 }
 
 function extractRecordCup(events: AdkEvent[]): RecordCup | null {
+  let toolResponse: RecordCup | null = null;
+
   for (let i = events.length - 1; i >= 0; i -= 1) {
     const parts = events[i]?.content?.parts ?? [];
     for (const part of parts) {
       const fr = part.functionResponse;
-      if (fr && /record_cup/i.test(fr.name ?? '')) {
-        return (fr.response as RecordCup) ?? null;
-      }
       const fc = part.functionCall;
       if (fc && /record_cup/i.test(fc.name ?? '')) {
         return (fc.args as RecordCup) ?? null;
+      }
+      if (fr && /record_cup/i.test(fr.name ?? '') && !toolResponse) {
+        toolResponse = (fr.response as RecordCup) ?? null;
+      }
+    }
+  }
+
+  return toolResponse;
+}
+
+function extractStartBag(events: AdkEvent[]): StartBagResult | null {
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const parts = events[i]?.content?.parts ?? [];
+    for (const part of parts) {
+      const response = part.functionResponse;
+      if (response && /start_bag/i.test(response.name ?? '')) {
+        return (response.response as StartBagResult) ?? null;
       }
     }
   }
@@ -156,6 +188,7 @@ export async function sendTurn(
   return {
     messages: extractMessages(events),
     recordCup: extractRecordCup(events),
+    startBag: extractStartBag(events),
     rawEvents: events,
   };
 }

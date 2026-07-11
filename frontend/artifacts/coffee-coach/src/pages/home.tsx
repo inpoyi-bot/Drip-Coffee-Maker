@@ -1,45 +1,63 @@
 import { useState } from 'react';
-import { setSeed, getSeed, startNewSession } from '@/lib/session';
+import { clearCupHistory, setSeed, getSeed, getSeedRecipe, setSeedRecipe, startNewSession } from '@/lib/session';
 import { coldStartToNaturalLanguage, type ColdStartInput } from '@/lib/nlAssembly';
 import { useSendTurn } from '@/hooks/use-agent';
 import { useLocation } from 'wouter';
 import { RadioOption, CheckboxOption, Label, Input } from '@/components/ui/forms';
 import { Button } from '@/components/ui/button';
 
+const STARTING_GRIND_OPTIONS = ['白砂糖粗细', '食盐粗细', '玉米粉粗细'] as const;
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const mutation = useSendTurn();
 
-  const [roastLevel, setRoastLevel] = useState('中焙');
+  const [roastLevel, setRoastLevel] = useState('');
   const [roastDate, setRoastDate] = useState('');
   const [roastDateUnknown, setRoastDateUnknown] = useState(false);
-  const [doseGrams, setDoseGrams] = useState('15');
-  const [grinderType, setGrinderType] = useState('锥刀电动磨');
+  const [doseGrams, setDoseGrams] = useState('');
+  const [grinderType, setGrinderType] = useState('');
   const [startingGrind, setStartingGrind] = useState('');
   
   const [seed, setLocalSeed] = useState(getSeed());
+  const [seedRecipe, setLocalSeedRecipe] = useState(getSeedRecipe());
+  const dose = Number(doseGrams);
+  const canSubmit = Boolean(
+    roastLevel
+      && (roastDateUnknown || roastDate.trim())
+      && Number.isFinite(dose)
+      && dose > 0
+      && grinderType
+      && startingGrind,
+  );
 
   const handleSubmit = async () => {
     const input: ColdStartInput = {
       roastLevel,
-      roastDate: roastDateUnknown ? 'unknown' : roastDate || '没填',
-      doseGrams: Number(doseGrams) || 15,
+      roastDate: roastDateUnknown ? 'unknown' : roastDate,
+      doseGrams: dose,
       grinderType,
-      startingGrindDescription: startingGrind || '未描述',
+      startingGrindDescription: startingGrind,
     };
     const nl = coldStartToNaturalLanguage(input);
     const result = await mutation.mutateAsync(nl);
-    if (result.messages.length > 0) {
-      const newSeed = result.messages[0];
+    const newSeedRecipe = result.startBag?.seed_recipe ?? null;
+    if (result.messages.length > 0 || newSeedRecipe) {
+      const newSeed = result.messages[0] ?? '起点配方已建立。';
       setSeed(newSeed);
       setLocalSeed(newSeed);
+      setSeedRecipe(newSeedRecipe);
+      setLocalSeedRecipe(newSeedRecipe);
     }
   };
 
   const handleReset = () => {
     startNewSession();
+    clearCupHistory();
     setSeed('');
     setLocalSeed(null);
+    setSeedRecipe(null);
+    setLocalSeedRecipe(null);
   };
 
   if (seed) {
@@ -50,6 +68,23 @@ export default function Home() {
           <p className="text-muted-foreground text-sm leading-relaxed">
             起始配方已经确定。接下来的调试中，请保持手法、水温等其他变量不变，我们只调整研磨度。
           </p>
+          {seedRecipe && (
+            <div className="border border-border rounded-md divide-y divide-border bg-card text-sm">
+              <div className="px-4 py-3 font-medium text-foreground">起点配方</div>
+              {([
+                ['粉量', seedRecipe.粉量],
+                ['粉水比', seedRecipe.比例],
+                ['水温', seedRecipe.水温],
+                ['研磨基准', seedRecipe.研磨基准],
+                ['注水手法', seedRecipe.注水手法],
+              ] as const).map(([label, value]) => value && (
+                <div key={label} className="grid grid-cols-[5rem_1fr] gap-3 px-4 py-3">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="text-foreground leading-relaxed">{value}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="p-4 bg-card border border-border rounded-md text-sm text-foreground leading-relaxed">
             {seed}
           </div>
@@ -128,18 +163,24 @@ export default function Home() {
         </div>
 
         <div className="space-y-3">
-          <Label>起始研磨描述</Label>
-          <Input 
-            type="text" 
-            placeholder="例如: 像粗砂糖那么粗" 
-            value={startingGrind} 
-            onChange={(e: any) => setStartingGrind(e.target.value)} 
-          />
+          <Label>起始研磨粗细</Label>
+          <div className="flex flex-col gap-2">
+            {STARTING_GRIND_OPTIONS.map(option => (
+              <RadioOption
+                key={option}
+                name="startingGrind"
+                value={option}
+                label={option}
+                checked={startingGrind === option}
+                onChange={() => setStartingGrind(option)}
+              />
+            ))}
+          </div>
         </div>
 
         <Button 
           onClick={handleSubmit} 
-          disabled={mutation.isPending} 
+          disabled={mutation.isPending || !canSubmit}
           className="w-full h-14 text-base"
         >
           {mutation.isPending ? '生成起点配方...' : '提交建立基线'}

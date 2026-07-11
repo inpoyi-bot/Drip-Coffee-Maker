@@ -33,7 +33,7 @@ function App() {
               <Route path="/diagnosis" component={Diagnosis} />
               <Route path="/trajectory" component={Trajectory} />
               <Route>
-                <div className="p-6 text-center text-muted-foreground">Not found</div>
+                <div className="p-6 text-center text-muted-foreground">页面不存在</div>
               </Route>
             </Switch>
           </Layout>

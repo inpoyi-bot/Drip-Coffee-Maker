@@ -10,6 +10,8 @@ token.json
 *.pem
 *.key
 service-account*.json
+*-sa-key.json
+vertex-sa-key.json
 
 # ── 2. Python 运行时产物 ──────────────────────────────────
 # 虚拟环境
