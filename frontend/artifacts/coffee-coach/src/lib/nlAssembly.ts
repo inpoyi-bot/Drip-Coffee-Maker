@@ -64,3 +64,42 @@ export function cupFeedbackToNaturalLanguage(input: CupFeedbackInput): string {
 
   return `冲好了。${sensorySentence}${comparison},${brewTime},${bedShape},${wallRing}。${note}`;
 }
+
+/**
+ * Turns a probe-button choice back into the same natural-language shape the
+ * agent receives in evals. The visible option remains the locked diagnostic
+ * wording; this layer only supplies the subject so the reply is a sentence,
+ * never a structured payload.
+ */
+export type ProbeType = 'P2' | 'P3' | 'P4' | 'P5';
+
+const PROBE_REPLY_SENTENCES: Record<ProbeType, Record<string, string>> = {
+  P2: {
+    '酸完发空、收尾就没了': '这酸酸完发空、收尾就没了。',
+    '会化成甜、有回甘': '这酸会化成甜、有回甘。',
+    '说不清': '这个酸收尾是什么感觉，我说不清。',
+  },
+  P3: {
+    '甜能清楚盖过酸、喝完持续回甘': '这点甜能清楚盖过酸、喝完持续回甘。',
+    '只是比最开始好一点、努力才尝到一点甜': '这点甜只是比最开始好一点、努力才尝到一点甜。',
+    '说不清': '这点甜到什么程度，我说不清。',
+  },
+  P4: {
+    '我不太爱这类酸的风格': '我不太爱这类酸的风格。',
+    '我喜欢这个酸,只是想要更厚/更圆': '我喜欢这个酸，只是想要更厚、更圆。',
+    '说不清': '关于这个酸，我说不清。',
+  },
+  P5: {
+    '寡淡、没什么余味,酸把甜压没了': '这个“不甜”更像寡淡、没什么余味，酸把甜压没了。',
+    '有回甘的,只是酸太亮把甜盖住了、想更厚': '有回甘的，只是酸太亮把甜盖住了，想更厚。',
+    '说不清': '这个“不甜”我说不清。',
+  },
+};
+
+export function probeReplyToNaturalLanguage(probe: ProbeType, optionLabel: string): string {
+  const sentence = PROBE_REPLY_SENTENCES[probe][optionLabel];
+  if (!sentence) {
+    throw new Error(`Unknown ${probe} probe option`);
+  }
+  return sentence;
+}

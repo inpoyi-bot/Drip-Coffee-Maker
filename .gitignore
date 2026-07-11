@@ -53,3 +53,5 @@ logs/
 .vscode/
 .idea/
 frontend/**/node_modules/
+
+ *.tsbuildinfo

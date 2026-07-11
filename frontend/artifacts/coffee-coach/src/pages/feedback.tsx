@@ -3,7 +3,7 @@ import { AppContext } from '@/App';
 import { useSendTurn } from '@/hooks/use-agent';
 import { useLocation } from 'wouter';
 import { cupFeedbackToNaturalLanguage, type CupFeedbackInput } from '@/lib/nlAssembly';
-import { appendCup } from '@/lib/session';
+import { appendCup, setLatestSensory } from '@/lib/session';
 import { RadioOption, CheckboxOption, Label, Input, Textarea } from '@/components/ui/forms';
 import { Button } from '@/components/ui/button';
 
@@ -55,6 +55,7 @@ export default function Feedback() {
     };
 
     const nl = cupFeedbackToNaturalLanguage(input);
+    setLatestSensory(sensory);
     const result = await mutation.mutateAsync(nl);
     
     if (result.recordCup) {

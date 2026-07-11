@@ -19,6 +19,7 @@ const SESSION_ID_KEY = 'coffee-coach:session-id';
 const CUPS_KEY = 'coffee-coach:cups';
 const SEED_KEY = 'coffee-coach:seed';
 const SEED_RECIPE_KEY = 'coffee-coach:seed-recipe';
+const LATEST_SENSORY_KEY = 'coffee-coach:latest-sensory';
 
 function randomId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
@@ -77,6 +78,32 @@ export function appendCup(cup: RecordCup): StoredCup[] {
 
 export function clearCupHistory(): void {
   localStorage.removeItem(CUPS_KEY);
+}
+
+/**
+ * Keeps the user's unmodified sensory-button choices for the current cup.
+ * The agent's `record_cup.sensory` is a free-text normalization, so it is
+ * deliberately not used to decide which probe options the UI may show.
+ */
+export function getLatestSensory(): string[] {
+  const raw = localStorage.getItem(LATEST_SENSORY_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')
+      ? parsed
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function setLatestSensory(sensory: string[]): void {
+  localStorage.setItem(LATEST_SENSORY_KEY, JSON.stringify(sensory));
+}
+
+export function clearLatestSensory(): void {
+  localStorage.removeItem(LATEST_SENSORY_KEY);
 }
 
 /** Cold-start seed recipe text returned by the agent, shown on later screens. */

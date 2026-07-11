@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { clearCupHistory, setSeed, getSeed, getSeedRecipe, setSeedRecipe, startNewSession } from '@/lib/session';
+import { clearCupHistory, clearLatestSensory, setSeed, getSeed, getSeedRecipe, setSeedRecipe, startNewSession } from '@/lib/session';
 import { coldStartToNaturalLanguage, type ColdStartInput } from '@/lib/nlAssembly';
 import { useSendTurn } from '@/hooks/use-agent';
 import { useLocation } from 'wouter';
@@ -54,6 +54,7 @@ export default function Home() {
   const handleReset = () => {
     startNewSession();
     clearCupHistory();
+    clearLatestSensory();
     setSeed('');
     setLocalSeed(null);
     setSeedRecipe(null);

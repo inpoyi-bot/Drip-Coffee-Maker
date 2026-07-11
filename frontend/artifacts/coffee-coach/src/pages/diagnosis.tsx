@@ -4,6 +4,9 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { CupTimeline } from '@/components/timeline';
 import { ChevronDown } from 'lucide-react';
+import { useSendTurn } from '@/hooks/use-agent';
+import { probeReplyToNaturalLanguage, type ProbeType } from '@/lib/nlAssembly';
+import { appendCup, getLatestSensory } from '@/lib/session';
 import {
   adjustmentLabel,
   confidenceDisplay,
@@ -14,9 +17,55 @@ import {
   turnTypeLabel,
 } from '@/lib/diagnosisCopy';
 
+type ProbeOption = {
+  label: string;
+  probe: ProbeType;
+};
+
+const PROBE_OPTIONS = {
+  P2: [
+    { label: '酸完发空、收尾就没了', probe: 'P2' },
+    { label: '会化成甜、有回甘', probe: 'P2' },
+    { label: '说不清', probe: 'P2' },
+  ],
+  P3: [
+    { label: '甜能清楚盖过酸、喝完持续回甘', probe: 'P3' },
+    { label: '只是比最开始好一点、努力才尝到一点甜', probe: 'P3' },
+    { label: '说不清', probe: 'P3' },
+  ],
+  P4: [
+    { label: '我不太爱这类酸的风格', probe: 'P4' },
+    { label: '我喜欢这个酸,只是想要更厚/更圆', probe: 'P4' },
+    { label: '说不清', probe: 'P4' },
+  ],
+  P5: [
+    { label: '寡淡、没什么余味,酸把甜压没了', probe: 'P5' },
+    { label: '有回甘的,只是酸太亮把甜盖住了、想更厚', probe: 'P5' },
+    { label: '说不清', probe: 'P5' },
+  ],
+} as const satisfies Record<ProbeOption['probe'], readonly ProbeOption[]>;
+
+function optionsForProbe(flags: unknown, sensory: string[]): ProbeOption[] {
+  const assertedFlags = Array.isArray(flags)
+    ? flags.filter((flag): flag is string => typeof flag === 'string')
+    : [];
+
+  if (assertedFlags.includes('preference_unspecified')) return [...PROBE_OPTIONS.P4];
+  if (assertedFlags.includes('absolute_extraction_uncertain')) return [...PROBE_OPTIONS.P3];
+  if (!assertedFlags.includes('info_insufficient')) return [];
+
+  const reportsAcidity = sensory.includes('酸');
+  const reportsThinOrNotSweet = sensory.some((item) => item.includes('薄') || item.includes('不甜'));
+  if (reportsAcidity && reportsThinOrNotSweet) return [...PROBE_OPTIONS.P2, ...PROBE_OPTIONS.P5];
+  if (reportsAcidity) return [...PROBE_OPTIONS.P2];
+  if (reportsThinOrNotSweet) return [...PROBE_OPTIONS.P5];
+  return [];
+}
+
 export default function Diagnosis() {
-  const { latestTurn } = useContext(AppContext);
+  const { latestTurn, setLatestTurn } = useContext(AppContext);
   const [, setLocation] = useLocation();
+  const mutation = useSendTurn();
 
   if (!latestTurn) {
     return (
@@ -35,6 +84,18 @@ export default function Diagnosis() {
   const adjustmentText = adjustmentLabel(recordCup?.direction, recordCup?.step);
   const decisionText = decisionLabel(recordCup?.decision);
   const grindNowText = grindNowLabel(recordCup?.grind_now);
+  const isDegasValidation = Array.isArray(recordCup?.flags_asserted)
+    && recordCup.flags_asserted.includes('degas_signals_observed');
+  const probeOptions = optionsForProbe(recordCup?.flags_asserted, getLatestSensory());
+
+  const handleProbeReply = async (option: ProbeOption) => {
+    const reply = probeReplyToNaturalLanguage(option.probe, option.label);
+    const result = await mutation.mutateAsync(reply);
+    if (result.recordCup) {
+      appendCup(result.recordCup);
+    }
+    setLatestTurn(result);
+  };
 
   return (
     <div className="p-4 space-y-6">
@@ -136,6 +197,39 @@ export default function Diagnosis() {
             </div>
           ))}
         </div>
+      )}
+
+      {isDegasValidation && (
+        <div className="border border-border bg-card p-4 text-sm leading-relaxed text-foreground">
+          这是复现验证：下一杯请保持研磨、水温、粉量和手法不变，照旧再冲一次后走正常反馈记录。
+        </div>
+      )}
+
+      {probeOptions.length > 0 && (
+        <section className="space-y-3" aria-labelledby="probe-options-heading">
+          <div className="space-y-1">
+            <h2 id="probe-options-heading" className="font-sans font-medium text-base text-foreground">请补充判断</h2>
+            <p className="text-sm text-muted-foreground">选择最接近的描述后，我会据此继续判断。</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            {probeOptions.map((option, index) => (
+              <Button
+                key={`${option.probe}-${option.label}-${index}`}
+                variant="outline"
+                className="justify-start h-auto whitespace-normal py-3 text-left"
+                disabled={mutation.isPending}
+                onClick={() => handleProbeReply(option)}
+              >
+                {option.label}
+              </Button>
+            ))}
+          </div>
+          {mutation.isError && (
+            <p role="alert" className="text-sm text-destructive">
+              没有成功发出这次回答，请检查连接后重试。
+            </p>
+          )}
+        </section>
       )}
 
       <div className="pt-4 flex gap-3">
