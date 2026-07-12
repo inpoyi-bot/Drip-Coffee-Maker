@@ -84,6 +84,7 @@
   --mist: 207 5% 88%; /* #DDE2E6 -- hairline borders / dividers */
   --fog: 210 2% 96%; /* #F2F4F6 -- secondary background / card base */
   --paper: 210 1% 99%; /* #FBFCFD -- primary background, cool white */
+  --select-accent: 209 19% 44%; /* #5B7085 -- cool gray-blue for form selection only */
   --converge: 173 83% 34%; /* #0F9E8E -- SIGNATURE convergence teal. Reserved for the
     satisfied/converged moment only (satisfied, would_overextract回退画面, trajectory
     convergence point, graduation). Do NOT wire this into charts, nav, or buttons this

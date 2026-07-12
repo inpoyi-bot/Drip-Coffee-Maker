@@ -31,9 +31,9 @@ const CONFIDENCE_STARS = {
 } as const;
 
 const TURN_TYPE_LABELS = {
-  probe: '正在追问确认',
-  terminate: '停手',
-  adjust: '这轮调整',
+  probe: '追问确认',
+  terminate: '调整完成',
+  adjust: '调整研磨',
   seed: '起点配方',
 } as const;
 

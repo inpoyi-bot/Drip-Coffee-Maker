@@ -1,12 +1,60 @@
-import { useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { clearCupHistory, clearLatestSensory, setSeed, getSeed, getSeedRecipe, setSeedRecipe, startNewSession } from '@/lib/session';
 import { coldStartToNaturalLanguage, type ColdStartInput } from '@/lib/nlAssembly';
 import { useSendTurn } from '@/hooks/use-agent';
 import { useLocation } from 'wouter';
 import { RadioOption, CheckboxOption, Label, Input } from '@/components/ui/forms';
 import { Button } from '@/components/ui/button';
+import { assembleCoachMessage } from '@/lib/utils';
 
 const STARTING_GRIND_OPTIONS = ['白砂糖粗细', '食盐粗细', '玉米粉粗细'] as const;
+const REQUIRED_FIELDS = ['roastLevel', 'roastDate', 'doseGrams', 'grinderType', 'startingGrind'] as const;
+
+type RequiredField = typeof REQUIRED_FIELDS[number];
+
+function renderInlineMarkdown(text: string): ReactNode {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index} className="font-semibold">{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
+function CoachExplanation({ message }: { message: string }) {
+  const blocks = message.split(/\n\s*\n/).filter(Boolean);
+
+  return (
+    <section className="bg-card border border-border border-l-4 border-l-slate p-5 shadow-sm space-y-4" aria-labelledby="coach-explanation-heading">
+      <h2 id="coach-explanation-heading" className="font-sans font-medium text-base text-foreground">教练说明</h2>
+      <div className="space-y-3 font-sans text-sm leading-7 text-foreground">
+        {blocks.map((block, index) => {
+          const lines = block.split('\n');
+          const listItems = lines.map((line) => line.match(/^\s*[-*+]\s+(.+)$/));
+
+          if (listItems.every(Boolean)) {
+            return (
+              <ul key={index} className="list-disc space-y-1 pl-5 marker:text-slate">
+                {listItems.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item![1])}</li>)}
+              </ul>
+            );
+          }
+
+          return (
+            <p key={index}>
+              {lines.map((line, lineIndex) => (
+                <span key={lineIndex}>
+                  {lineIndex > 0 && <br />}
+                  {renderInlineMarkdown(line)}
+                </span>
+              ))}
+            </p>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -18,20 +66,44 @@ export default function Home() {
   const [doseGrams, setDoseGrams] = useState('');
   const [grinderType, setGrinderType] = useState('');
   const [startingGrind, setStartingGrind] = useState('');
+  const [showMissing, setShowMissing] = useState(false);
+  const fieldRefs = useRef<Record<RequiredField, HTMLDivElement | null>>({
+    roastLevel: null,
+    roastDate: null,
+    doseGrams: null,
+    grinderType: null,
+    startingGrind: null,
+  });
   
   const [seed, setLocalSeed] = useState(getSeed());
   const [seedRecipe, setLocalSeedRecipe] = useState(getSeedRecipe());
   const dose = Number(doseGrams);
-  const canSubmit = Boolean(
-    roastLevel
-      && (roastDateUnknown || roastDate.trim())
-      && Number.isFinite(dose)
-      && dose > 0
-      && grinderType
-      && startingGrind,
-  );
+  const missingFields: Record<RequiredField, boolean> = {
+    roastLevel: !roastLevel,
+    roastDate: !(roastDateUnknown || roastDate.trim()),
+    doseGrams: !(Number.isFinite(dose) && dose > 0),
+    grinderType: !grinderType,
+    startingGrind: !startingGrind,
+  };
+  const firstMissingField = REQUIRED_FIELDS.find((field) => missingFields[field]);
+  const canSubmit = !firstMissingField;
+  const isMissing = (field: RequiredField) => showMissing && missingFields[field];
+
+  const revealMissingField = () => {
+    if (!firstMissingField) return;
+    setShowMissing(true);
+    window.requestAnimationFrame(() => {
+      const field = fieldRefs.current[firstMissingField];
+      field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      field?.querySelector<HTMLInputElement>('input')?.focus();
+    });
+  };
 
   const handleSubmit = async () => {
+    if (!canSubmit) {
+      revealMissingField();
+      return;
+    }
     const input: ColdStartInput = {
       roastLevel,
       roastDate: roastDateUnknown ? 'unknown' : roastDate,
@@ -43,7 +115,7 @@ export default function Home() {
     const result = await mutation.mutateAsync(nl);
     const newSeedRecipe = result.startBag?.seed_recipe ?? null;
     if (result.messages.length > 0 || newSeedRecipe) {
-      const newSeed = result.messages[0] ?? '起点配方已建立。';
+      const newSeed = assembleCoachMessage(result.messages) || '起点配方已建立。';
       setSeed(newSeed);
       setLocalSeed(newSeed);
       setSeedRecipe(newSeedRecipe);
@@ -86,9 +158,7 @@ export default function Home() {
               ))}
             </div>
           )}
-          <div className="p-4 bg-card border border-border rounded-md text-sm text-foreground leading-relaxed">
-            {seed}
-          </div>
+          <CoachExplanation message={seed} />
         </div>
         
         <div className="flex flex-col gap-3">
@@ -111,8 +181,12 @@ export default function Home() {
       </div>
 
       <div className="space-y-8">
-        <div className="space-y-3">
-          <Label>烘焙度</Label>
+        <div
+          ref={(element) => { fieldRefs.current.roastLevel = element; }}
+          className={`space-y-3 ${isMissing('roastLevel') ? 'rounded-md border p-3' : ''}`}
+          style={isMissing('roastLevel') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
+        >
+          <Label required>烘焙度</Label>
           <div className="flex flex-col gap-2">
             {['极浅焙', '浅焙', '中焙', '中深焙', '深焙'].map(level => (
               <RadioOption key={level} name="roastLevel" value={level} label={level} checked={roastLevel === level} onChange={() => setRoastLevel(level)} />
@@ -120,14 +194,19 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="space-y-3">
-          <Label>烘焙日期</Label>
+        <div
+          ref={(element) => { fieldRefs.current.roastDate = element; }}
+          className={`space-y-3 ${isMissing('roastDate') ? 'rounded-md border p-3' : ''}`}
+          style={isMissing('roastDate') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
+        >
+          <Label required>烘焙日期</Label>
           <Input 
             type="text" 
             placeholder="例如: 8天前 / 2023-10-01" 
             value={roastDate} 
             onChange={(e: any) => setRoastDate(e.target.value)} 
             disabled={roastDateUnknown}
+            aria-invalid={isMissing('roastDate')}
           />
           <CheckboxOption 
             label="不知道 / 包装上找不到" 
@@ -137,17 +216,26 @@ export default function Home() {
           />
         </div>
 
-        <div className="space-y-3">
-          <Label>粉量 (克)</Label>
+        <div
+          ref={(element) => { fieldRefs.current.doseGrams = element; }}
+          className={`space-y-3 ${isMissing('doseGrams') ? 'rounded-md border p-3' : ''}`}
+          style={isMissing('doseGrams') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
+        >
+          <Label required>粉量 (克)</Label>
           <Input 
             type="number" 
             value={doseGrams} 
             onChange={(e: any) => setDoseGrams(e.target.value)} 
+            aria-invalid={isMissing('doseGrams')}
           />
         </div>
 
-        <div className="space-y-3">
-          <Label>磨豆机类型</Label>
+        <div
+          ref={(element) => { fieldRefs.current.grinderType = element; }}
+          className={`space-y-3 ${isMissing('grinderType') ? 'rounded-md border p-3' : ''}`}
+          style={isMissing('grinderType') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
+        >
+          <Label required>磨豆机类型</Label>
           <div className="flex flex-col gap-2">
             {['砍豆机', '锥刀电动磨', '平刀电动磨', '手摇磨', '不确定', '没有磨豆机'].map(type => (
               <RadioOption 
@@ -163,8 +251,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="space-y-3">
-          <Label>起始研磨粗细</Label>
+        <div
+          ref={(element) => { fieldRefs.current.startingGrind = element; }}
+          className={`space-y-3 ${isMissing('startingGrind') ? 'rounded-md border p-3' : ''}`}
+          style={isMissing('startingGrind') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
+        >
+          <Label required>起始研磨粗细</Label>
           <div className="flex flex-col gap-2">
             {STARTING_GRIND_OPTIONS.map(option => (
               <RadioOption
@@ -180,12 +272,19 @@ export default function Home() {
         </div>
 
         <Button 
-          onClick={handleSubmit} 
-          disabled={mutation.isPending || !canSubmit}
-          className="w-full h-14 text-base"
+          onClick={canSubmit ? handleSubmit : revealMissingField}
+          disabled={mutation.isPending}
+          data-disabled={!canSubmit}
+          aria-describedby={showMissing && !canSubmit ? 'form-incomplete-hint' : undefined}
+          className={`w-full h-14 text-base ${!canSubmit ? 'cursor-not-allowed opacity-50' : ''}`}
         >
           {mutation.isPending ? '生成起点配方...' : '提交建立基线'}
         </Button>
+        {showMissing && !canSubmit && (
+          <p id="form-incomplete-hint" role="status" className="text-sm text-muted-foreground">
+            请补全标记为必填的项目。
+          </p>
+        )}
       </div>
     </div>
   );

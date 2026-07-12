@@ -2,10 +2,17 @@ import { useMemo } from 'react';
 import { getCupHistory } from '@/lib/session';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { CupTimeline } from '@/components/timeline';
-import { adjustmentLabel, gradientLabel, terminateReasonLabel } from '@/lib/diagnosisCopy';
+import {
+  adjustmentLabel,
+  gradientLabel,
+  grindNowLabel,
+  terminateReasonLabel,
+  turnTypeLabel,
+} from '@/lib/diagnosisCopy';
 
-function TrajectoryDot({ cx, cy, payload, r = 4 }: any) {
-  const color = payload?.isConverged
+function TrajectoryDot({ cx, cy, payload }: any) {
+  const isCurrentConvergence = payload?.isCurrentConvergence;
+  const color = isCurrentConvergence
     ? 'hsl(var(--converge))'
     : 'hsl(var(--slate))';
 
@@ -14,10 +21,10 @@ function TrajectoryDot({ cx, cy, payload, r = 4 }: any) {
       <circle
         cx={cx}
         cy={cy}
-        r={r}
-        fill={payload?.isConverged ? color : 'hsl(var(--paper))'}
+        r={isCurrentConvergence ? 7 : 3.5}
+        fill={isCurrentConvergence ? color : 'hsl(var(--mist))'}
         stroke={color}
-        strokeWidth={2}
+        strokeWidth={isCurrentConvergence ? 2.5 : 1.5}
       />
       {payload?.turnbackLabel && (
         <text
@@ -37,6 +44,13 @@ function TrajectoryDot({ cx, cy, payload, r = 4 }: any) {
 
 export default function Trajectory() {
   const history = getCupHistory();
+  const currentCup = history[history.length - 1];
+  const currentTurnType = turnTypeLabel(currentCup?.turn_type);
+  const currentGrind = grindNowLabel(currentCup?.grind_now);
+  const isCurrentConverged =
+    currentCup?.gradient === '已收敛' ||
+    currentCup?.terminate_reason === 'satisfied' ||
+    currentCup?.terminate_reason === 'would_overextract';
 
   const chartData = useMemo(() => {
     let relativeHeight = 0;
@@ -63,10 +77,11 @@ export default function Trajectory() {
           cup.gradient === '变坏' && cup.direction === 'coarser' && adjustmentText
             ? `${gradientText} → ${adjustmentText}`
             : undefined,
-        isConverged:
-          cup.gradient === '已收敛' ||
-          cup.terminate_reason === 'satisfied' ||
-          cup.terminate_reason === 'would_overextract',
+        isCurrentConvergence:
+          i === history.length - 1 &&
+          (cup.gradient === '已收敛' ||
+            cup.terminate_reason === 'satisfied' ||
+            cup.terminate_reason === 'would_overextract'),
       };
     });
   }, [history]);
@@ -81,37 +96,60 @@ export default function Trajectory() {
       </div>
 
       {history.length > 0 ? (
-        <div className="bg-card border border-border p-4 shadow-sm space-y-4">
-          <div className="h-[300px] w-full mt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--mist))" vertical={false} />
-                <XAxis 
-                  dataKey="cup_no" 
-                  tick={{ fill: 'hsl(var(--slate))', fontSize: 12, fontFamily: 'var(--app-font-mono)' }} 
-                  axisLine={false} 
-                  tickLine={false}
-                  tickMargin={10}
-                />
-                <YAxis hide domain={['dataMin - 1', 'dataMax + 1']} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'hsl(var(--fog))', border: '1px solid hsl(var(--mist))', borderRadius: '6px', fontSize: '12px', fontFamily: 'var(--app-font-mono)' }}
-                  itemStyle={{ color: 'hsl(var(--ink))' }}
-                  formatter={(value: any, name: any, props: any) => [props.payload.tooltipText, props.payload.tooltipLabel]}
-                  labelStyle={{ color: 'hsl(var(--slate))', marginBottom: '4px' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="hsl(var(--slate))"
-                  strokeWidth={2} 
-                  dot={TrajectoryDot}
-                  activeDot={(props: any) => <TrajectoryDot {...props} r={6} />}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+        <>
+          <section className="bg-card border border-border border-l-4 border-l-slate p-4 space-y-3" aria-labelledby="current-status-heading">
+            <div className="flex items-center justify-between gap-3">
+              <h2 id="current-status-heading" className="font-sans font-medium text-base text-foreground">当前状态</h2>
+              <span className="font-mono text-xs text-muted-foreground">第 {currentCup.cup_no || history.length} 杯</span>
+            </div>
+            <div className="grid gap-3 text-sm sm:grid-cols-3">
+              <div>
+                <span className="block font-mono text-xs text-muted-foreground">状态</span>
+                <span className="text-foreground">{currentTurnType || '正在记录'}</span>
+              </div>
+              <div>
+                <span className="block font-mono text-xs text-muted-foreground">当前研磨</span>
+                <span className="text-foreground">{currentGrind || '暂未记录'}</span>
+              </div>
+              <div>
+                <span className="block font-mono text-xs text-muted-foreground">研磨调整</span>
+                <span className="text-foreground">{isCurrentConverged ? '已完成' : '继续校准中'}</span>
+              </div>
+            </div>
+          </section>
+
+          <div className="bg-card border border-border p-4 shadow-sm space-y-4">
+            <div className="h-[300px] w-full mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--mist))" vertical={false} />
+                  <XAxis
+                    dataKey="cup_no"
+                    tick={{ fill: 'hsl(var(--slate))', fontSize: 12, fontFamily: 'var(--app-font-mono)' }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickMargin={10}
+                  />
+                  <YAxis hide domain={['dataMin - 1', 'dataMax + 1']} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: 'hsl(var(--fog))', border: '1px solid hsl(var(--mist))', borderRadius: '6px', fontSize: '12px', fontFamily: 'var(--app-font-mono)' }}
+                    itemStyle={{ color: 'hsl(var(--ink))' }}
+                    formatter={(value: any, name: any, props: any) => [props.payload.tooltipText, props.payload.tooltipLabel]}
+                    labelStyle={{ color: 'hsl(var(--slate))', marginBottom: '4px' }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="hsl(var(--slate))"
+                    strokeWidth={2}
+                    dot={TrajectoryDot}
+                    activeDot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <div className="p-8 text-center text-muted-foreground text-sm font-mono border border-dashed border-border bg-card">
           还没有记录

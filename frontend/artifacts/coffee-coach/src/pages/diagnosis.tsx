@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, type ReactNode } from 'react';
 import { AppContext } from '@/App';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { ChevronDown } from 'lucide-react';
 import { useSendTurn } from '@/hooks/use-agent';
 import { probeReplyToNaturalLanguage, type ProbeType } from '@/lib/nlAssembly';
 import { appendCup, getLatestSensory } from '@/lib/session';
+import { assembleCoachMessage } from '@/lib/utils';
 import {
   adjustmentLabel,
   confidenceDisplay,
@@ -62,6 +63,50 @@ function optionsForProbe(flags: unknown, sensory: string[]): ProbeOption[] {
   return [];
 }
 
+function renderInlineMarkdown(text: string): ReactNode {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index} className="font-semibold">{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
+function CoachExplanation({ message }: { message: string }) {
+  const blocks = message.split(/\n\s*\n/).filter(Boolean);
+
+  return (
+    <section className="bg-card border border-border border-l-4 border-l-slate p-5 shadow-sm space-y-4" aria-labelledby="coach-explanation-heading">
+      <h2 id="coach-explanation-heading" className="font-sans font-medium text-base text-foreground">教练说明</h2>
+      <div className="space-y-3 font-sans text-sm leading-7 text-foreground">
+        {blocks.map((block, index) => {
+          const lines = block.split('\n');
+          const listItems = lines.map((line) => line.match(/^\s*[-*+]\s+(.+)$/));
+
+          if (listItems.every(Boolean)) {
+            return (
+              <ul key={index} className="list-disc space-y-1 pl-5 marker:text-slate">
+                {listItems.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item![1])}</li>)}
+              </ul>
+            );
+          }
+
+          return (
+            <p key={index}>
+              {lines.map((line, lineIndex) => (
+                <span key={lineIndex}>
+                  {lineIndex > 0 && <br />}
+                  {renderInlineMarkdown(line)}
+                </span>
+              ))}
+            </p>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export default function Diagnosis() {
   const { latestTurn, setLatestTurn } = useContext(AppContext);
   const [, setLocation] = useLocation();
@@ -77,6 +122,7 @@ export default function Diagnosis() {
   }
 
   const { messages, recordCup } = latestTurn;
+  const coachMessage = assembleCoachMessage(messages);
   const terminateReasonText = terminateReasonLabel(recordCup?.terminate_reason);
   const confidence = confidenceDisplay(recordCup?.confidence);
   const turnTypeText = turnTypeLabel(recordCup?.turn_type);
@@ -187,17 +233,7 @@ export default function Diagnosis() {
         </div>
       )}
 
-      {/* Messages */}
-      {messages.length > 0 && (
-        <div className="space-y-3 font-sans text-sm leading-relaxed text-foreground">
-          {messages.map((msg, i) => (
-            <div key={i} className="bg-card border border-border p-4 shadow-sm relative">
-              <div className="absolute top-0 left-0 w-1 h-full bg-slate"></div>
-              {msg}
-            </div>
-          ))}
-        </div>
-      )}
+      {coachMessage && <CoachExplanation message={coachMessage} />}
 
       {isDegasValidation && (
         <div className="border border-border bg-card p-4 text-sm leading-relaxed text-foreground">

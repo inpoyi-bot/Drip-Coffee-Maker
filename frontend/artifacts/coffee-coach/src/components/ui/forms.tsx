@@ -14,10 +14,19 @@ export function RadioOption({ name, value, checked, onChange, label, description
   return (
     <label className={`flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
       ${containerStyle}
-      ${checked ? (fallbackType ? '!bg-card/80 border-slate' : '!bg-card border-slate') : ''}`}>
+      ${checked ? (fallbackType ? '!bg-card/80' : '') : ''}`}
+      style={checked ? {
+        borderColor: 'hsl(var(--select-accent))',
+        borderWidth: 2,
+        backgroundColor: 'hsl(var(--select-accent) / 0.08)',
+      } : undefined}
+    >
       <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="sr-only" />
-      <div className={`mt-0.5 w-4 h-4 rounded-full border border-slate flex-shrink-0 flex items-center justify-center ${checked ? 'bg-slate' : ''}`}>
-         {checked && <div className="w-1.5 h-1.5 bg-background rounded-full" />}
+      <div
+        className="mt-0.5 w-4 h-4 rounded-full border border-slate flex-shrink-0 flex items-center justify-center"
+        style={checked ? { borderColor: 'hsl(var(--select-accent))' } : undefined}
+      >
+         {checked && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'hsl(var(--select-accent))' }} />}
       </div>
       <div className="flex flex-col">
         <span className="font-medium text-sm leading-tight text-current">{label}</span>
@@ -38,9 +47,22 @@ export function CheckboxOption({ checked, onChange, label, fallbackType }: any) 
   return (
     <label className={`flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
       ${containerStyle}
-      ${checked ? (fallbackType ? '!bg-card/80 border-slate' : '!bg-card border-slate') : ''}`}>
+      ${checked ? (fallbackType ? '!bg-card/80' : '') : ''}`}
+      style={checked ? {
+        borderColor: 'hsl(var(--select-accent))',
+        borderWidth: 2,
+        backgroundColor: 'hsl(var(--select-accent) / 0.08)',
+      } : undefined}
+    >
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" />
-      <div className={`mt-0.5 w-4 h-4 rounded-sm border border-slate flex-shrink-0 flex items-center justify-center ${checked ? 'bg-slate text-background' : ''}`}>
+      <div
+        className="mt-0.5 w-4 h-4 rounded-sm border border-slate flex-shrink-0 flex items-center justify-center"
+        style={checked ? {
+          borderColor: 'hsl(var(--select-accent))',
+          backgroundColor: 'hsl(var(--select-accent))',
+          color: 'hsl(var(--paper))',
+        } : undefined}
+      >
          {checked && <Check className="w-3 h-3" />}
       </div>
       <span className="font-medium text-sm leading-tight text-current">{label}</span>
@@ -48,8 +70,13 @@ export function CheckboxOption({ checked, onChange, label, fallbackType }: any) 
   );
 }
 
-export function Label({ children, className = '' }: any) {
-  return <label className={`block text-sm font-medium text-foreground mb-2 ${className}`}>{children}</label>;
+export function Label({ children, className = '', required = false }: any) {
+  return (
+    <label className={`flex items-center justify-between gap-2 text-sm font-medium text-foreground mb-2 ${className}`}>
+      <span>{children}</span>
+      {required && <span className="font-normal text-xs" style={{ color: 'hsl(var(--select-accent))' }}>必填</span>}
+    </label>
+  );
 }
 
 export function Input({ className = '', ...props }: any) {
