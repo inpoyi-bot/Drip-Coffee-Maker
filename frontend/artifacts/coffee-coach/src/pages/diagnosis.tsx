@@ -7,6 +7,7 @@ import { ChevronDown } from 'lucide-react';
 import { useSendTurn } from '@/hooks/use-agent';
 import { probeReplyToNaturalLanguage, type ProbeType } from '@/lib/nlAssembly';
 import { appendCup, getLatestSensory } from '@/lib/session';
+import type { AgentTurnResult } from '@/lib/adkClient';
 import { assembleCoachMessage } from '@/lib/utils';
 import {
   adjustmentLabel,
@@ -46,6 +47,25 @@ const PROBE_OPTIONS = {
   ],
 } as const satisfies Record<ProbeOption['probe'], readonly ProbeOption[]>;
 
+/* Visual-review state for ?sample=diagnosis only. It never enters storage or
+ * the agent loop; real route data always takes precedence outside this URL. */
+const DIAGNOSIS_VISUAL_SAMPLE: Pick<AgentTurnResult, 'messages' | 'recordCup'> = {
+  messages: [
+    '这次比上一杯更甜、酸感也收住了一些，说明把研磨磨细的方向是对的。我们继续沿同一方向再走一小步，其他条件保持不变。\n\n**这次只动研磨**：再磨细一点。水温、粉量和注水手法都照上一杯。',
+  ],
+  recordCup: {
+    cup_no: 3,
+    turn_type: 'adjust',
+    gradient: '变好+同向',
+    direction: 'finer',
+    step: 2,
+    decision: '继续',
+    grind_now: '较基准磨细 4 格',
+    confidence: 'high',
+    rationale: '这一杯相对上一杯变好，且变化和“磨细”的方向一致，所以保留单变量控制，继续读取下一杯的反馈梯度。',
+  },
+};
+
 function optionsForProbe(flags: unknown, sensory: string[]): ProbeOption[] {
   const assertedFlags = Array.isArray(flags)
     ? flags.filter((flag): flag is string => typeof flag === 'string')
@@ -76,7 +96,7 @@ function CoachExplanation({ message }: { message: string }) {
   const blocks = message.split(/\n\s*\n/).filter(Boolean);
 
   return (
-    <section className="bg-card border border-border border-l-4 border-l-slate p-5 shadow-sm space-y-4" aria-labelledby="coach-explanation-heading">
+    <section className="diagnosis-coach bg-card border border-border p-5 shadow-sm space-y-4" aria-labelledby="coach-explanation-heading">
       <h2 id="coach-explanation-heading" className="font-sans font-medium text-base text-foreground">教练说明</h2>
       <div className="space-y-3 font-sans text-sm leading-7 text-foreground">
         {blocks.map((block, index) => {
@@ -111,8 +131,11 @@ export default function Diagnosis() {
   const { latestTurn, setLatestTurn } = useContext(AppContext);
   const [, setLocation] = useLocation();
   const mutation = useSendTurn();
+  const isVisualSample = new URLSearchParams(window.location.search).get('sample') === 'diagnosis';
+  const activeTurn: Pick<AgentTurnResult, 'messages' | 'recordCup'> | null =
+    isVisualSample ? DIAGNOSIS_VISUAL_SAMPLE : latestTurn;
 
-  if (!latestTurn) {
+  if (!activeTurn) {
     return (
       <div className="p-4 flex flex-col items-center justify-center h-[50vh] space-y-4 text-center">
         <p className="text-muted-foreground text-sm font-mono">还没有这一轮的判断。</p>
@@ -121,7 +144,7 @@ export default function Diagnosis() {
     );
   }
 
-  const { messages, recordCup } = latestTurn;
+  const { messages, recordCup } = activeTurn;
   const coachMessage = assembleCoachMessage(messages);
   const terminateReasonText = terminateReasonLabel(recordCup?.terminate_reason);
   const confidence = confidenceDisplay(recordCup?.confidence);
@@ -133,6 +156,10 @@ export default function Diagnosis() {
   const isDegasValidation = Array.isArray(recordCup?.flags_asserted)
     && recordCup.flags_asserted.includes('degas_signals_observed');
   const probeOptions = optionsForProbe(recordCup?.flags_asserted, getLatestSensory());
+  const isConverged =
+    recordCup?.gradient === '已收敛' ||
+    recordCup?.terminate_reason === 'satisfied' ||
+    recordCup?.terminate_reason === 'would_overextract';
 
   const handleProbeReply = async (option: ProbeOption) => {
     const reply = probeReplyToNaturalLanguage(option.probe, option.label);
@@ -144,18 +171,21 @@ export default function Diagnosis() {
   };
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="space-y-1">
+    <div className="diagnosis-page p-4 space-y-6">
+      <div className="diagnosis-intro space-y-1">
         <h1 className="font-sans font-medium text-xl text-foreground">诊断结果</h1>
+        {isVisualSample && <p className="font-mono text-[11px] text-muted-foreground">VISUAL SAMPLE · 不写入保存记录</p>}
       </div>
 
       {recordCup && (
-        <div className="bg-card border border-border p-4 flex flex-col gap-4 font-mono text-sm shadow-sm relative overflow-hidden">
+        <section className={`diagnosis-dashboard bg-card border border-border p-4 flex flex-col gap-3 font-mono text-sm relative overflow-hidden ${
+          isConverged ? 'diagnosis-dashboard--converged' : ''
+        }`} aria-label="本轮结构化诊断">
           {/* Decision state indicator */}
-          <div className="flex items-center gap-2 pb-3 border-b border-border">
-            <span className="text-muted-foreground uppercase text-xs tracking-widest">状态</span>
+          <div className="diagnosis-status flex items-center gap-2 pb-3 border-b border-border">
+            <span className="diagnosis-label text-muted-foreground uppercase text-xs tracking-widest">状态</span>
             {turnTypeText && (
-              <span className="bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
+              <span className="diagnosis-chip bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
                 {turnTypeText}
               </span>
             )}
@@ -163,43 +193,43 @@ export default function Diagnosis() {
 
           {/* Terminate reason card */}
           {terminateReasonText && (
-            <div className="bg-background border border-border p-3 border-l-4 border-l-slate">
-              <span className="text-muted-foreground text-xs tracking-widest block mb-1">这一轮的判断</span>
+            <div className="diagnosis-l1 bg-background border border-border p-3 border-l-4 border-l-slate">
+              <span className="diagnosis-label text-muted-foreground text-xs tracking-widest block mb-1">这一轮的判断</span>
               <div className="text-foreground font-medium text-base">{terminateReasonText}</div>
             </div>
           )}
 
           {gradientText && (
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-muted-foreground text-xs uppercase tracking-widest">变化方向</span>
-              <span className="bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
+            <div className="diagnosis-row flex items-center gap-2 pt-1">
+              <span className="diagnosis-label text-muted-foreground text-xs uppercase tracking-widest">变化方向</span>
+              <span className="diagnosis-chip bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
                 {gradientText}
               </span>
             </div>
           )}
 
           {adjustmentText && (
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-muted-foreground text-xs uppercase tracking-widest">调整动作</span>
-              <span className="bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
+            <div className="diagnosis-row flex items-center gap-2 pt-1">
+              <span className="diagnosis-label text-muted-foreground text-xs uppercase tracking-widest">调整动作</span>
+              <span className="diagnosis-chip bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
                 {adjustmentText}
               </span>
             </div>
           )}
 
           {decisionText && (
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-muted-foreground text-xs uppercase tracking-widest">下一步</span>
-              <span className="bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
+            <div className="diagnosis-row flex items-center gap-2 pt-1">
+              <span className="diagnosis-label text-muted-foreground text-xs uppercase tracking-widest">下一步</span>
+              <span className="diagnosis-chip bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
                 {decisionText}
               </span>
             </div>
           )}
 
           {grindNowText && (
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-muted-foreground text-xs uppercase tracking-widest">当前研磨</span>
-              <span className="bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
+            <div className="diagnosis-row flex items-center gap-2 pt-1">
+              <span className="diagnosis-label text-muted-foreground text-xs uppercase tracking-widest">当前研磨</span>
+              <span className="diagnosis-chip bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
                 {grindNowText}
               </span>
             </div>
@@ -207,10 +237,12 @@ export default function Diagnosis() {
 
           {/* Confidence is a separate calibration signal, not part of the diagnosis copy. */}
           {confidence && (
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-muted-foreground text-xs uppercase tracking-widest">判断把握</span>
-              <span className="bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight" aria-label={`判断把握${confidence.stars}`}>
-                {confidence.stars}
+            <div className="diagnosis-row diagnosis-confidence flex items-center gap-2 pt-1">
+              <span className="diagnosis-label text-muted-foreground text-xs uppercase tracking-widest">判断把握</span>
+              <span className="diagnosis-chip diagnosis-confidence-stars bg-background px-2 py-1 border border-border font-medium tracking-tight" aria-label={`判断把握${confidence.stars}`}>
+                {confidence.stars.split('').map((star, index) => (
+                  <span key={`${star}-${index}`} className={star === '★' ? 'is-solid' : 'is-empty'}>{star}</span>
+                ))}
               </span>
               {confidence.note && (
                 <span className="text-muted-foreground text-xs">{confidence.note}</span>
@@ -220,7 +252,7 @@ export default function Diagnosis() {
 
           {/* 默认折叠的解释区，不作为主诊断出口。 */}
           {recordCup.rationale && (
-            <details className="group border border-border bg-background group-open:bg-card transition-colors [&_summary::-webkit-details-marker]:hidden mt-2">
+            <details className="diagnosis-rationale group border border-border bg-background group-open:bg-card transition-colors [&_summary::-webkit-details-marker]:hidden mt-2">
               <summary className="flex items-center justify-between cursor-pointer p-3 font-sans text-sm font-medium text-foreground select-none">
                 <span>为什么这样判断</span>
                 <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
@@ -230,19 +262,19 @@ export default function Diagnosis() {
               </div>
             </details>
           )}
-        </div>
+        </section>
       )}
 
       {coachMessage && <CoachExplanation message={coachMessage} />}
 
       {isDegasValidation && (
-        <div className="border border-border bg-card p-4 text-sm leading-relaxed text-foreground">
+        <div className="diagnosis-notice border border-border bg-card p-4 text-sm leading-relaxed text-foreground">
           这是复现验证：下一杯请保持研磨、水温、粉量和手法不变，照旧再冲一次后走正常反馈记录。
         </div>
       )}
 
       {probeOptions.length > 0 && (
-        <section className="space-y-3" aria-labelledby="probe-options-heading">
+        <section className="diagnosis-probe space-y-3" aria-labelledby="probe-options-heading">
           <div className="space-y-1">
             <h2 id="probe-options-heading" className="font-sans font-medium text-base text-foreground">请补充判断</h2>
             <p className="text-sm text-muted-foreground">选择最接近的描述后，我会据此继续判断。</p>
@@ -252,7 +284,7 @@ export default function Diagnosis() {
               <Button
                 key={`${option.probe}-${option.label}-${index}`}
                 variant="outline"
-                className="justify-start h-auto whitespace-normal py-3 text-left"
+                className="diagnosis-probe-option justify-start h-auto whitespace-normal py-3 text-left"
                 disabled={mutation.isPending}
                 onClick={() => handleProbeReply(option)}
               >
@@ -269,7 +301,7 @@ export default function Diagnosis() {
       )}
 
       <div className="pt-4 flex gap-3">
-        <Button onClick={() => setLocation('/feedback')} className="flex-1">继续下一杯</Button>
+        <Button onClick={() => setLocation('/feedback')} className="diagnosis-primary-action flex-1">继续下一杯</Button>
         <Button variant="outline" onClick={() => setLocation('/trajectory')} className="flex-1">查看轨迹</Button>
       </div>
 

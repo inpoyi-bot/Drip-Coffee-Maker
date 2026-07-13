@@ -12,7 +12,7 @@ export function RadioOption({ name, value, checked, onChange, label, description
   }
 
   return (
-    <label className={`flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
+    <label data-fallback={fallbackType} className={`form-choice flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
       ${containerStyle}
       ${checked ? (fallbackType ? '!bg-card/80' : '') : ''}`}
       style={checked ? {
@@ -23,7 +23,7 @@ export function RadioOption({ name, value, checked, onChange, label, description
     >
       <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="sr-only" />
       <div
-        className="mt-0.5 w-4 h-4 rounded-full border border-slate flex-shrink-0 flex items-center justify-center"
+        className="form-choice-control mt-0.5 w-4 h-4 rounded-full border border-slate flex-shrink-0 flex items-center justify-center"
         style={checked ? { borderColor: 'hsl(var(--select-accent))' } : undefined}
       >
          {checked && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'hsl(var(--select-accent))' }} />}
@@ -45,7 +45,7 @@ export function CheckboxOption({ checked, onChange, label, fallbackType }: any) 
   }
 
   return (
-    <label className={`flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
+    <label data-fallback={fallbackType} className={`form-choice flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
       ${containerStyle}
       ${checked ? (fallbackType ? '!bg-card/80' : '') : ''}`}
       style={checked ? {
@@ -56,7 +56,7 @@ export function CheckboxOption({ checked, onChange, label, fallbackType }: any) 
     >
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" />
       <div
-        className="mt-0.5 w-4 h-4 rounded-sm border border-slate flex-shrink-0 flex items-center justify-center"
+        className="form-choice-control mt-0.5 w-4 h-4 rounded-sm border border-slate flex-shrink-0 flex items-center justify-center"
         style={checked ? {
           borderColor: 'hsl(var(--select-accent))',
           backgroundColor: 'hsl(var(--select-accent))',
@@ -72,7 +72,7 @@ export function CheckboxOption({ checked, onChange, label, fallbackType }: any) 
 
 export function Label({ children, className = '', required = false }: any) {
   return (
-    <label className={`flex items-center justify-between gap-2 text-sm font-medium text-foreground mb-2 ${className}`}>
+    <label className={`form-field-label flex items-center justify-between gap-2 text-sm font-medium text-foreground mb-2 ${className}`}>
       <span>{children}</span>
       {required && <span className="font-normal text-xs" style={{ color: 'hsl(var(--select-accent))' }}>必填</span>}
     </label>
@@ -80,9 +80,9 @@ export function Label({ children, className = '', required = false }: any) {
 }
 
 export function Input({ className = '', ...props }: any) {
-  return <input className={`flex h-12 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate disabled:cursor-not-allowed disabled:opacity-50 ${className}`} {...props} />;
+  return <input className={`form-text-input flex h-12 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate disabled:cursor-not-allowed disabled:opacity-50 ${className}`} {...props} />;
 }
 
 export function Textarea({ className = '', ...props }: any) {
-  return <textarea className={`flex min-h-[80px] w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate disabled:cursor-not-allowed disabled:opacity-50 ${className}`} {...props} />;
+  return <textarea className={`form-text-input flex min-h-[80px] w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate disabled:cursor-not-allowed disabled:opacity-50 ${className}`} {...props} />;
 }

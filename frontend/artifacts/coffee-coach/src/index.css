@@ -422,3 +422,450 @@
     inset: -1px;
   }
 }
+
+/*
+ * v2 dark route shells
+ *
+ * This scope deliberately starts at the route shell instead of :root: the
+ * handoff asks for one screen to be reviewed before the palette rolls out to
+ * the rest of the product. Existing semantic Tailwind tokens are remapped
+ * here, so the trajectory and its header inherit the dark system while every
+ * other route remains untouched.
+ */
+.trajectory-shell,
+.coldstart-shell,
+.diagnosis-shell,
+.feedback-shell {
+  --void: 216 15% 6%;
+  --surface: 216 14% 10%;
+  --surface-raised: 216 14% 14%;
+  --line: 219 13% 19%;
+  --text-dim: 216 8% 52%;
+  --text: 211 20% 91%;
+  --converge: 157 63% 49%;
+  --converge-deep: 155 61% 27%;
+  --interact: 216 68% 55%;
+  --interact-deep: 214 88% 34%;
+  --glow-cool:
+    radial-gradient(ellipse 76% 42% at 50% -14%, hsl(var(--interact) / 0.11), transparent 70%),
+    radial-gradient(ellipse 56% 34% at 80% 5%, hsl(var(--converge-deep) / 0.1), transparent 72%);
+
+  --paper: var(--void);
+  --fog: var(--surface);
+  --ink: var(--text);
+  --slate: var(--text-dim);
+  --mist: var(--line);
+  --background: var(--void);
+  --foreground: var(--text);
+  --border: var(--line);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --card-border: var(--line);
+  --popover: var(--surface-raised);
+  --popover-foreground: var(--text);
+  --popover-border: var(--line);
+  --primary: var(--text);
+  --primary-foreground: var(--void);
+  --secondary: var(--surface-raised);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface);
+  --muted-foreground: var(--text-dim);
+  --accent: var(--surface-raised);
+  --accent-foreground: var(--text);
+  --input: var(--line);
+  --ring: var(--interact);
+
+  background: var(--glow-cool), hsl(var(--void));
+  color: hsl(var(--text));
+}
+
+.trajectory-shell > header,
+.coldstart-shell > header,
+.diagnosis-shell > header,
+.feedback-shell > header {
+  background-color: hsl(var(--void) / 0.82);
+  border-color: hsl(var(--line));
+  backdrop-filter: blur(14px);
+}
+
+.trajectory-proof {
+  border-color: hsl(var(--line));
+  background: hsl(var(--surface) / 0.72);
+  color: hsl(var(--text-dim));
+}
+
+.trajectory-card {
+  border-color: hsl(var(--line));
+  box-shadow:
+    inset 0 1px 0 hsl(var(--text) / 0.025),
+    0 16px 42px hsl(var(--void) / 0.2);
+}
+
+.trajectory-current-card {
+  background: hsl(var(--surface-raised));
+}
+
+.trajectory-chart-card {
+  background: hsl(var(--surface));
+}
+
+.cup-timeline {
+  gap: 0.85rem;
+}
+
+.cup-timeline-heading {
+  font-family: var(--app-font-mono);
+  letter-spacing: 0.07em;
+}
+
+.cup-timeline-entry {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  column-gap: 0.7rem;
+  align-items: stretch;
+}
+
+.cup-timeline-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100%;
+}
+
+.cup-timeline-node {
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 1rem;
+  flex: none;
+  border: 1px solid hsl(var(--text-dim));
+  border-radius: 999px;
+  background: hsl(var(--surface-raised));
+}
+
+.cup-timeline-line {
+  width: 1px;
+  min-height: 1.5rem;
+  flex: 1;
+  margin: 0.42rem 0;
+  background: hsl(var(--line));
+}
+
+.cup-timeline-card {
+  border-color: hsl(var(--line));
+  box-shadow: inset 0 1px 0 hsl(var(--text) / 0.02);
+}
+
+.cup-timeline-card--current {
+  border-color: hsl(var(--text-dim) / 0.5);
+  background:
+    linear-gradient(120deg, hsl(var(--surface-raised)), hsl(var(--text) / 0.025)),
+    hsl(var(--surface-raised));
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--text) / 0.035),
+    inset 0 1px 0 hsl(var(--text) / 0.045);
+}
+
+.cup-timeline-entry--current .cup-timeline-node {
+  border-color: hsl(var(--text));
+  background: hsl(var(--text));
+  box-shadow: 0 0 10px hsl(var(--text) / 0.16);
+}
+
+.cup-timeline-entry--converged .cup-timeline-node {
+  border-color: hsl(var(--converge));
+  background: hsl(var(--converge));
+  box-shadow: 0 0 14px hsl(var(--converge) / 0.6);
+}
+
+/* Cold-start: sparse calibration intake, using blue only for interaction. */
+.coldstart-shell {
+  --select-accent: var(--interact);
+}
+
+.feedback-shell {
+  --select-accent: var(--interact);
+}
+
+.coldstart-intro {
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid hsl(var(--line));
+}
+
+.coldstart-intro > h1 {
+  letter-spacing: -0.02em;
+}
+
+.coldstart-intro > p {
+  font-family: var(--app-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.65;
+  color: hsl(var(--text-dim));
+}
+
+.coldstart-shell .form-field-label,
+.feedback-shell .form-field-label {
+  margin-bottom: 0;
+  font-family: var(--app-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: hsl(var(--text-dim));
+}
+
+.coldstart-shell .form-field-label > span:last-child,
+.feedback-shell .form-field-label > span:last-child {
+  color: hsl(var(--interact));
+}
+
+.coldstart-shell .form-choice,
+.feedback-shell .form-choice {
+  border-color: hsl(var(--line));
+  border-style: solid;
+  border-radius: var(--radius-md);
+  background-color: hsl(var(--surface));
+  color: hsl(var(--text));
+  opacity: 1;
+  font-style: normal;
+  box-shadow: inset 0 1px 0 hsl(var(--text) / 0.018);
+}
+
+.coldstart-shell .form-choice:hover,
+.feedback-shell .form-choice:hover {
+  border-color: hsl(var(--text-dim) / 0.55);
+  background-color: hsl(var(--surface-raised));
+}
+
+.coldstart-shell .form-choice:has(input:checked),
+.feedback-shell .form-choice:has(input:checked) {
+  border-color: hsl(var(--interact)) !important;
+  background-color: hsl(var(--interact-deep) / 0.16) !important;
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--interact) / 0.2),
+    0 0 18px hsl(var(--interact) / 0.12);
+}
+
+.coldstart-shell .form-choice-control,
+.feedback-shell .form-choice-control {
+  border-color: hsl(var(--text-dim));
+}
+
+.coldstart-shell .form-choice:has(input:checked) .form-choice-control,
+.feedback-shell .form-choice:has(input:checked) .form-choice-control {
+  border-color: hsl(var(--interact)) !important;
+  box-shadow: 0 0 10px hsl(var(--interact) / 0.4);
+}
+
+.coldstart-shell .form-text-input,
+.feedback-shell .form-text-input {
+  border-color: hsl(var(--line));
+  background-color: hsl(var(--surface));
+}
+
+.coldstart-shell .form-text-input:focus-visible,
+.feedback-shell .form-text-input:focus-visible {
+  border-color: hsl(var(--interact));
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--interact) / 0.18),
+    0 0 16px hsl(var(--interact) / 0.12);
+}
+
+.coldstart-shell .coldstart-submit {
+  border: 1px solid hsl(var(--interact));
+  background: hsl(var(--interact));
+  color: hsl(var(--void));
+  box-shadow: 0 8px 24px hsl(var(--interact-deep) / 0.25);
+}
+
+.coldstart-shell .coldstart-submit:hover:not(:disabled) {
+  background: hsl(var(--interact) / 0.9);
+  box-shadow: 0 10px 28px hsl(var(--interact-deep) / 0.34);
+}
+
+.coldstart-shell .coldstart-incomplete-hint {
+  color: hsl(var(--interact));
+}
+
+/* Feedback: sparse sensory input with neutral distinctions for two fallbacks. */
+.feedback-intro {
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid hsl(var(--line));
+}
+
+.feedback-intro > h1 {
+  letter-spacing: -0.02em;
+}
+
+.feedback-intro > p {
+  font-family: var(--app-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.65;
+  color: hsl(var(--text-dim));
+}
+
+.feedback-reading-field {
+  padding-top: 0.25rem;
+}
+
+.feedback-reading-field > .form-field-label {
+  color: hsl(var(--text-dim));
+}
+
+.feedback-shell .form-choice[data-fallback='missing'] {
+  border-style: dashed;
+  background: hsl(var(--surface) / 0.72);
+  color: hsl(var(--text-dim));
+}
+
+.feedback-shell .form-choice[data-fallback='vague'] {
+  border-style: dotted;
+  background: hsl(var(--surface-raised) / 0.58);
+}
+
+.feedback-shell .form-choice[data-fallback='missing']:has(input:checked),
+.feedback-shell .form-choice[data-fallback='vague']:has(input:checked) {
+  color: hsl(var(--text));
+}
+
+.feedback-sensory-help {
+  border-color: hsl(var(--line));
+  background: hsl(var(--void) / 0.54);
+}
+
+.feedback-sensory-help summary {
+  color: hsl(var(--text));
+}
+
+.feedback-shell .feedback-submit {
+  border: 1px solid hsl(var(--interact));
+  background: hsl(var(--interact));
+  color: hsl(var(--void));
+  box-shadow: 0 8px 24px hsl(var(--interact-deep) / 0.25);
+}
+
+.feedback-shell .feedback-submit:hover:not(:disabled) {
+  background: hsl(var(--interact) / 0.9);
+  box-shadow: 0 10px 28px hsl(var(--interact-deep) / 0.34);
+}
+
+/* Diagnosis: dense instrument readings with a separate, readable coach voice. */
+.diagnosis-intro {
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid hsl(var(--line));
+}
+
+.diagnosis-dashboard {
+  border-color: hsl(var(--line));
+  background:
+    linear-gradient(165deg, hsl(var(--surface-raised) / 0.5), transparent 36%),
+    hsl(var(--surface));
+  box-shadow:
+    inset 0 1px 0 hsl(var(--text) / 0.03),
+    0 16px 42px hsl(var(--void) / 0.18);
+}
+
+.diagnosis-status {
+  border-color: hsl(var(--line));
+}
+
+.diagnosis-label {
+  min-width: 5.75rem;
+  font-family: var(--app-font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: hsl(var(--text-dim));
+}
+
+.diagnosis-chip {
+  border-color: hsl(var(--line));
+  border-radius: var(--radius-sm);
+  background: hsl(var(--void));
+  color: hsl(var(--text));
+}
+
+.diagnosis-row {
+  display: grid;
+  grid-template-columns: minmax(5.75rem, 0.9fr) minmax(0, 1.6fr);
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.diagnosis-row .diagnosis-chip {
+  justify-self: start;
+}
+
+.diagnosis-l1 {
+  border-color: hsl(var(--line));
+  border-left-color: hsl(var(--text-dim));
+  background: hsl(var(--void) / 0.62);
+}
+
+.diagnosis-confidence-stars .is-solid {
+  color: hsl(var(--text));
+}
+
+.diagnosis-confidence-stars .is-empty {
+  color: hsl(var(--text-dim));
+}
+
+.diagnosis-rationale {
+  border-color: hsl(var(--line));
+  background: hsl(var(--void) / 0.52);
+}
+
+.diagnosis-rationale summary {
+  color: hsl(var(--text-dim));
+}
+
+.diagnosis-rationale > div {
+  border-color: hsl(var(--line));
+  background: transparent;
+}
+
+.diagnosis-coach {
+  border-color: hsl(var(--line));
+  background: hsl(var(--surface));
+  box-shadow:
+    inset 0 1px 0 hsl(var(--text) / 0.03),
+    0 14px 36px hsl(var(--void) / 0.12);
+}
+
+.diagnosis-coach > h2 {
+  letter-spacing: -0.01em;
+}
+
+.diagnosis-coach ul::marker {
+  color: hsl(var(--text-dim));
+}
+
+.diagnosis-notice {
+  border-color: hsl(var(--line));
+  background: hsl(var(--surface));
+}
+
+.diagnosis-probe-option {
+  border-color: hsl(var(--line));
+  background: hsl(var(--surface));
+}
+
+.diagnosis-probe-option:hover:not(:disabled) {
+  border-color: hsl(var(--interact) / 0.7);
+  background: hsl(var(--surface-raised));
+}
+
+.diagnosis-shell .diagnosis-primary-action {
+  border: 1px solid hsl(var(--interact));
+  background: hsl(var(--interact));
+  color: hsl(var(--void));
+}
+
+.diagnosis-shell .diagnosis-dashboard--converged {
+  border-color: hsl(var(--converge) / 0.7);
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--converge) / 0.1),
+    0 0 26px hsl(var(--converge) / 0.1);
+}
+
+.diagnosis-shell .diagnosis-dashboard--converged .diagnosis-l1 {
+  border-left-color: hsl(var(--converge));
+}

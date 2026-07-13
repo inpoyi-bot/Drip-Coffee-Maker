@@ -7,7 +7,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [matchTrajectory] = useRoute('/trajectory');
 
   return (
-    <div className="min-h-[100dvh] w-full bg-background flex flex-col items-center">
+    <div
+      className={`min-h-[100dvh] w-full bg-background flex flex-col items-center ${
+        matchTrajectory
+          ? 'trajectory-shell'
+          : matchHome
+            ? 'coldstart-shell'
+            : matchDiagnosis
+              ? 'diagnosis-shell'
+              : matchFeedback
+                ? 'feedback-shell'
+              : ''
+      }`}
+    >
       <header className="w-full max-w-md border-b border-border bg-background px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="font-mono text-sm font-medium tracking-tight text-foreground">COFFEE_COACH</div>
         <nav className="flex gap-4 text-sm font-medium">

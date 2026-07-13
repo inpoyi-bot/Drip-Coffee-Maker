@@ -174,20 +174,20 @@ export default function Home() {
   }
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="space-y-2">
+    <div className="coldstart-page p-6 space-y-10">
+      <div className="coldstart-intro space-y-2">
         <h1 className="font-sans font-medium text-2xl text-foreground">冷启动录入</h1>
         <p className="text-muted-foreground text-sm">告诉仪器你的初始状态，以建立校准基线。</p>
       </div>
 
-      <div className="space-y-8">
+      <div className="coldstart-form space-y-9">
         <div
           ref={(element) => { fieldRefs.current.roastLevel = element; }}
-          className={`space-y-3 ${isMissing('roastLevel') ? 'rounded-md border p-3' : ''}`}
+          className={`coldstart-field space-y-3 ${isMissing('roastLevel') ? 'rounded-md border p-3' : ''}`}
           style={isMissing('roastLevel') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
         >
           <Label required>烘焙度</Label>
-          <div className="flex flex-col gap-2">
+          <div className="coldstart-options flex flex-col gap-2">
             {['极浅焙', '浅焙', '中焙', '中深焙', '深焙'].map(level => (
               <RadioOption key={level} name="roastLevel" value={level} label={level} checked={roastLevel === level} onChange={() => setRoastLevel(level)} />
             ))}
@@ -196,7 +196,7 @@ export default function Home() {
 
         <div
           ref={(element) => { fieldRefs.current.roastDate = element; }}
-          className={`space-y-3 ${isMissing('roastDate') ? 'rounded-md border p-3' : ''}`}
+          className={`coldstart-field space-y-3 ${isMissing('roastDate') ? 'rounded-md border p-3' : ''}`}
           style={isMissing('roastDate') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
         >
           <Label required>烘焙日期</Label>
@@ -218,7 +218,7 @@ export default function Home() {
 
         <div
           ref={(element) => { fieldRefs.current.doseGrams = element; }}
-          className={`space-y-3 ${isMissing('doseGrams') ? 'rounded-md border p-3' : ''}`}
+          className={`coldstart-field space-y-3 ${isMissing('doseGrams') ? 'rounded-md border p-3' : ''}`}
           style={isMissing('doseGrams') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
         >
           <Label required>粉量 (克)</Label>
@@ -232,11 +232,11 @@ export default function Home() {
 
         <div
           ref={(element) => { fieldRefs.current.grinderType = element; }}
-          className={`space-y-3 ${isMissing('grinderType') ? 'rounded-md border p-3' : ''}`}
+          className={`coldstart-field space-y-3 ${isMissing('grinderType') ? 'rounded-md border p-3' : ''}`}
           style={isMissing('grinderType') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
         >
           <Label required>磨豆机类型</Label>
-          <div className="flex flex-col gap-2">
+          <div className="coldstart-options flex flex-col gap-2">
             {['砍豆机', '锥刀电动磨', '平刀电动磨', '手摇磨', '不确定', '没有磨豆机'].map(type => (
               <RadioOption 
                  key={type} 
@@ -253,11 +253,11 @@ export default function Home() {
 
         <div
           ref={(element) => { fieldRefs.current.startingGrind = element; }}
-          className={`space-y-3 ${isMissing('startingGrind') ? 'rounded-md border p-3' : ''}`}
+          className={`coldstart-field space-y-3 ${isMissing('startingGrind') ? 'rounded-md border p-3' : ''}`}
           style={isMissing('startingGrind') ? { borderColor: 'hsl(var(--select-accent))', backgroundColor: 'hsl(var(--select-accent) / 0.05)' } : undefined}
         >
           <Label required>起始研磨粗细</Label>
-          <div className="flex flex-col gap-2">
+          <div className="coldstart-options flex flex-col gap-2">
             {STARTING_GRIND_OPTIONS.map(option => (
               <RadioOption
                 key={option}
@@ -276,12 +276,12 @@ export default function Home() {
           disabled={mutation.isPending}
           data-disabled={!canSubmit}
           aria-describedby={showMissing && !canSubmit ? 'form-incomplete-hint' : undefined}
-          className={`w-full h-14 text-base ${!canSubmit ? 'cursor-not-allowed opacity-50' : ''}`}
+          className={`coldstart-submit w-full h-14 text-base ${!canSubmit ? 'cursor-not-allowed opacity-50' : ''}`}
         >
           {mutation.isPending ? '生成起点配方...' : '提交建立基线'}
         </Button>
         {showMissing && !canSubmit && (
-          <p id="form-incomplete-hint" role="status" className="text-sm text-muted-foreground">
+          <p id="form-incomplete-hint" role="status" className="coldstart-incomplete-hint text-sm text-muted-foreground">
             请补全标记为必填的项目。
           </p>
         )}

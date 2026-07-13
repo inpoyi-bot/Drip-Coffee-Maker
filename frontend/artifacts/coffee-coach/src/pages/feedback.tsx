@@ -19,8 +19,11 @@ export default function Feedback() {
   const [, setLocation] = useLocation();
   const mutation = useSendTurn();
   const { setLatestTurn } = useContext(AppContext);
+  const isVisualSample = new URLSearchParams(window.location.search).get('sample') === 'feedback';
 
-  const [sensory, setSensory] = useState<string[]>([]);
+  const [sensory, setSensory] = useState<string[]>(() =>
+    isVisualSample ? ['酸', '薄(寡淡、水感)'] : [],
+  );
   const [sensoryElaboration, setSensoryElaboration] = useState('');
   const hasCantDescribe = sensory.includes('尝到了但说不清');
 
@@ -28,15 +31,21 @@ export default function Feedback() {
     setSensory(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
   };
 
-  const [vsPrev, setVsPrev] = useState<'变好' | '变坏' | '没变' | '说不清'>('说不清');
+  const [vsPrev, setVsPrev] = useState<'变好' | '变坏' | '没变' | '说不清'>(
+    isVisualSample ? '变好' : '说不清',
+  );
   
-  const [brewMin, setBrewMin] = useState('');
-  const [brewSec, setBrewSec] = useState('');
+  const [brewMin, setBrewMin] = useState(isVisualSample ? '2' : '');
+  const [brewSec, setBrewSec] = useState(isVisualSample ? '10' : '');
   const [notTimed, setNotTimed] = useState(false);
 
-  const [bedShape, setBedShape] = useState<'平' | '拱' | '塌坑' | '偏厚下陷' | 'not_observed'>('not_observed');
-  const [wallRing, setWallRing] = useState<'present' | 'absent' | 'not_observed'>('not_observed');
-  const [bedNote, setBedNote] = useState('');
+  const [bedShape, setBedShape] = useState<'平' | '拱' | '塌坑' | '偏厚下陷' | 'not_observed'>(
+    isVisualSample ? '平' : 'not_observed',
+  );
+  const [wallRing, setWallRing] = useState<'present' | 'absent' | 'not_observed'>(
+    isVisualSample ? 'absent' : 'not_observed',
+  );
+  const [bedNote, setBedNote] = useState(isVisualSample ? '床面平，流速稳定。' : '');
 
   const handleSubmit = async () => {
     let brewTimeSeconds: number | 'not_timed' = 'not_timed';
@@ -67,16 +76,17 @@ export default function Feedback() {
   };
 
   return (
-    <div className="p-6 space-y-10">
-      <div className="space-y-2">
+    <div className="feedback-page p-6 space-y-10">
+      <div className="feedback-intro space-y-2">
         <h1 className="font-sans font-medium text-2xl text-foreground">这杯怎么样？</h1>
         <p className="text-muted-foreground text-sm">按你观察到的如实记录，没注意看的直接选没注意看。</p>
+        {isVisualSample && <p className="font-mono text-[11px] text-muted-foreground">VISUAL SAMPLE · 不会提交记录</p>}
       </div>
 
-      <div className="space-y-8">
-        <div className="space-y-3">
+      <div className="feedback-form space-y-9">
+        <div className="feedback-sensory-field space-y-3">
           <Label>感官风味 (可多选)</Label>
-          <div className="flex flex-col gap-2">
+          <div className="feedback-options flex flex-col gap-2">
             {SENSORY_OPTIONS.map(opt => (
               <CheckboxOption 
                 key={opt.value} 
@@ -100,7 +110,7 @@ export default function Feedback() {
                 />
               </div>
             )}
-            <details className="border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
+            <details className="feedback-sensory-help border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
               <summary className="cursor-pointer font-medium text-foreground">苦和涩怎么分？</summary>
               <p className="mt-2 leading-relaxed">
                 发苦更像烧焦或木头味；发涩是口腔收紧、发干，像浓茶或生柿子。两者可能同时出现，请分别勾选，不要把“发干”一概当成苦。
@@ -109,9 +119,9 @@ export default function Feedback() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="feedback-comparison-field space-y-3">
           <Label>和上一杯比</Label>
-          <div className="flex flex-col gap-2">
+          <div className="feedback-options flex flex-col gap-2">
             {(['变好', '变坏', '没变'] as const).map(opt => (
                <RadioOption key={opt} name="vsPrev" value={opt} label={opt} checked={vsPrev === opt} onChange={() => setVsPrev(opt)} />
             ))}
@@ -119,7 +129,7 @@ export default function Feedback() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="feedback-reading-field space-y-3">
           <Label>冲煮时间</Label>
           <div className="flex items-center gap-2">
              <Input type="number" placeholder="分" value={brewMin} onChange={(e: any) => setBrewMin(e.target.value)} disabled={notTimed} className="w-20" />
@@ -132,9 +142,9 @@ export default function Feedback() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="feedback-reading-field space-y-3">
           <Label>床面形态</Label>
-          <div className="flex flex-col gap-2">
+          <div className="feedback-options flex flex-col gap-2">
             {(['平', '拱', '塌坑', '偏厚下陷'] as const).map(opt => (
                <RadioOption key={opt} name="bedShape" value={opt} label={opt} checked={bedShape === opt} onChange={() => setBedShape(opt)} />
             ))}
@@ -142,16 +152,16 @@ export default function Feedback() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="feedback-reading-field space-y-3">
           <Label>挂粉环</Label>
-          <div className="flex flex-col gap-2">
+          <div className="feedback-options flex flex-col gap-2">
             <RadioOption name="wallRing" value="present" label="有挂粉环" checked={wallRing === 'present'} onChange={() => setWallRing('present')} />
             <RadioOption name="wallRing" value="absent" label="没有挂粉环" checked={wallRing === 'absent'} onChange={() => setWallRing('absent')} />
             <RadioOption name="wallRing" value="not_observed" label="没注意看" checked={wallRing === 'not_observed'} onChange={() => setWallRing('not_observed')} fallbackType="missing" />
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="feedback-reading-field space-y-3">
           <Label>床面备注 (选填)</Label>
           <Textarea 
             placeholder="其他观察到的细节..." 
@@ -160,7 +170,7 @@ export default function Feedback() {
           />
         </div>
 
-        <Button onClick={handleSubmit} disabled={mutation.isPending} className="w-full h-14 text-base">
+        <Button onClick={handleSubmit} disabled={mutation.isPending} className="feedback-submit w-full h-14 text-base">
           {mutation.isPending ? '诊断中...' : '提交记录'}
         </Button>
       </div>
