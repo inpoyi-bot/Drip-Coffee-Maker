@@ -21,8 +21,8 @@ import {
 
 /*
  * Visual-review data for the explicit ?sample=trajectory route only. It is a
- * faithful front-end rendering of docs/demo-arc.md, never persisted and never
- * used when the user has real saved cups.
+ * faithful front-end rendering of docs/demo-arc.md. It is never persisted and
+ * is used only when the explicit `?sample=trajectory` query parameter is set.
  */
 const TRAJECTORY_VISUAL_SAMPLE: StoredCup[] = [
   {
@@ -74,6 +74,78 @@ const TRAJECTORY_VISUAL_SAMPLE: StoredCup[] = [
   },
 ];
 
+const FORWARD_PHRASE = '方向对了,继续推进';
+
+function countText(count: number): string {
+  const numerals = ['零', '一', '两', '三', '四', '五', '六', '七', '八', '九', '十'];
+  return count <= 10 ? numerals[count] : String(count);
+}
+
+function phraseForCup(cup: StoredCup, isFirstAdjust: boolean): string | undefined {
+  if (isFirstAdjust && cup.turn_type === 'adjust') return '认出欠萃';
+  if (cup.gradient === '变好+同向') return FORWARD_PHRASE;
+  if (cup.gradient === '变坏' && cup.direction === 'coarser') return '这一步过头了,回退一格';
+  if (cup.turn_type === 'probe') return '线索还不够,再进一步探一探';
+  if (cup.terminate_reason === 'satisfied') return '到位收手';
+  return undefined;
+}
+
+function foldPhrases(phrases: string[]): string[] {
+  const folded: string[] = [];
+
+  for (let index = 0; index < phrases.length;) {
+    const phrase = phrases[index];
+    let count = 1;
+    while (phrases[index + count] === phrase) count += 1;
+
+    folded.push(
+      count === 1
+        ? phrase
+        : phrase === FORWARD_PHRASE
+          ? `连续${countText(count)}次方向对、继续推进`
+          : `连续${countText(count)}次${phrase}`,
+    );
+    index += count;
+  }
+
+  return folded;
+}
+
+interface SatisfiedEnding {
+  narrative: string;
+  finalGrind: string;
+}
+
+/**
+ * A read-only display projection of an already-completed happy-path history.
+ * Returning null for an unmapped record prevents the UI from inventing a
+ * phrase when the record contract grows beyond this card's scope.
+ */
+function deriveSatisfiedEnding(history: StoredCup[]): SatisfiedEnding | null {
+  const lastCup = history[history.length - 1];
+  if (lastCup?.terminate_reason !== 'satisfied' || !lastCup.grind_now?.trim()) return null;
+
+  let sawFirstAdjust = false;
+  const phrases: string[] = [];
+
+  for (const cup of history) {
+    if (cup.turn_type === 'seed') continue;
+
+    const phrase = phraseForCup(cup, !sawFirstAdjust);
+    if (!phrase) {
+      if (import.meta.env.DEV) console.warn('[trajectory] unmapped satisfied-path cup', cup);
+      return null;
+    }
+    if (cup.turn_type === 'adjust') sawFirstAdjust = true;
+    phrases.push(phrase);
+  }
+
+  return {
+    narrative: `这包豆你走了 ${history.length} 杯。${foldPhrases(phrases).join(' → ')}。下次换一包新豆,你也知道该怎么读、怎么调、什么时候停了。`,
+    finalGrind: lastCup.grind_now,
+  };
+}
+
 function TrajectoryDot({ cx, cy, payload }: any) {
   const isCurrentConvergence = payload?.isCurrentConvergence;
   const color = isCurrentConvergence ? 'hsl(var(--converge))' : 'hsl(var(--slate))';
@@ -116,13 +188,12 @@ function TrajectoryDot({ cx, cy, payload }: any) {
 
 export default function Trajectory() {
   const savedHistory = getCupHistory();
-  const isVisualSample =
-    savedHistory.length === 0 &&
-    new URLSearchParams(window.location.search).get('sample') === 'trajectory';
+  const isVisualSample = new URLSearchParams(window.location.search).get('sample') === 'trajectory';
   const history = isVisualSample ? TRAJECTORY_VISUAL_SAMPLE : savedHistory;
   const currentCup = history[history.length - 1];
   const currentTurnType = turnTypeLabel(currentCup?.turn_type);
   const currentGrind = grindNowLabel(currentCup?.grind_now);
+  const satisfiedEnding = useMemo(() => deriveSatisfiedEnding(history), [history]);
   const isCurrentConverged =
     currentCup?.gradient === '已收敛' ||
     currentCup?.terminate_reason === 'satisfied' ||
@@ -165,7 +236,7 @@ export default function Trajectory() {
   return (
     <div className="trajectory-page p-4 space-y-6">
       <div className="space-y-1">
-        <h1 className="font-sans font-medium text-xl text-foreground">收敛轨迹</h1>
+        <h1 className="font-sans font-medium text-xl text-foreground">这包豆的轨迹</h1>
         <p className="trajectory-proof text-muted-foreground text-xs font-mono border border-border bg-card p-2 rounded mt-2 block">
           {isVisualSample
             ? '视觉样张：来自 demo-arc，不写入你的保存记录。'
@@ -175,26 +246,38 @@ export default function Trajectory() {
 
       {history.length > 0 ? (
         <>
-          <section className="trajectory-card trajectory-current-card bg-card border border-border p-4 space-y-3" aria-labelledby="current-status-heading">
-            <div className="flex items-center justify-between gap-3">
-              <h2 id="current-status-heading" className="font-sans font-medium text-base text-foreground">当前状态</h2>
-              <span className="font-mono text-xs text-muted-foreground">第 {currentCup.cup_no || history.length} 杯</span>
-            </div>
-            <div className="grid gap-3 text-sm sm:grid-cols-3">
-              <div>
-                <span className="block font-mono text-xs text-muted-foreground">状态</span>
-                <span className="text-foreground">{currentTurnType || '正在记录'}</span>
+          {satisfiedEnding ? (
+            <section className="trajectory-card trajectory-current-card bg-card border border-border p-5 space-y-5" aria-label="本包豆的收束记录">
+              <p className="text-base leading-7 text-foreground">{satisfiedEnding.narrative}</p>
+              <p className="border-l-2 border-border pl-3 text-sm leading-6 text-muted-foreground">
+                你这包豆的落点:研磨 {satisfiedEnding.finalGrind}。下次开同款豆,直接从这儿开始,不用再从大师配方那套从头试。
+              </p>
+              <p className="text-xs leading-5 text-muted-foreground">
+                这次我们只调了「研磨」这一根轴,它到位了。水温、注水手法也还能再调——不过那是后面的事,现在不用急。
+              </p>
+            </section>
+          ) : (
+            <section className="trajectory-card trajectory-current-card bg-card border border-border p-4 space-y-3" aria-labelledby="current-status-heading">
+              <div className="flex items-center justify-between gap-3">
+                <h2 id="current-status-heading" className="font-sans font-medium text-base text-foreground">当前状态</h2>
+                <span className="font-mono text-xs text-muted-foreground">第 {currentCup.cup_no || history.length} 杯</span>
               </div>
-              <div>
-                <span className="block font-mono text-xs text-muted-foreground">当前研磨</span>
-                <span className="text-foreground">{currentGrind || '暂未记录'}</span>
+              <div className="grid gap-3 text-sm sm:grid-cols-3">
+                <div>
+                  <span className="block font-mono text-xs text-muted-foreground">状态</span>
+                  <span className="text-foreground">{currentTurnType || '正在记录'}</span>
+                </div>
+                <div>
+                  <span className="block font-mono text-xs text-muted-foreground">当前研磨</span>
+                  <span className="text-foreground">{currentGrind || '暂未记录'}</span>
+                </div>
+                <div>
+                  <span className="block font-mono text-xs text-muted-foreground">研磨调整</span>
+                  <span className="text-foreground">{isCurrentConverged ? '已完成' : '继续校准中'}</span>
+                </div>
               </div>
-              <div>
-                <span className="block font-mono text-xs text-muted-foreground">研磨调整</span>
-                <span className="text-foreground">{isCurrentConverged ? '已完成' : '继续校准中'}</span>
-              </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           <section className="trajectory-card trajectory-chart-card bg-card border border-border p-4 space-y-4" aria-labelledby="trajectory-chart-heading">
             <div className="flex items-start justify-between gap-4">
@@ -266,7 +349,18 @@ export default function Trajectory() {
       )}
 
       <div className="pt-2">
-         <CupTimeline history={history} />
+        {satisfiedEnding ? (
+          <details className="cup-history-details">
+            <summary className="cursor-pointer list-none font-mono text-sm text-muted-foreground">
+              查看完整 {history.length} 杯记录 ▾
+            </summary>
+            <div className="pt-5">
+              <CupTimeline history={history} />
+            </div>
+          </details>
+        ) : (
+          <CupTimeline history={history} />
+        )}
       </div>
     </div>
   );
