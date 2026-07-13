@@ -505,6 +505,13 @@ E12a / E12b 建议新增 flags:
   - 评分:`agents/hello_agent/e5_metric.py::e5_plateau_contract_gate`。只判最后一次 `record_cup` 的结构化字段:`turn_type=terminate`、`decision=停手`、`terminate_reason=plateau_ambiguous`,且 `direction`/`step` 为空;话术不计分。
   - 配置:`agents/hello_agent/e5_test_config.json`。
   - ✅ 端到端结果:`agents/hello_agent/.adk/eval_history/hello_agent_e5_plateau_1782811532.15476.evalset_result.json` → `Tests passed: 1`, `Tests failed: 0`。
+- [ ] **【证据层写入契约 · `record_cup` `terminate_reason` 白名单】** `record_cup` 当前无 `terminate_reason` 枚举校验,传入任何非空字符串都会原样落库。诚实契约(E5 欠定不坐实 / E11 三分互斥 / E12 不复用 `taste_unaddressable`)目前只靠 agent 指令(prompt)守,写入层完全敞开——agent 一旦幻觉出违约值(如坐实的 `plateau_axis_topped` / `plateau_bean_decay`),`record_cup` 会乖乖落库,append-only 轨迹里就躺进一个违反 E5 命根子的坐实归因,无任何一层拦截。
+  - **失败模式**:contract enforcement gap。契约是“约定”(活在 prompt/evals),不是“强制”(本该活在 `record_cup` 写入校验)。这是已有 `record_cup` invariants(E5 矛盾记录拒写、E11 seed 完整性)的**同类漏项**——校验了字段组合一致性,漏了 `terminate_reason` 取值合法性。
+  - **加固方向**:`record_cup` 写入前对 `terminate_reason` 加白名单,只允许合法枚举 `{satisfied, would_overextract, plateau_ambiguous, axis_unreliable, axis_limit_underextracted, flavor_mismatch, taste_unaddressable}`,拒绝坐实值(`plateau_axis_topped` / `plateau_bean_decay`)、probe 阶段 flag(`preference_unspecified`)、拼写错误及任意未知字符串。拒写而非静默接受。
+  - **价值**:把诚实契约从“prompt 约定”升级为“写入强制”——agent 即便幻觉也写不进违约值。延续“seed 整备是 triage 第 0 步 / 证据层完整性在写入口强制”这条纪律。
+  - **优先级**:不阻塞 ending UI(展示层已对坐实值走兜底、不予翻译,双头夹);但证据层写入防线的缺口比展示层严重,不宜久拖。
+  - **来源**:ending 路由层设计(第二张 Codex 卡)期间,核查 `terminate_reason` 真实枚举时发现;详见 Ending System decision log D-E7。
+  - **注**:纯后端契约加固,非 eval case,无 gold behavior;可开一张独立小 Codex 卡实现,配一条“写入违约值应被拒绝”的单元测试即可,不需要 ADK evalset。
 - [x] 把 E3/E3b 砍豆机条件化归因编码为 ADK evalset + 确定性 custom metric
   - 数据:`agents/hello_agent/e3_grinder.evalset.json`(砍豆机 vs 锥刀,同样"又酸又苦")。
   - 评分:`agents/hello_agent/e3_metric.py::e3_grinder_contract_gate`。E3 必须 `terminate_reason=axis_unreliable`;E3b 不得使用 `axis_unreliable` 或直接停手。
@@ -523,5 +530,10 @@ E12a / E12b 建议新增 flags:
   - 设计证据:`scripts/smoke_e13_contract.py` 的 c) invariant 已验证 contract 会拒绝带方向的 terminate 记录:`record_cup contract violation: terminate 记录不能带 direction`。
   - 结论:未来 E9 backtrack termination 只记录停手原因;实际回退目标从轨迹上一杯恢复,不要把"回到上一杯"塞成 terminate row 的新 direction。
   - 状态:feature freeze 内不新增 E9 gate;保持为 future automation backlog / claim consistency item。
+- [ ] **【`would_overextract` 专属出口 + 落账契约】** `would_overextract`(E9 认峰回退)当前是“纸面 reason”:有 agent 指令文案/翻译,但无 evalset、无 mock、无真实落账,且 agent 指令未规定回退终止时 `grind_now` 写“过头杯”还是“峰杯”值,record 也无 `peak_cup_no` / `reverted_to_cup_no` 标记。
+  - **两个耦合缺口**:(1) E9 未编码成 evalset + gold;(2) `record_cup` 回退落账契约未定义(terminate 杯 `grind_now` 语义、过头杯是否单独 record、如何指向峰杯)。
+  - **当前处置**:ending 路由层暂将 `would_overextract` 降级为兜底出口(无叙事无坐标),诚实回避“无法确认末杯 `grind_now` 是否为峰值”的问题,不落错坐标。
+  - **升级条件**:E9 编码 + 落账契约确定后,把 `would_overextract` 升级为专属 happy 出口(能力叙事末段“认峰回退” + 坐标读峰杯),并重判本卡降级决定。见 Ending decision log D-E6(该条 Risk accepted 已预埋此依赖)。
+  - **优先级**:低。当前 demo(clean satisfied arc)不触发此 reason;不阻塞 ending 落地。
 - [x] **【E13 dirty-arc · 已编码但标 v1 known limitation】** E13a/E13b eval artifact 已存在,最终快照 `Tests passed: 0`, `Tests failed: 2`;记录为可复现 v1 limitation,不作为当前提交 blocker。详见 §十一。
 - [x] **【E11 口味层 · admission gate twin 已编码】** E11b 前置消歧:用户报「不甜」要区分 **真欠萃**(违反开局前提 → 退回萃取层,E11c)vs **回甘被酸盖住**(符合开局 → 走口味层,E11d);用专家「**反向探针:寡淡没余味 vs 有回甘被酸盖住**」。这是 E11b「爱这个酸但要更厚」的镜像入口,已并入 `agents/hello_agent/e11_taste_twin.evalset.json` + `agents/hello_agent/e11_metric.py`。
