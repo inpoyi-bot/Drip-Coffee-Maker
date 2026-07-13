@@ -113,7 +113,38 @@ function foldPhrases(phrases: string[]): string[] {
 
 interface SatisfiedEnding {
   narrative: string;
-  finalGrind: string;
+  finalGrind?: string;
+}
+
+interface CapabilityNarrative {
+  narrative: string;
+}
+
+function deriveCapabilityNarrative(
+  history: StoredCup[],
+  { skipTerminalCup = false }: { skipTerminalCup?: boolean } = {},
+): CapabilityNarrative | null {
+  const cupsToNarrate = skipTerminalCup ? history.slice(0, -1) : history;
+  let sawFirstAdjust = false;
+  const phrases: string[] = [];
+
+  for (const cup of cupsToNarrate) {
+    if (cup.turn_type === 'seed') continue;
+
+    const phrase = phraseForCup(cup, !sawFirstAdjust);
+    if (!phrase) {
+      if (import.meta.env.DEV) console.warn('[trajectory] unmapped capability-narrative cup', cup);
+      return null;
+    }
+    if (cup.turn_type === 'adjust') sawFirstAdjust = true;
+    phrases.push(phrase);
+  }
+
+  if (!phrases.length) return null;
+
+  return {
+    narrative: `这包豆你走了 ${history.length} 杯。${foldPhrases(phrases).join(' → ')}。下次换一包新豆,你也知道该怎么读、怎么调、什么时候停了。`,
+  };
 }
 
 /**
@@ -123,27 +154,129 @@ interface SatisfiedEnding {
  */
 function deriveSatisfiedEnding(history: StoredCup[]): SatisfiedEnding | null {
   const lastCup = history[history.length - 1];
-  if (lastCup?.terminate_reason !== 'satisfied' || !lastCup.grind_now?.trim()) return null;
+  if (lastCup?.terminate_reason !== 'satisfied') return null;
 
-  let sawFirstAdjust = false;
-  const phrases: string[] = [];
-
-  for (const cup of history) {
-    if (cup.turn_type === 'seed') continue;
-
-    const phrase = phraseForCup(cup, !sawFirstAdjust);
-    if (!phrase) {
-      if (import.meta.env.DEV) console.warn('[trajectory] unmapped satisfied-path cup', cup);
-      return null;
-    }
-    if (cup.turn_type === 'adjust') sawFirstAdjust = true;
-    phrases.push(phrase);
-  }
+  const capability = deriveCapabilityNarrative(history);
+  if (!capability) return null;
 
   return {
-    narrative: `这包豆你走了 ${history.length} 杯。${foldPhrases(phrases).join(' → ')}。下次换一包新豆,你也知道该怎么读、怎么调、什么时候停了。`,
-    finalGrind: lastCup.grind_now,
+    narrative: capability.narrative,
+    finalGrind: lastCup.grind_now?.trim() || undefined,
   };
+}
+
+type EndingRoute =
+  | { kind: 'none' }
+  | { kind: 'satisfied'; ending: SatisfiedEnding | null }
+  | { kind: 'flavor_mismatch'; capability: CapabilityNarrative | null }
+  | { kind: 'taste_unaddressable'; capability: CapabilityNarrative | null }
+  | { kind: 'axis_limit_underextracted'; capability: CapabilityNarrative | null }
+  | { kind: 'plateau_ambiguous' }
+  | { kind: 'axis_unreliable' }
+  | { kind: 'fallback' };
+
+/**
+ * The trajectory screen's only ending dispatcher. It reads the terminal cup
+ * without writing to history or inferring facts that the record does not hold.
+ */
+function deriveEndingRoute(history: StoredCup[]): EndingRoute {
+  const lastCup = history[history.length - 1];
+  if (lastCup?.turn_type !== 'terminate') return { kind: 'none' };
+
+  switch (lastCup.terminate_reason) {
+    case 'satisfied':
+      return { kind: 'satisfied', ending: deriveSatisfiedEnding(history) };
+    case 'flavor_mismatch':
+      return { kind: 'flavor_mismatch', capability: deriveCapabilityNarrative(history, { skipTerminalCup: true }) };
+    case 'taste_unaddressable':
+      return { kind: 'taste_unaddressable', capability: deriveCapabilityNarrative(history, { skipTerminalCup: true }) };
+    case 'axis_limit_underextracted':
+      return { kind: 'axis_limit_underextracted', capability: deriveCapabilityNarrative(history, { skipTerminalCup: true }) };
+    case 'plateau_ambiguous':
+      return { kind: 'plateau_ambiguous' };
+    case 'axis_unreliable':
+      return { kind: 'axis_unreliable' };
+    default:
+      return { kind: 'fallback' };
+  }
+}
+
+type StaticEndingKind =
+  | 'flavor_mismatch'
+  | 'taste_unaddressable'
+  | 'axis_limit_underextracted'
+  | 'plateau_ambiguous'
+  | 'axis_unreliable'
+  | 'fallback';
+
+const STATIC_ENDING_COPY: Record<StaticEndingKind, { status: string; paragraphs: string[] }> = {
+  flavor_mismatch: {
+    status: '状态:萃取到位了,剩下的是口味的事。',
+    paragraphs: [
+      '你这包豆的萃取已经调到位了——酸干净、有回甘,四项都到了。这一步你做成了。',
+      '剩下的"还是不太喜欢",不是萃取的问题,而是这支豆的风味取向不太对你的口味——这个冲煮端调不动。想解决,方向是换一支风味不同的豆。口味没有标准答案,你现在知道该往哪儿找了。',
+    ],
+  },
+  taste_unaddressable: {
+    status: '状态:萃取到位了,这支豆很对你。',
+    paragraphs: [
+      '你这包豆的萃取已经调到位了,而且你喜欢它的酸——这支豆是对的,别换。',
+      '你想要的"更厚一点",不在研磨这件事上,而在水温、接触时间、浓度那些地方——这一版我只调研磨,专注把这一件事帮你走到位。想往更厚走,是下一步可以探索的方向。你的方向没错,这支豆也值得留着。',
+    ],
+  },
+  axis_limit_underextracted: {
+    status: '状态:调整研磨能做的,做到头了。',
+    paragraphs: [
+      '这包豆你一路调研磨、一路在变好——从最开始的尖酸发空,到现在酸干净了很多、也能尝到一点甜。这套"看反馈、往好的方向调"的判断,你练到了。',
+      '但到这一步,再磨细已经改变有限了:磨到更细会开始堵、细粉变多、流速不稳,而这杯离"酸能干净化成甜、喝完明显回甘"还差一点。光靠调研磨,这包豆到这儿就是上限了。',
+      '这不是你的手法问题,是只调研磨这一件事能给的,就到这里。想再往前,得靠研磨以外的调整——那是这一版没做的部分,但你现在知道卡点在哪了。',
+    ],
+  },
+  plateau_ambiguous: {
+    status: '状态:到这儿了,我们停。',
+    paragraphs: [
+      '这包豆连着两杯没再变好,而且开始有点纸板感、香气也淡了。',
+      '这种情况有两种可能:一种是研磨这件事已经做到头了;另一种是这包豆过了最佳赏味期、状态在走下坡。说实话,单看现在的信息,我没法确定是哪一种。',
+      '但这两种情况有个共同点:继续磨细都帮不了你——如果是前者,再细只会过萃发苦;如果是豆子状态的问题,磨细也补不回已经淡掉的香气。',
+      '所以我们在这儿停,不是因为调好了,而是因为再调下去对这包豆已经没有意义了。这不是你的手法问题,是现实条件决定的。',
+    ],
+  },
+  axis_unreliable: {
+    status: '状态:先换磨豆机,我们再一起把这包豆调到位。',
+    paragraphs: [
+      '你用的是砍豆机(靠刀片打碎的那种)。它磨出来的粉,粗细会两极分化——细的那部分萃过头发苦,粗的那部分没萃够发酸,同一杯里又酸又苦是这么来的,不是你冲得不对。',
+      '我帮你调咖啡的办法,是每次只动一点点,再看这一杯比上一杯变好还是变坏,一步步逼近你的最佳点。但砍豆机每次磨出来的粗细都不太稳定,调了也分不清是调的作用还是磨的随机——没有稳定的反馈,这套方法就跑不起来。',
+      '所以在换磨之前,我先不让你瞎调浪费豆子。换一台锥刀或平刀的磨豆机(手摇的也可以),磨出来的粉稳定了,我就能一步步帮你把这包豆调到位。这不是你的问题,是工具还没到位。',
+    ],
+  },
+  fallback: {
+    status: '状态:这包豆的调整到这儿结束了。',
+    paragraphs: ['下面是你这几杯完整的调整过程和轨迹,可以回看每一步。'],
+  },
+};
+
+function StaticEndingCard({ route }: { route: EndingRoute }) {
+  if (route.kind === 'none' || route.kind === 'satisfied') return null;
+
+  const copy = STATIC_ENDING_COPY[route.kind];
+  const capability =
+    route.kind === 'flavor_mismatch' ||
+    route.kind === 'taste_unaddressable' ||
+    route.kind === 'axis_limit_underextracted'
+      ? route.capability
+      : null;
+
+  return (
+    <section className="trajectory-card trajectory-current-card bg-card border border-border p-5 space-y-5" aria-label="本包豆的结束记录">
+      {capability && <p className="text-base leading-7 text-foreground">{capability.narrative}</p>}
+      <div className="space-y-3 text-sm leading-6 text-muted-foreground">
+        <p className="font-medium text-foreground">{copy.status}</p>
+        {copy.paragraphs.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function TrajectoryDot({ cx, cy, payload }: any) {
@@ -193,7 +326,9 @@ export default function Trajectory() {
   const currentCup = history[history.length - 1];
   const currentTurnType = turnTypeLabel(currentCup?.turn_type);
   const currentGrind = grindNowLabel(currentCup?.grind_now);
-  const satisfiedEnding = useMemo(() => deriveSatisfiedEnding(history), [history]);
+  const endingRoute = useMemo(() => deriveEndingRoute(history), [history]);
+  const satisfiedEnding = endingRoute.kind === 'satisfied' ? endingRoute.ending : null;
+  const hasEnding = endingRoute.kind !== 'none';
   const isCurrentConverged =
     currentCup?.gradient === '已收敛' ||
     currentCup?.terminate_reason === 'satisfied' ||
@@ -249,13 +384,17 @@ export default function Trajectory() {
           {satisfiedEnding ? (
             <section className="trajectory-card trajectory-current-card bg-card border border-border p-5 space-y-5" aria-label="本包豆的收束记录">
               <p className="text-base leading-7 text-foreground">{satisfiedEnding.narrative}</p>
-              <p className="border-l-2 border-border pl-3 text-sm leading-6 text-muted-foreground">
-                你这包豆的落点:研磨 {satisfiedEnding.finalGrind}。下次开同款豆,直接从这儿开始,不用再从大师配方那套从头试。
-              </p>
+              {satisfiedEnding.finalGrind && (
+                <p className="border-l-2 border-border pl-3 text-sm leading-6 text-muted-foreground">
+                  你这包豆的落点:研磨 {satisfiedEnding.finalGrind}。下次开同款豆,直接从这儿开始,不用再从大师配方那套从头试。
+                </p>
+              )}
               <p className="text-xs leading-5 text-muted-foreground">
                 这次我们只调了「研磨」这一根轴,它到位了。水温、注水手法也还能再调——不过那是后面的事,现在不用急。
               </p>
             </section>
+          ) : endingRoute.kind !== 'none' ? (
+            <StaticEndingCard route={endingRoute} />
           ) : (
             <section className="trajectory-card trajectory-current-card bg-card border border-border p-4 space-y-3" aria-labelledby="current-status-heading">
               <div className="flex items-center justify-between gap-3">
@@ -279,6 +418,7 @@ export default function Trajectory() {
             </section>
           )}
 
+          {history.length >= 2 && (
           <section className="trajectory-card trajectory-chart-card bg-card border border-border p-4 space-y-4" aria-labelledby="trajectory-chart-heading">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -341,6 +481,7 @@ export default function Trajectory() {
               </ResponsiveContainer>
             </div>
           </section>
+          )}
         </>
       ) : (
         <div className="trajectory-card p-8 text-center text-muted-foreground text-sm font-mono border border-dashed border-border bg-card">
@@ -349,7 +490,7 @@ export default function Trajectory() {
       )}
 
       <div className="pt-2">
-        {satisfiedEnding ? (
+        {hasEnding ? (
           <details className="cup-history-details">
             <summary className="cursor-pointer list-none font-mono text-sm text-muted-foreground">
               查看完整 {history.length} 杯记录 ▾
