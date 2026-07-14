@@ -1,7 +1,7 @@
 # S3 启动 Brief · Taste Diagnostician(因果模型 · EDD)
 
 > **怎么用**:把本文件整段复制进一个全新对话,作为冷启动交接,读完即可开 S3 讨论。
-> **项目**:咖啡 Agent capstone,代码在 `/Users/yue/Documents/Drip Coffee Maker/`,完整产品定义见该 repo `docs/SPEC.md`,eval 标尺见 `docs/evals.md`,现有因果规则在 `agents/hello_agent/agent.py`。
+> **项目**:Pour Over Coffee Coach Agent（咖啡 Agent capstone）,代码在 `/Users/yue/Documents/Drip Coffee Maker/`,完整产品定义见该 repo `docs/SPEC.md`,eval 标尺见 `docs/evals.md`,现有因果规则在 `agents/hello_agent/agent.py`。
 > **状态**:S0(骨架)/ S1(单轴收敛闭环 + 14 eval,7 个高危已全绿)/ S2(豆级记忆:start_bag+record_cup 工具,纯 Python 已验,端到端待测)均已完成。S3 现在开始。
 
 ---

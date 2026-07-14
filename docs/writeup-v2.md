@@ -1,4 +1,4 @@
-# Drip Coffee Maker: A V60 Convergence Coach — and the Eval Discipline That Kept It Honest
+# Pour Over Coffee Coach Agent: A V60 Convergence Coach — and the Eval Discipline That Kept It Honest
 
 *Kaggle Agentic Engineering Capstone · Concierge Agents track*
 

@@ -1,4 +1,4 @@
-# Drip Coffee Maker
+# Pour Over Coffee Coach Agent
 
 An ADK coffee agent capstone: a V60 pour-over coach that helps a beginner converge across cups, not a one-shot recipe recommender.
 
