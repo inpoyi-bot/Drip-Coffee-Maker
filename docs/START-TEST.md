@@ -10,6 +10,12 @@
 
 > 这套 v1 的后端仍在本机。只有前端在 Vercel；电脑休眠、断网，或任一进程退出时，Agent 都会不可用。
 
+## 首次部署验收记录（2026-07-14）
+
+- 已从 Vercel Production 前端通过 Cloudflare Tunnel 向本机 ADK 发起并完成一轮浏览器交互。
+- 这条记录证明部署链路可用：公网前端 → Tunnel → 本机 ADK → 模型凭证；不是 24/7 可用性、托管后端、安全、性能或扩缩容测试。
+- 因此 README / writeup 只能称其为 **limited live demo**，不能称为 production deployment。
+
 ## 每次启动
 
 需要打开两个终端，并保持它们都在运行。

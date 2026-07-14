@@ -131,9 +131,9 @@ agents/hello_agent/.adk/eval_history/
 
 Some older eval history files are intentionally kept as iteration traces. For pass/fail evidence, use the latest passing runs called out in `docs/evals.md` rather than treating every historical run as current status.
 
-## Local Deployability
+## Limited Live Demo Deployment
 
-This project does not claim production or cloud deployment. It claims a locally deployable and reproducibly runnable ADK agent.
+This project is reproducibly runnable locally and deployed as a limited live demo. The frontend is publicly hosted on Vercel; requests reach the ADK backend and SQLite session store through a Cloudflare Tunnel, while both backend processes remain on the local machine. `docs/START-TEST.md` records the first manual browser-to-agent acceptance and the operating runbook.
 
 Supported:
 
@@ -142,12 +142,13 @@ Supported:
 - Documented local ADK runtime launch command.
 - Verified SQLite-backed session persistence across restarts.
 - Documented ADK eval regression commands and committed eval artifacts.
+- Public Vercel frontend plus a fixed Cloudflare Tunnel URL for limited live demonstrations.
+- One manually exercised browser-to-agent interaction through that deployed path.
 
 Not claimed:
 
-- No hosted URL.
 - No Docker image.
-- No Cloud Run or production deployment.
+- No 24/7 hosted backend or Cloud Run deployment: the local machine, network, tunnel, and ADK process must remain available.
 - No CI/CD pipeline.
 - No production auth, monitoring, or scaling guarantees.
 
@@ -164,7 +165,7 @@ This section maps repo artifacts back to the course/project concepts in SPEC §6
 | Guardrails | `record_cup` in `memory.py` rejects contradictory structured records; evals check contract-sensitive failures. | The build protects the memory trajectory from invalid action/termination records. |
 | Security features | `record_cup` invariants (`memory.py`) reject internally contradictory writes, for example a `terminate` decision co-occurring with an `adjust` write; credentials use `.env` and are never committed; `sessions.db` is git-ignored. | The build validates every write to persisted trajectory state, preventing a class of state-corruption failures. This is a data-contract guardrail, not adversarial-input or prompt-injection defense; no such threat model was tested in this version. |
 | MCP Server | `mcp_server/coffee_server.py` and `mcp_server/README.md` define and smoke-test static seed/precheck tools. | MCP demonstrates the external static-tool boundary; it is standalone and intentionally separate from the ADK runtime path. |
-| Deployability | `requirements.txt`, `.env.example`, local `adk web` commands, SQLite session command, verified SQLite session persistence, and eval run commands are documented here. | The project has a reproducible local ADK run path with SQLite-backed sessions; it does not claim cloud or production deployment. |
+| Deployability | `requirements.txt`, `.env.example`, `docs/DEPLOY.md`, `docs/START-TEST.md`, Vercel configuration, local ADK/SQLite launch commands, and eval run commands. | The project has a reproducible local run path and a manually exercised limited live-demo path: Vercel frontend → Cloudflare Tunnel → local ADK/SQLite backend. It does not claim a 24/7 hosted backend or production operations. |
 
 ## Failure-mode Evidence Table
 
@@ -206,6 +207,6 @@ This version is a focused capstone build, not a full coffee product.
 
 ## Project Status
 
-The project is in final submission packaging, not feature expansion. The grind-only V60 vertical slice is implemented, local run and eval instructions are documented, and the main high-risk eval gates are evidence-tracked through committed artifacts and the status notes in `docs/evals.md`.
+The project is in final submission packaging, not feature expansion. The grind-only V60 vertical slice is implemented; local run and eval instructions are documented; and the main high-risk eval gates are evidence-tracked through committed artifacts and the status notes in `docs/evals.md`. The same slice is also available as a limited live demo through a Vercel frontend and Cloudflare Tunnel to the local ADK backend; the deployed browser-to-agent path has been manually exercised and is recorded in `docs/START-TEST.md`.
 
-Remaining work is submission-facing: final writeup, demo/video script, and one more claim review pass. This status does not claim that every E1-E13 rubric case is automated, that E13 is delivered, or that the full E11 group has a complete live pass; E11 live evidence is the documented first valid observation after seed cleanup plus offline/mutation validation for the broader encoded gate.
+The final writeup, demo/video scripts, and claim-review pass are complete. Remaining work is submission hand-off only. This status does not claim that every E1-E13 rubric case is automated, that E13 is delivered, or that the full E11 group has a complete live pass; E11 live evidence is the documented first valid observation after seed cleanup plus offline/mutation validation for the broader encoded gate.
