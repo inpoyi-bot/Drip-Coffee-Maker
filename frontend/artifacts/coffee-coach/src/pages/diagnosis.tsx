@@ -102,6 +102,7 @@ function CoachExplanation({ message }: { message: string }) {
         {blocks.map((block, index) => {
           const lines = block.split('\n');
           const listItems = lines.map((line) => line.match(/^\s*[-*+]\s+(.+)$/));
+          const orderedListItems = lines.map((line) => line.match(/^\s*\d+\.\s+(.+)$/));
 
           if (listItems.every(Boolean)) {
             return (
@@ -109,6 +110,66 @@ function CoachExplanation({ message }: { message: string }) {
                 {listItems.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item![1])}</li>)}
               </ul>
             );
+          }
+
+          if (listItems.some(Boolean)) {
+            const content: ReactNode[] = [];
+            let pendingList: string[] = [];
+            let listIndex = 0;
+
+            const flushList = () => {
+              if (pendingList.length === 0) return;
+              content.push(
+                <ul key={`list-${listIndex++}`} className="list-disc space-y-1 pl-5 marker:text-slate">
+                  {pendingList.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item)}</li>)}
+                </ul>,
+              );
+              pendingList = [];
+            };
+
+            lines.forEach((line, lineIndex) => {
+              const listItem = line.match(/^\s*[-*+]\s+(.+)$/);
+              if (listItem) {
+                pendingList.push(listItem[1]);
+                return;
+              }
+
+              flushList();
+              if (line.trim()) content.push(<p key={`paragraph-${lineIndex}`}>{renderInlineMarkdown(line)}</p>);
+            });
+            flushList();
+
+            return <div key={index} className="space-y-2">{content}</div>;
+          }
+
+          if (orderedListItems.some(Boolean)) {
+            const content: ReactNode[] = [];
+            let pendingList: string[] = [];
+            let listIndex = 0;
+
+            const flushList = () => {
+              if (pendingList.length === 0) return;
+              content.push(
+                <ol key={`list-${listIndex++}`} className="list-decimal space-y-1 pl-5 marker:text-slate">
+                  {pendingList.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item)}</li>)}
+                </ol>,
+              );
+              pendingList = [];
+            };
+
+            lines.forEach((line, lineIndex) => {
+              const listItem = line.match(/^\s*\d+\.\s+(.+)$/);
+              if (listItem) {
+                pendingList.push(listItem[1]);
+                return;
+              }
+
+              flushList();
+              if (line.trim()) content.push(<p key={`paragraph-${lineIndex}`}>{renderInlineMarkdown(line)}</p>);
+            });
+            flushList();
+
+            return <div key={index} className="space-y-2">{content}</div>;
           }
 
           return (
@@ -252,10 +313,10 @@ export default function Diagnosis() {
 
           {/* 默认折叠的解释区，不作为主诊断出口。 */}
           {recordCup.rationale && (
-            <details className="diagnosis-rationale group border border-border bg-background group-open:bg-card transition-colors [&_summary::-webkit-details-marker]:hidden mt-2">
+            <details className="diagnosis-rationale group border border-border bg-background group-open:bg-card transition-[background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [&_summary::-webkit-details-marker]:hidden mt-2">
               <summary className="flex items-center justify-between cursor-pointer p-3 font-sans text-sm font-medium text-foreground select-none">
                 <span>为什么这样判断</span>
-                <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+                <ChevronDown className="w-4 h-4 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-open:rotate-180" />
               </summary>
               <div className="px-3 pb-3 text-muted-foreground text-xs leading-relaxed border-t border-border pt-2 bg-background">
                 {recordCup.rationale}

@@ -496,9 +496,7 @@
 
 .trajectory-card {
   border-color: hsl(var(--line));
-  box-shadow:
-    inset 0 1px 0 hsl(var(--text) / 0.025),
-    0 16px 42px hsl(var(--void) / 0.2);
+  box-shadow: inset 0 1px 0 hsl(var(--text) / 0.025);
 }
 
 .trajectory-current-card {
@@ -758,9 +756,7 @@
   background:
     linear-gradient(165deg, hsl(var(--surface-raised) / 0.5), transparent 36%),
     hsl(var(--surface));
-  box-shadow:
-    inset 0 1px 0 hsl(var(--text) / 0.03),
-    0 16px 42px hsl(var(--void) / 0.18);
+  box-shadow: inset 0 1px 0 hsl(var(--text) / 0.03);
 }
 
 .diagnosis-status {
@@ -825,9 +821,7 @@
 .diagnosis-coach {
   border-color: hsl(var(--line));
   background: hsl(var(--surface));
-  box-shadow:
-    inset 0 1px 0 hsl(var(--text) / 0.03),
-    0 14px 36px hsl(var(--void) / 0.12);
+  box-shadow: inset 0 1px 0 hsl(var(--text) / 0.03);
 }
 
 .diagnosis-coach > h2 {

@@ -6,13 +6,13 @@ export function RadioOption({ name, value, checked, onChange, label, description
   
   let containerStyle = 'rounded-md bg-background hover:bg-card/50 border-solid';
   if (fallbackType === 'missing') {
-    containerStyle = 'rounded-none border-dashed bg-card/30 opacity-80 text-muted-foreground';
+    containerStyle = 'rounded-md border-dashed bg-card/30 text-muted-foreground';
   } else if (fallbackType === 'vague') {
-    containerStyle = 'rounded-tr-2xl rounded-bl-2xl border-dotted bg-background/50 hover:bg-card/30 italic';
+    containerStyle = 'rounded-md border-dotted bg-background/50 hover:bg-card/30';
   }
 
   return (
-    <label data-fallback={fallbackType} className={`form-choice flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
+    <label data-fallback={fallbackType} className={`form-choice flex items-start gap-3 p-4 border border-border transition-[transform,background-color,border-color,color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.985] motion-reduce:transition-none motion-reduce:active:transform-none cursor-pointer
       ${containerStyle}
       ${checked ? (fallbackType ? '!bg-card/80' : '') : ''}`}
       style={checked ? {
@@ -39,13 +39,13 @@ export function RadioOption({ name, value, checked, onChange, label, description
 export function CheckboxOption({ checked, onChange, label, fallbackType }: any) {
   let containerStyle = 'rounded-md bg-background hover:bg-card/50 border-solid';
   if (fallbackType === 'missing') {
-    containerStyle = 'rounded-none border-dashed bg-card/30 opacity-80 text-muted-foreground';
+    containerStyle = 'rounded-md border-dashed bg-card/30 text-muted-foreground';
   } else if (fallbackType === 'vague') {
-    containerStyle = 'rounded-tr-2xl rounded-bl-2xl border-dotted bg-background/50 hover:bg-card/30 italic';
+    containerStyle = 'rounded-md border-dotted bg-background/50 hover:bg-card/30';
   }
 
   return (
-    <label data-fallback={fallbackType} className={`form-choice flex items-start gap-3 p-4 border border-border transition-colors cursor-pointer
+    <label data-fallback={fallbackType} className={`form-choice flex items-start gap-3 p-4 border border-border transition-[transform,background-color,border-color,color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.985] motion-reduce:transition-none motion-reduce:active:transform-none cursor-pointer
       ${containerStyle}
       ${checked ? (fallbackType ? '!bg-card/80' : '') : ''}`}
       style={checked ? {

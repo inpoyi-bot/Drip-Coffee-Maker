@@ -6,6 +6,7 @@ import { cupFeedbackToNaturalLanguage, type CupFeedbackInput } from '@/lib/nlAss
 import { appendCup, setLatestSensory } from '@/lib/session';
 import { RadioOption, CheckboxOption, Label, Input, Textarea } from '@/components/ui/forms';
 import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
 
 const SENSORY_OPTIONS = [
   { value: '酸', label: '酸' },
@@ -102,7 +103,7 @@ export default function Feedback() {
               fallbackType="vague"
             />
             {hasCantDescribe && (
-              <div className="pl-4 mt-2 animate-in fade-in">
+              <div className="pl-4 mt-2 animate-in fade-in motion-reduce:animate-none">
                 <Textarea 
                   placeholder="尽量描述一下你的感受..." 
                   value={sensoryElaboration} 
@@ -110,8 +111,11 @@ export default function Feedback() {
                 />
               </div>
             )}
-            <details className="feedback-sensory-help border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
-              <summary className="cursor-pointer font-medium text-foreground">苦和涩怎么分？</summary>
+            <details className="feedback-sensory-help group border border-border bg-card px-3 py-2 text-xs text-muted-foreground [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-between font-medium text-foreground">
+                <span>苦和涩怎么分？</span>
+                <ChevronDown className="h-4 w-4 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-open:rotate-180" />
+              </summary>
               <p className="mt-2 leading-relaxed">
                 发苦更像烧焦或木头味；发涩是口腔收紧、发干，像浓茶或生柿子。两者可能同时出现，请分别勾选，不要把“发干”一概当成苦。
               </p>

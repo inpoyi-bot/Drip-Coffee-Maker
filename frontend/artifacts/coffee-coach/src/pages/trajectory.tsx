@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import { CupTimeline } from '@/components/timeline';
+import { ChevronDown } from 'lucide-react';
 import {
   adjustmentLabel,
   gradientLabel,
@@ -491,9 +492,10 @@ export default function Trajectory() {
 
       <div className="pt-2">
         {hasEnding ? (
-          <details className="cup-history-details">
-            <summary className="cursor-pointer list-none font-mono text-sm text-muted-foreground">
-              查看完整 {history.length} 杯记录 ▾
+          <details className="cup-history-details group">
+            <summary className="flex w-fit cursor-pointer list-none items-center gap-1 font-mono text-sm text-muted-foreground">
+              <span>查看完整 {history.length} 杯记录</span>
+              <ChevronDown className="h-4 w-4 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-open:rotate-180" />
             </summary>
             <div className="pt-5">
               <CupTimeline history={history} />

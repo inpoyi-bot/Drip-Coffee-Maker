@@ -25,19 +25,80 @@ function CoachExplanation({ message }: { message: string }) {
   const blocks = message.split(/\n\s*\n/).filter(Boolean);
 
   return (
-    <section className="bg-card border border-border border-l-4 border-l-slate p-5 shadow-sm space-y-4" aria-labelledby="coach-explanation-heading">
+    <section className="bg-card border border-border border-l-4 border-l-slate p-5 space-y-4" aria-labelledby="coach-explanation-heading">
       <h2 id="coach-explanation-heading" className="font-sans font-medium text-base text-foreground">教练说明</h2>
       <div className="space-y-3 font-sans text-sm leading-7 text-foreground">
         {blocks.map((block, index) => {
           const lines = block.split('\n');
           const listItems = lines.map((line) => line.match(/^\s*[-*+]\s+(.+)$/));
+          const orderedListItems = lines.map((line) => line.match(/^\s*\d+\.\s+(.+)$/));
 
           if (listItems.every(Boolean)) {
             return (
               <ul key={index} className="list-disc space-y-1 pl-5 marker:text-slate">
-                {listItems.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item![1])}</li>)}
+              {listItems.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item![1])}</li>)}
               </ul>
             );
+          }
+
+          if (listItems.some(Boolean)) {
+            const content: ReactNode[] = [];
+            let pendingList: string[] = [];
+            let listIndex = 0;
+
+            const flushList = () => {
+              if (pendingList.length === 0) return;
+              content.push(
+                <ul key={`list-${listIndex++}`} className="list-disc space-y-1 pl-5 marker:text-slate">
+                  {pendingList.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item)}</li>)}
+                </ul>,
+              );
+              pendingList = [];
+            };
+
+            lines.forEach((line, lineIndex) => {
+              const listItem = line.match(/^\s*[-*+]\s+(.+)$/);
+              if (listItem) {
+                pendingList.push(listItem[1]);
+                return;
+              }
+
+              flushList();
+              if (line.trim()) content.push(<p key={`paragraph-${lineIndex}`}>{renderInlineMarkdown(line)}</p>);
+            });
+            flushList();
+
+            return <div key={index} className="space-y-2">{content}</div>;
+          }
+
+          if (orderedListItems.some(Boolean)) {
+            const content: ReactNode[] = [];
+            let pendingList: string[] = [];
+            let listIndex = 0;
+
+            const flushList = () => {
+              if (pendingList.length === 0) return;
+              content.push(
+                <ol key={`list-${listIndex++}`} className="list-decimal space-y-1 pl-5 marker:text-slate">
+                  {pendingList.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item)}</li>)}
+                </ol>,
+              );
+              pendingList = [];
+            };
+
+            lines.forEach((line, lineIndex) => {
+              const listItem = line.match(/^\s*\d+\.\s+(.+)$/);
+              if (listItem) {
+                pendingList.push(listItem[1]);
+                return;
+              }
+
+              flushList();
+              if (line.trim()) content.push(<p key={`paragraph-${lineIndex}`}>{renderInlineMarkdown(line)}</p>);
+            });
+            flushList();
+
+            return <div key={index} className="space-y-2">{content}</div>;
           }
 
           return (
@@ -135,7 +196,7 @@ export default function Home() {
 
   if (seed) {
     return (
-      <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4">
+      <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 motion-reduce:animate-none">
         <div className="space-y-4">
           <h1 className="font-sans font-medium text-2xl text-foreground">手法已冻结</h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
