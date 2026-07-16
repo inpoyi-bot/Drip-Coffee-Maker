@@ -745,6 +745,14 @@
   box-shadow: 0 10px 28px hsl(var(--interact-deep) / 0.34);
 }
 
+.feedback-submit-status {
+  animation: feedback-status-arrive 180ms ease-out both;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  text-align: center;
+  color: hsl(var(--text-dim));
+}
+
 /* Diagnosis: dense instrument readings with a separate, readable coach voice. */
 .diagnosis-intro {
   padding-bottom: 0.9rem;
@@ -757,6 +765,60 @@
     linear-gradient(165deg, hsl(var(--surface-raised) / 0.5), transparent 36%),
     hsl(var(--surface));
   box-shadow: inset 0 1px 0 hsl(var(--text) / 0.03);
+}
+
+.diagnosis-dashboard--arriving {
+  animation: diagnosis-result-arrive 240ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.diagnosis-completion {
+  animation: diagnosis-completion-arrive 360ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  border: 1px solid hsl(var(--converge) / 0.48);
+  border-left: 4px solid hsl(var(--converge));
+  border-radius: var(--radius-md);
+  background: hsl(var(--converge) / 0.1);
+  padding: 0.75rem 0.85rem;
+  font-family: var(--app-font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: hsl(var(--text));
+}
+
+.diagnosis-next-action {
+  border: 1px solid hsl(var(--text) / 0.28);
+  border-left: 4px solid hsl(var(--text));
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(120deg, hsl(var(--surface-raised) / 0.82), hsl(var(--void) / 0.7)),
+    hsl(var(--surface));
+  padding: 1rem;
+}
+
+.diagnosis-next-action-label {
+  margin-bottom: 0.45rem;
+  font-family: var(--app-font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  color: hsl(var(--text-dim));
+}
+
+.diagnosis-next-action-value {
+  font-family: var(--app-font-sans);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: hsl(var(--text));
+}
+
+.diagnosis-next-action-note {
+  margin-top: 0.5rem;
+  font-family: var(--app-font-sans);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: hsl(var(--text-dim));
 }
 
 .diagnosis-status {
@@ -862,4 +924,32 @@
 
 .diagnosis-shell .diagnosis-dashboard--converged .diagnosis-l1 {
   border-left-color: hsl(var(--converge));
+}
+
+@keyframes feedback-status-arrive {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes diagnosis-result-arrive {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes diagnosis-completion-arrive {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback-submit-status,
+  .diagnosis-dashboard--arriving,
+  .diagnosis-completion {
+    animation: reduced-feedback-fade 180ms ease-out both;
+  }
+}
+
+@keyframes reduced-feedback-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

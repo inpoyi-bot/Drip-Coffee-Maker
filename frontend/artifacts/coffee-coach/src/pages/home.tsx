@@ -197,11 +197,22 @@ export default function Home() {
   if (seed) {
     return (
       <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 motion-reduce:animate-none">
-        <div className="space-y-4">
+        <div className="space-y-5">
           <h1 className="font-sans font-medium text-2xl text-foreground">手法已冻结</h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            起始配方已经确定。接下来的调试中，请保持手法、水温等其他变量不变，我们只调整研磨度。
-          </p>
+          <div className="border border-border border-l-4 border-l-slate bg-card p-4 space-y-2">
+            <p className="font-medium text-foreground">这包豆接下来只调研磨。</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              粉量、水温和注水手法全部照起点配方。先冲一杯，再用它和上一杯比较。
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">下一步：按下面配方冲煮；冲完后，记录这一杯的反馈。</p>
+            <Button onClick={() => setLocation('/feedback')} className="w-full h-14 text-base">
+              冲煮完成后，记录这一杯
+            </Button>
+          </div>
+
           {seedRecipe && (
             <div className="border border-border rounded-md divide-y divide-border bg-card text-sm">
               <div className="px-4 py-3 font-medium text-foreground">起点配方</div>
@@ -210,22 +221,35 @@ export default function Home() {
                 ['粉水比', seedRecipe.比例],
                 ['水温', seedRecipe.水温],
                 ['研磨基准', seedRecipe.研磨基准],
-                ['注水手法', seedRecipe.注水手法],
               ] as const).map(([label, value]) => value && (
                 <div key={label} className="grid grid-cols-[5rem_1fr] gap-3 px-4 py-3">
                   <span className="text-muted-foreground">{label}</span>
                   <span className="text-foreground leading-relaxed">{value}</span>
                 </div>
               ))}
+              {seedRecipe.注水手法 && (
+                <details className="group">
+                  <summary className="cursor-pointer px-4 py-3 font-medium text-foreground marker:text-muted-foreground">
+                    查看冻结的注水手法
+                  </summary>
+                  <p className="border-t border-border px-4 py-3 leading-relaxed text-muted-foreground">
+                    {seedRecipe.注水手法}
+                  </p>
+                </details>
+              )}
             </div>
           )}
-          <CoachExplanation message={seed} />
+          <details className="group border border-border bg-card">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground marker:text-muted-foreground">
+              为什么这包豆要这样冲？
+            </summary>
+            <div className="border-t border-border p-4">
+              <CoachExplanation message={seed} />
+            </div>
+          </details>
         </div>
         
         <div className="flex flex-col gap-3">
-          <Button onClick={() => setLocation('/feedback')} className="w-full">
-            冲煮完这杯，去填反馈
-          </Button>
           <Button variant="outline" onClick={handleReset} className="w-full">
             换豆子/重新开始
           </Button>

@@ -239,9 +239,23 @@ export default function Diagnosis() {
       </div>
 
       {recordCup && (
-        <section className={`diagnosis-dashboard bg-card border border-border p-4 flex flex-col gap-3 font-mono text-sm relative overflow-hidden ${
+        <section className={`diagnosis-dashboard diagnosis-dashboard--arriving bg-card border border-border p-4 flex flex-col gap-3 font-mono text-sm relative overflow-hidden ${
           isConverged ? 'diagnosis-dashboard--converged' : ''
         }`} aria-label="本轮结构化诊断">
+          {isConverged && (
+            <p className="diagnosis-completion" role="status" aria-live="polite">
+              这一轮到这里结束，先停在这里。
+            </p>
+          )}
+
+          {adjustmentText && (
+            <section className="diagnosis-next-action" aria-label="本杯唯一调整">
+              <p className="diagnosis-next-action-label">本杯唯一调整</p>
+              <p className="diagnosis-next-action-value">{adjustmentText}</p>
+              <p className="diagnosis-next-action-note">只动研磨；水温、粉量和注水手法都照上一杯。</p>
+            </section>
+          )}
+
           {/* Decision state indicator */}
           <div className="diagnosis-status flex items-center gap-2 pb-3 border-b border-border">
             <span className="diagnosis-label text-muted-foreground uppercase text-xs tracking-widest">状态</span>
@@ -265,15 +279,6 @@ export default function Diagnosis() {
               <span className="diagnosis-label text-muted-foreground text-xs uppercase tracking-widest">变化方向</span>
               <span className="diagnosis-chip bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
                 {gradientText}
-              </span>
-            </div>
-          )}
-
-          {adjustmentText && (
-            <div className="diagnosis-row flex items-center gap-2 pt-1">
-              <span className="diagnosis-label text-muted-foreground text-xs uppercase tracking-widest">调整动作</span>
-              <span className="diagnosis-chip bg-background px-2 py-1 border border-border font-medium text-foreground tracking-tight">
-                {adjustmentText}
               </span>
             </div>
           )}
