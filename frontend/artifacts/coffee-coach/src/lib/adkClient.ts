@@ -44,6 +44,10 @@ export interface RecordCup {
   [key: string]: unknown;
 }
 
+type RecordCupToolResponse = {
+  record?: RecordCup;
+};
+
 /** Structured seed returned by start_bag. Keep these user-facing fields
  * separate from the agent's free-text explanation so the cold-start screen
  * can reliably show the frozen baseline. */
@@ -110,23 +114,28 @@ export async function ensureSession(
 }
 
 function extractRecordCup(events: AdkEvent[]): RecordCup | null {
-  let toolResponse: RecordCup | null = null;
+  let persistedRecord: RecordCup | null = null;
+  let toolCallArgs: RecordCup | null = null;
 
   for (let i = events.length - 1; i >= 0; i -= 1) {
     const parts = events[i]?.content?.parts ?? [];
     for (const part of parts) {
       const fr = part.functionResponse;
       const fc = part.functionCall;
-      if (fc && /record_cup/i.test(fc.name ?? '')) {
-        return (fc.args as RecordCup) ?? null;
+      if (fr && /record_cup/i.test(fr.name ?? '') && !persistedRecord) {
+        const response = fr.response as RecordCupToolResponse | undefined;
+        persistedRecord = response?.record ?? null;
       }
-      if (fr && /record_cup/i.test(fr.name ?? '') && !toolResponse) {
-        toolResponse = (fr.response as RecordCup) ?? null;
+      if (fc && /record_cup/i.test(fc.name ?? '') && !toolCallArgs) {
+        toolCallArgs = (fc.args as RecordCup) ?? null;
       }
     }
   }
 
-  return toolResponse;
+  // Prefer the state-write result: it carries derived fields and the exact
+  // cup number that the agent will see on its next turn. Tool-call arguments
+  // are only a compatibility fallback for older backends.
+  return persistedRecord ?? toolCallArgs;
 }
 
 function extractStartBag(events: AdkEvent[]): StartBagResult | null {

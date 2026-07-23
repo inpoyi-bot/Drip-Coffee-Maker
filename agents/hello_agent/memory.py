@@ -312,7 +312,16 @@ def record_cup(
             bag["phase"] = "grind_converged"
             tool_context.state["bag"] = bag
 
-    return {"ok": True, "recorded_cup_no": record["cup_no"], "flags_derived": flags_derived}
+    # The caller needs the exact persisted shape to render the same trajectory
+    # the agent will read next turn.  Keep the receipt fields for existing
+    # callers, and return the immutable record alongside them rather than
+    # asking a client to reconstruct it from tool-call arguments.
+    return {
+        "ok": True,
+        "recorded_cup_no": record["cup_no"],
+        "flags_derived": flags_derived,
+        "record": record,
+    }
 
 
 # ── 注入:把结构化轨迹渲染成一段文本,喂给 instruction ───────────────
