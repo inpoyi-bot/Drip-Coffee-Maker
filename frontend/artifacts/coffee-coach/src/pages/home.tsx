@@ -262,7 +262,7 @@ export default function Home() {
     <div className="coldstart-page p-6 space-y-10">
       <div className="coldstart-intro space-y-2">
         <h1 className="font-sans font-medium text-2xl text-foreground">冷启动录入</h1>
-        <p className="text-muted-foreground text-sm">告诉仪器你的初始状态，以建立校准基线。</p>
+        <p className="text-muted-foreground text-sm">告诉我你的初始状态，以建立校准基线。</p>
       </div>
 
       <div className="coldstart-form space-y-9">
@@ -287,7 +287,7 @@ export default function Home() {
           <Label required>烘焙日期</Label>
           <Input 
             type="text" 
-            placeholder="例如: 8天前 / 2023-10-01" 
+            placeholder="例如: 8天前 / 2026-05-01"
             value={roastDate} 
             onChange={(e: any) => setRoastDate(e.target.value)} 
             disabled={roastDateUnknown}

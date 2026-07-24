@@ -339,7 +339,7 @@ export default function Trajectory() {
     let relativeHeight = 0;
 
     return history.map((cup, i) => {
-      if (cup.gradient === '变好+同向' || cup.gradient === '变好' || cup.gradient === '已收敛') {
+      if (cup.gradient === '变好+同向' || cup.gradient === '变好') {
         relativeHeight += 1;
       } else if (cup.gradient === '变坏') {
         relativeHeight -= 1;
@@ -368,6 +368,15 @@ export default function Trajectory() {
       };
     });
   }, [history]);
+  const trajectoryMin = Math.min(0, ...chartData.map((cup) => cup.value));
+  const trajectoryMax = Math.max(0, ...chartData.map((cup) => cup.value));
+  const trajectoryTicks = [...new Set([trajectoryMin, 0, trajectoryMax])].sort((a, b) => a - b);
+  const trajectoryTickLabel = (value: number) => {
+    if (value === 0) return '起点';
+    if (value === trajectoryMax && trajectoryMax > 0) return '好于起点';
+    if (value === trajectoryMin && trajectoryMin < 0) return '差于起点';
+    return '';
+  };
 
   return (
     <div className="trajectory-page p-4 space-y-6">
@@ -376,7 +385,7 @@ export default function Trajectory() {
         <p className="trajectory-proof text-muted-foreground text-xs font-mono border border-border bg-card p-2 rounded mt-2 block">
           {isVisualSample
             ? '视觉样张：来自 demo-arc，不写入你的保存记录。'
-            : '这些杯子来自你保存的记录，不是当前对话上下文。'}
+            : '这些数据来自你保存的记录，不是当前对话上下文。'}
         </p>
       </div>
 
@@ -455,22 +464,24 @@ export default function Trajectory() {
                     tickMargin={10}
                   />
                   <YAxis
-                    domain={['dataMin - 1', 'dataMax + 1']}
+                    domain={[trajectoryMin - 1, trajectoryMax + 1]}
+                    ticks={trajectoryTicks}
                     tick={{ fill: 'hsl(var(--slate))', fontSize: 10, fontFamily: 'var(--app-font-mono)' }}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => `${value > 0 ? '+' : ''}${value}`}
-                    width={34}
+                    tickFormatter={trajectoryTickLabel}
+                    width={64}
                   />
                   <Tooltip
-                    contentStyle={{ backgroundColor: 'hsl(var(--surface-raised))', border: '1px solid hsl(var(--line))', borderRadius: '6px', fontSize: '12px', fontFamily: 'var(--app-font-mono)', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.28)' }}
+                    position={{ x: 8, y: 8 }}
+                    contentStyle={{ backgroundColor: 'hsl(var(--surface-raised))', border: '1px solid hsl(var(--line))', borderRadius: '6px', fontSize: '12px', fontFamily: 'var(--app-font-mono)', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.28)', maxWidth: 240, whiteSpace: 'normal', wordBreak: 'break-word' }}
                     itemStyle={{ color: 'hsl(var(--text))' }}
                     formatter={(value: any, name: any, props: any) => [props.payload.tooltipText, props.payload.tooltipLabel]}
                     labelStyle={{ color: 'hsl(var(--text-dim))', marginBottom: '4px' }}
                   />
-                  <Area type="monotone" dataKey="value" stroke="none" fill="url(#trajectory-fill)" isAnimationActive={false} />
+                  <Area type="linear" dataKey="value" tooltipType="none" stroke="none" fill="url(#trajectory-fill)" isAnimationActive={false} />
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="value"
                     stroke="url(#trajectory-line)"
                     strokeWidth={2}

@@ -80,7 +80,8 @@ C. **味觉校准(只前置一句,别在开局砸一堆):**
 
    **萃取毕业 gate(拦截欠萃伪装毕业,E12):**
    这一步专门审查"我有没有资格写 `gradient=已收敛`"。四项看似全绿(`vs_prev 没变`、流速正常、床面平、无挂粉环、有一点甜)只是**诱饵**,不能自动毕业;E11 的口味层只信任已经写下的 `gradient=已收敛`,这里就是上游责任。
-   - **表面接近毕业,但绝对甜感不足/不确定**:用户说"有一点甜/一点回甘",同时又说"甜感不明显/不确定是否酸甜平衡/整体偏薄/酸压甜",且没有明确轴到顶证据 → **停在萃取层 probe**,不要宣布毕业、不要进 preference probe。调 `record_cup(turn_type=probe, decision=探针, gradient="没变", flags_asserted=["absolute_extraction_uncertain"], confidence=medium)`,不要带 `direction`/`step`/`terminate_reason`;然后问**绝对刻度化甜探针**:"这点甜是能清楚盖过酸、喝完嘴里还有持续回甘,还是只是比最开始好一些、需要努力才尝到一点点甜?整体是酸甜平衡,还是仍然酸压甜、偏薄?"
+   - **表面接近毕业,但绝对甜感不足/不确定**:用户说"有一点甜/一点回甘/尝到了但说不清",同时又说"甜感不明显/不确定是否酸甜平衡/整体偏薄/酸压甜/说不清是否已经满意",且没有明确轴到顶证据 → **停在萃取层 probe**,不要宣布毕业、不要进 preference probe。调 `record_cup(turn_type=probe, decision=探针, flags_asserted=["absolute_extraction_uncertain"], confidence=medium)`,不要带 `direction`/`step`/`terminate_reason`;`gradient` 忠实记录本杯相对上杯的搜索变化(用户明确说变好就填 `变好`,说没变才填 `没变`),但绝不填 `已收敛`;然后问**绝对刻度化甜探针**:"这点甜是能清楚盖过酸、喝完嘴里还有持续回甘,还是只是比最开始好一些、需要努力才尝到一点点甜?整体是酸甜平衡,还是仍然酸压甜、偏薄?"
+   - **P3 UI 路由硬约束**:只要你准备追问"这杯是否满意/研磨是否到位/甜感够不够",就必须先按上一条写入 `turn_type=probe` + `decision=探针` + `flags_asserted=["absolute_extraction_uncertain"]`;绝不只输出一段没有 `record_cup` 的自由文本追问。前端靠这个 flag 显示 P3 选项。唯一例外是用户已经明确说"我很满意/整体满意",此时不要重复确认,直接按下方满意终止规则写 `terminate_reason=satisfied`。
    - **到研磨轴极限,但绝对萃取仍未毕业**:用户明确说已经到最细可用位置,再细会堵/细粉很多/流速开始不稳定;同时甜感仍弱、酸压甜、偏薄 → 判**萃取层 underextraction plateau**。调 `record_cup(turn_type=terminate, decision=停手, gradient="没变", terminate_reason="axis_limit_underextracted", flags_asserted=["absolute_extraction_not_met","axis_limit_reached"], confidence=medium)`,不要带 `direction`/`step`,也不要带 `limitation_noted`。可一句话说 brew 端也许有版本外出口(升温/延长接触/调整比例),但本版不执行。
    - **硬禁**:以上两种都不得写 `gradient=已收敛`;不得用 `preference_unspecified`;不得填 `flavor_mismatch`/`taste_unaddressable`/`satisfied`;不得换豆;不得继续 `direction=finer`;不得解冻水温、比例、粉量或手法。
 
